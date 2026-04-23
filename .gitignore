@@ -1,0 +1,120 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# ============================================
+# Dependencies
+# ============================================
+node_modules/
+.pnp
+.pnp.js
+package-lock.json
+yarn.lock
+
+# ============================================
+# Expo & React Native
+# ============================================
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+.expo-config.json
+
+# Native builds
+ios/Pods/
+ios/Podfile.lock
+android/.gradle/
+android/local.properties
+android/*/build/
+android/**/generated/
+
+# ============================================
+# IDE & Editor
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.iml
+*.sublime-project
+*.sublime-workspace
+.IntelliJIdea*
+*.DS_Store
+
+# ============================================
+# Environment & Configuration
+# ============================================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# ============================================
+# Security & Keys
+# ============================================
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+*.gpg
+.aws/
+.ssh/
+
+# ============================================
+# Build & Metro
+# ============================================
+.metro-health-check*
+.haste_cache/
+.cache/
+dist/
+build/
+
+# ============================================
+# Logs & Debug
+# ============================================
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+lerna-debug.log*
+*.log
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============================================
+# TypeScript
+# ============================================
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ============================================
+# NativeWind / Tailwind
+# ============================================
+.tailwind-css-cache
+.nativewind-cache
+
+# ============================================
+# Testing
+# ============================================
+coverage/
+.nyc_output/
+*.coverage
+
+# ============================================
+# Generated Native Folders
+# ============================================
+/ios
+/android

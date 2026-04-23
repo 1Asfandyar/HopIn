@@ -1,0 +1,66 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#007AFF',
+        secondary: '#5AC8FA',
+        success: '#34C759',
+        error: '#FF3B30',
+        warning: '#FF9500',
+        background: '#F5F5F5',
+        surface: '#FFFFFF',
+        text: {
+          primary: '#000000',
+          secondary: '#666666',
+          tertiary: '#999999',
+        },
+        border: '#E0E0E0',
+      },
+      spacing: {
+        xs: '4px',
+        sm: '8px',
+        md: '16px',
+        lg: '24px',
+        xl: '32px',
+        xxl: '48px',
+      },
+      fontSize: {
+        xs: ['12px', { lineHeight: '16px' }],
+        sm: ['14px', { lineHeight: '20px' }],
+        base: ['16px', { lineHeight: '24px' }],
+        lg: ['18px', { lineHeight: '26px' }],
+        xl: ['20px', { lineHeight: '28px' }],
+        '2xl': ['24px', { lineHeight: '32px' }],
+        '3xl': ['32px', { lineHeight: '40px' }],
+      },
+      fontWeight: {
+        thin: '100',
+        extralight: '200',
+        light: '300',
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+        extrabold: '800',
+        black: '900',
+      },
+      borderRadius: {
+        none: '0',
+        sm: '4px',
+        md: '8px',
+        lg: '12px',
+        xl: '16px',
+        full: '9999px',
+      },
+      boxShadow: {
+        sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        md: '0 2px 4px 0 rgba(0, 0, 0, 0.1)',
+        lg: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        xl: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+      },
+    },
+  },
+  plugins: [],
+}
