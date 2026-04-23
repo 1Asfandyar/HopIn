@@ -1,6 +1,6 @@
-# HopIn - React Native App
+# Salah Tracker - React Native App
 
-A modern, scalable React Native application built with Expo, featuring clean architecture, NativeWind (Tailwind CSS), and best practices from Obytes.
+A modern, scalable React Native application for tracking Islamic prayers (Salah) built with Expo, featuring clean architecture, NativeWind (Tailwind CSS), and best practices from Obytes.
 
 ## 📱 Features
 
@@ -37,34 +37,35 @@ A modern, scalable React Native application built with Expo, featuring clean arc
 ```
 src/
 ├── app/                          # Expo Router navigation
-│   ├── _layout.tsx              # Root layout
-│   ├── (auth)/                  # Auth stack - Login/Register/etc
+│   ├── _layout.tsx              # Root layout (imports global.css)
+│   ├── index.tsx                # Entry point - Main dashboard
+│   ├── auth/                    # Auth stack - Login/Register/etc
 │   │   ├── _layout.tsx
 │   │   ├── login.tsx
 │   │   ├── register.tsx
 │   │   └── forgot-password.tsx
-│   └── (tabs)/                  # Tab navigation - Main features
+│   └── tabs/                    # Tab navigation - Main features
 │       ├── _layout.tsx
-│       ├── index.tsx            # Home tab
-│       ├── explore.tsx
-│       ├── wallet.tsx
-│       └── menu.tsx
+│       ├── today.tsx            # Today's prayers
+│       ├── schedule.tsx         # Prayer schedule
+│       ├── statistics.tsx       # Prayer statistics
+│       └── settings.tsx         # Settings
 │
 ├── components/                  # Reusable components
 │   ├── ui/                      # Generic UI components
 │   │   ├── Button.tsx
 │   │   ├── Input.tsx
-│   │   ├── Card.tsx
-│   │   ├── Avatar.tsx
 │   │   ├── Badge.tsx
+│   │   ├── TimePicker.tsx
 │   │   └── Text.tsx
 │   ├── layout/                  # Layout components
 │   │   ├── Screen.tsx
 │   │   ├── Header.tsx
 │   │   └── TabBar.tsx
 │   └── features/                # Feature-specific components
-│       ├── auth/
-│       ├── home/
+│       ├── auth/                # Auth-related components
+│       ├── home/                # Dashboard components
+│       └── menu/                # Menu/settings components
 │       └── menu/
 │
 ├── hooks/                       # Custom React hooks
@@ -74,12 +75,14 @@ src/
 │   └── index.ts
 │
 ├── store/                       # Zustand state stores
-│   ├── authStore.ts
-│   ├── userStore.ts
+│   ├── authStore.ts             # Authentication state
+│   ├── salahStore.ts            # Prayer tracking state
+│   ├── userStore.ts             # User preferences
 │   └── index.ts
 │
 ├── services/                    # API & external services
 │   ├── api.ts                   # API client
+│   ├── salah.service.ts         # Prayer times & tracking
 │   ├── auth.service.ts
 │   └── user.service.ts
 │
@@ -118,7 +121,7 @@ src/
 ### Installation
 
 1. **Clone the repository**
-```bash
+```salah-tracker
 git clone <repository-url>
 cd hopin
 ```
@@ -554,7 +557,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ---
 
-## 👥 Team
+## 👥 Teamfollowing [Obytes](https://obytes.com) best practices for scalable React Native app
 
 Built with ❤️ by the HopIn team, following [Obytes](https://obytes.com) best practices.
 
@@ -562,8 +565,7 @@ Built with ❤️ by the HopIn team, following [Obytes](https://obytes.com) best
 
 ## 📞 Support
 
-For issues and questions:
-- 📧 Email: support@hopinapp.com
+For Email: support@hopinapp.com
 - 🐛 GitHub Issues: [Report a bug](https://github.com/yourrepo/issues/new)
 - 💬 Discussions: [Ask a question](https://github.com/yourrepo/discussions)
 
@@ -573,11 +575,13 @@ For issues and questions:
 
 - [ ] Authentication (sign up, login, password reset)
 - [ ] User profiles
-- [ ] Push notifications
-- [ ] Offline support
+- [ ] Prayer time tracking & reminders
+- [ ] Push notifications for prayer times
+- [ ] Prayer statistics & analytics
+- [ ] User profiles & settings
+- [ ] Offline support & sync
 - [ ] Dark mode
-- [ ] Multi-language support
-- [ ] Unit & integration tests
+- [ ] Multi-language support (Arabic, English, Urdu, etc.)ts
 
 ---
 
