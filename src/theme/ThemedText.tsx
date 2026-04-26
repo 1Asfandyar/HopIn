@@ -1,5 +1,7 @@
-import { TextInput } from 'react-native'
-import { FontWeight, ThemedTextInputProps } from '../type'
+import { View, Text } from 'react-native'
+import { ThemedTextProps, FontWeight} from './types'
+import React from 'react'
+
 
 const fontMap: Record<FontWeight, string>  = {
   regular: 'Poppins_400Regular',
@@ -8,9 +10,9 @@ const fontMap: Record<FontWeight, string>  = {
   bold: 'Poppins_700Bold',
 }
 
-const ThemedInput = ({ weight = 'regular', style, ...props }: ThemedTextInputProps)  => {
+const ThemedText = ({weight= 'regular', style, ...props}: ThemedTextProps) => {
   return (
-    <TextInput
+    <Text
       {...props}
       style={[
         {
@@ -22,4 +24,4 @@ const ThemedInput = ({ weight = 'regular', style, ...props }: ThemedTextInputPro
   )
 }
 
-export default ThemedInput
+export default ThemedText
