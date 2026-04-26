@@ -239,14 +239,14 @@ import { create } from 'zustand'
 interface AuthState {
   isAuthenticated: boolean
   user: User | null
-  login: (email: string, password: string) => Promise<void>
+  login: (phone: number, password: string) => Promise<void>
   logout: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
-  login: async (email, password) => {
+  login: async (phone, password) => {
     // Login logic
     set({ isAuthenticated: true })
   },

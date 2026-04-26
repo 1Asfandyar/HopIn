@@ -1,5 +1,5 @@
 import ThemedText from '@/theme/ThemedText'
-import { Image, View } from 'react-native'
+import { Image, View, ScrollView,  KeyboardAvoidingView, Platform  } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LoginViewProps } from './types'
 import ThemedInput from '@/theme/ThemedInput'
@@ -15,7 +15,6 @@ const LoginView = (LoginParams: LoginViewProps) => {
         style={{ width:'55%', height: '45%' }}
         resizeMode="contain"/>
         <ThemedText className="text-xl text-gray-500" weight="semiBold">Welcome Back!</ThemedText>
-        <ThemedText className="text-gray-500">Login to continue your journey</ThemedText>
       </View>
 
       <View className=' flex-[0.35]  justify-center items-center'>
@@ -29,20 +28,32 @@ const LoginView = (LoginParams: LoginViewProps) => {
           <ThemedText className='text-gray-700'>Mobile Number</ThemedText>
           <ThemedInput
             placeholder='+923456789101'
-            value={LoginParams.email}
-            onChangeText={LoginParams.onEmailChange}
-            onBlur={LoginParams.onEmailBlur}
+            value={LoginParams.phone}
+            onChangeText={LoginParams.onPhoneChange}
+            onBlur={LoginParams.onPhoneBlur}
+            leftIcon='phone-portrait'
           />
+          {LoginParams.phoneTouched && LoginParams.phoneError && (
+            <ThemedText style={{ color: '#EF4444', fontSize: 12 }}>
+              {LoginParams.phoneError}
+            </ThemedText>
+          )}
         </View>
         <View className='mb-2'>
           <ThemedText>Password</ThemedText>
           <ThemedInput
             placeholder="••••••••"
+            leftIcon= 'lock-closed'
             value={LoginParams.password}
             onChangeText={LoginParams.onPasswordChange}
             onBlur={LoginParams.onPasswordBlur}
             containerClassName ='rounded-l'
           />
+          {LoginParams.passwordTouched && LoginParams.passwordError && (
+            <ThemedText style={{ color: '#EF4444', fontSize: 12 }}>
+              {LoginParams.passwordError}
+            </ThemedText>
+          )}
         </View>
         <ThemedButton
           title={LoginParams.isSubmitting ? 'Logging in...' : 'Login'}
@@ -51,6 +62,7 @@ const LoginView = (LoginParams: LoginViewProps) => {
           weight="medium"
           containerClassName="bg-primary py-4 rounded-2xl justify-center items-center"
           textClassName="text-lg text-primary"
+          onPress={LoginParams.onLoginPress}
         />
       </View>
 

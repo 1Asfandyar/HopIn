@@ -2,9 +2,9 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const validationSchema = Yup.object({
-    email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
+    phone: Yup.string()
+    .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits')
+    .required('Phone number is required'),
     password: Yup.string()
     .min(6, 'Password must be at least 6 characters')
     .required('Password is required'),
@@ -13,7 +13,7 @@ const validationSchema = Yup.object({
 export const useLogin = () =>{
     const formik = useFormik({
         initialValues: {
-            email: '',
+            phone: '',
             password: '',
         },
         validationSchema,
