@@ -1,20 +1,18 @@
 import ThemedText from '@/theme/ThemedText'
-import { Image, View, ScrollView,  KeyboardAvoidingView, Platform  } from 'react-native'
+import { Image, View  } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LoginViewProps } from './types'
 import ThemedInput from '@/theme/ThemedInput'
 import ThemedButton from '@/theme/ThemedButton'
-import { useRouter } from 'expo-router'
 
 const LoginView = (LoginParams: LoginViewProps) => {
-  const router = useRouter()
   return (
     <SafeAreaView className='flex-1 bg-white'>
       <View className="flex-[0.175]  bg-white justify-center items-center">
         <Image source={require('../assets/logos/hopin_light.png')}
         style={{ width:'55%', height: '45%' }}
         resizeMode="contain"/>
-        <ThemedText className="text-xl text-gray-500" weight="semiBold">Welcome Back!</ThemedText>
+        <ThemedText className="text-2xl" weight="semiBold">Welcome Back!</ThemedText>
       </View>
 
       <View className=' flex-[0.35]  justify-center items-center'>
@@ -25,22 +23,32 @@ const LoginView = (LoginParams: LoginViewProps) => {
 
       <View className=' flex-[0.3]  mx-6'>
         <View>
-          <ThemedText className='text-gray-700'>Mobile Number</ThemedText>
+          <View className='flex-row'>
+            <ThemedText className='text-gray-700 pr-2'>Mobile Number</ThemedText>
+            {LoginParams.phoneTouched && LoginParams.phoneError && (
+              <ThemedText className="text-red-500">
+                ({LoginParams.phoneError})
+              </ThemedText>
+            )}
+          </View>
           <ThemedInput
             placeholder='+923456789101'
+            keyboardType="numeric"
             value={LoginParams.phone}
             onChangeText={LoginParams.onPhoneChange}
             onBlur={LoginParams.onPhoneBlur}
             leftIcon='phone-portrait'
           />
-          {LoginParams.phoneTouched && LoginParams.phoneError && (
-            <ThemedText style={{ color: '#EF4444', fontSize: 12 }}>
-              {LoginParams.phoneError}
-            </ThemedText>
-          )}
         </View>
         <View className='mb-2'>
-          <ThemedText>Password</ThemedText>
+          <View className='flex-row'>
+            <ThemedText className='text-gray-700 pr-2'>Password</ThemedText>
+            {LoginParams.passwordTouched && LoginParams.passwordError && (
+              <ThemedText className="text-red-500">
+                ({LoginParams.passwordError})
+              </ThemedText>
+            )}
+          </View>
           <ThemedInput
             placeholder="••••••••"
             leftIcon= 'lock-closed'
@@ -49,11 +57,6 @@ const LoginView = (LoginParams: LoginViewProps) => {
             onBlur={LoginParams.onPasswordBlur}
             containerClassName ='rounded-l'
           />
-          {LoginParams.passwordTouched && LoginParams.passwordError && (
-            <ThemedText style={{ color: '#EF4444', fontSize: 12 }}>
-              {LoginParams.passwordError}
-            </ThemedText>
-          )}
         </View>
         <ThemedButton
           title={LoginParams.isSubmitting ? 'Logging in...' : 'Login'}
@@ -85,7 +88,7 @@ const LoginView = (LoginParams: LoginViewProps) => {
             title="Register"
             variant="ghost"
             weight="medium"
-            onPress={() => router.push('/register')}
+            onPress={() => LoginParams.router.navigate('/register')}
             containerClassName="self-start py-1"
             textClassName="text-l text-primary"
           />

@@ -1,3 +1,5 @@
+import type { Router } from 'expo-router'
+
 export interface LoginViewProps {
   // These come from Formik (from the parent container)
   phone: string                              // Current phone value
@@ -12,4 +14,31 @@ export interface LoginViewProps {
   onPhoneBlur: () => void                    // When user leaves phone field
   onPasswordBlur: () => void                 // When user leaves password field
   onLoginPress: () => void    
+  router: Router
+}
+
+export interface RegisterViewProps {
+  fullName: string
+  phone: number | null
+  email: string
+  password: string
+  fullNameError: string | undefined
+  phoneError: string | undefined
+  emailError: string | undefined
+  passwordError: string | undefined
+  fullNameTouched: boolean | undefined
+  phoneTouched: boolean | undefined
+  emailTouched: boolean | undefined
+  passwordTouched: boolean | undefined
+  isSubmitting: boolean
+  onFullNameChange: (fullName: string) => void
+  onPhoneChange: (phone: string) => void
+  onEmailChange: (email: string) => void
+  onPasswordChange: (password: string) => void
+  onFullNameBlur: () => void
+  onPhoneBlur: () => void
+  onEmailBlur: () => void
+  onPasswordBlur: () => void
+  onRegisterPress: () => void
+  router: Router
 }
