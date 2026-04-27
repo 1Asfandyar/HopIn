@@ -1,3 +1,4 @@
+import { useAuth } from '@/store/useAuth'
 import { useRouter } from 'expo-router'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
@@ -26,6 +27,7 @@ const validationSchema = Yup.object({
 
 export const useRegister = () =>{
     const router = useRouter()
+    const register = useAuth((state) => state.register);
     const formik = useFormik({
         initialValues: {
             fullName: '',
@@ -35,16 +37,13 @@ export const useRegister = () =>{
         },
         validationSchema,
         onSubmit: async (values) => {
-            // Handle registration logic here
-            console.log('Registration values:', values)
-            // TODO: Call API here
-            // const response = await fetch('https://api.example.com/login', {
-            //   method: 'POST',
-            //   body: JSON.stringify(values),
-            // })
-
-            router.replace('/dashboard')
-        
+            try{
+                console.log('Registration values:', values)
+                await register(values.email, values.password)
+                router.replace("/"); 
+            }catch(error){
+                console.error('Registration error:', error)
+            }
         }
     })
     return {...formik, router}

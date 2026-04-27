@@ -1,26 +1,32 @@
 import { useLogin } from '@/features/auth/hooks/useLogin'
 import LoginScreen from '@/features/auth/screens/LoginScreen'
-import { useRouter } from 'expo-router'
-
 
 const login = () => {
-  const formik = useLogin()
-  const router = useRouter()
+  const {
+    values, 
+    errors, 
+    touched, 
+    isSubmitting, 
+    setFieldValue, 
+    setFieldTouched, 
+    handleSubmit,
+    router
+  } = useLogin()
 
   return (
     <LoginScreen
-      phone={formik.values.phone}
-      password={formik.values.password}
-      phoneError={formik.errors.phone}
-      passwordError={formik.errors.password}
-      phoneTouched={formik.touched.phone}
-      passwordTouched={formik.touched.password}
-      isSubmitting={formik.isSubmitting}
-      onPhoneChange={(phone) => formik.setFieldValue('phone', phone)}
-      onPasswordChange={(password) => formik.setFieldValue('password', password)}
-      onPhoneBlur={() => formik.setFieldTouched('phone', true)}
-      onPasswordBlur={() => formik.setFieldTouched('password', true)}
-      onLoginPress={() => formik.handleSubmit()}
+      phone={values.phone}
+      password={values.password}
+      phoneError={errors.phone}
+      passwordError={errors.password}
+      phoneTouched={touched.phone}
+      passwordTouched={touched.password}
+      isSubmitting={isSubmitting}
+      onPhoneChange={(phone) => setFieldValue('phone', phone)}
+      onPasswordChange={(password) => setFieldValue('password', password)}
+      onPhoneBlur={() => setFieldTouched('phone', true)}
+      onPasswordBlur={() => setFieldTouched('password', true)}
+      onLoginPress={() => handleSubmit()}
       router={router}
     />
   )

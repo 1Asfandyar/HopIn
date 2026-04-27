@@ -26,11 +26,12 @@ export default function RootLayout() {
         headerShown: false,
       }}
     >
-    <Stack>
-      <Stack.Screen name="index" options={{ title: "Home"}} />
-      <Stack.Screen name="(auth)/login" options={{ title: "Login" }} />
-      <Stack.Screen name="(auth)/register" options={{ title: "Sign Up" }} />
-    </Stack>
+      <Stack>
+        <Stack.Screen name="index" options={{ title: "Home"}} />
+        <Stack.Screen name="(auth)/login" options={{ title: "Login" }} />
+        <Stack.Screen name="(auth)/register" options={{ title: "Sign Up" }} />
+        <Stack.Screen name="(main)/welcome" options={{ title: "Welcome" }} />
+      </Stack>
     </Stack>
   )
 }

@@ -1,3 +1,5 @@
+import { useAuth } from '@/store/useAuth'
+import { useRouter } from 'expo-router'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
@@ -11,6 +13,8 @@ const validationSchema = Yup.object({
 })
 
 export const useLogin = () =>{
+    const router = useRouter()
+    const login = useAuth((state) => state.login);
     const formik = useFormik({
         initialValues: {
             phone: '',
@@ -18,16 +22,14 @@ export const useLogin = () =>{
         },
         validationSchema,
         onSubmit: async (values) => {
-            // Handle login logic here
-            console.log('Login values:', values)
-            // TODO: Call API here
-            // const response = await fetch('https://api.example.com/login', {
-            //   method: 'POST',
-            //   body: JSON.stringify(values),
-            // })
-        
+            try {
+                console.log('Login values:', values)
+                await login(values.phone, values.password)
+            } catch (error) {
+                console.error('Login error:', error)
+            }
         },
     })
 
-    return formik
+    return {...formik, router}
 }
