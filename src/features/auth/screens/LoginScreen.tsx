@@ -1,22 +1,22 @@
-import ThemedText from '@/theme/ThemedText'
+import ThemedText from '@/theme/components/ThemedText'
 import { Image, View  } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { LoginViewProps } from './types'
-import ThemedInput from '@/theme/ThemedInput'
-import ThemedButton from '@/theme/ThemedButton'
+import { LoginViewProps } from '../types'
+import ThemedInput from '@/theme/components/ThemedInput'
+import ThemedButton from '@/theme/components/ThemedButton'
 
-const LoginView = (LoginParams: LoginViewProps) => {
+const LoginScreen = (LoginParams: LoginViewProps) => {
   return (
     <SafeAreaView className='flex-1 bg-white'>
       <View className="flex-[0.175]  bg-white justify-center items-center">
-        <Image source={require('../assets/logos/hopin_light.png')}
+        <Image source={require('../../../assets/logos/hopin_light.png')}
         style={{ width:'55%', height: '45%' }}
         resizeMode="contain"/>
         <ThemedText className="text-2xl" weight="semiBold">Welcome Back!</ThemedText>
       </View>
 
       <View className=' flex-[0.35]  justify-center items-center'>
-        <Image source={require('../assets/illustrations/hopin_cab.png')}
+        <Image source={require('../../../assets/illustrations/hopin_cab.png')}
           style={{width: '70%', height: '100%'}}
           resizeMode="contain" />
       </View>
@@ -98,4 +98,4 @@ const LoginView = (LoginParams: LoginViewProps) => {
   )
 }
 
-export default LoginView
+export default LoginScreen

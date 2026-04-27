@@ -1,6 +1,6 @@
 import { View, TextInput, Text, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { FontWeight, ThemedTextInputProps } from './types'
+import { FontWeight, ThemedTextInputProps } from '../types'
 import ThemedText from './ThemedText'
 
 const fontMap: Record<FontWeight, string> = {

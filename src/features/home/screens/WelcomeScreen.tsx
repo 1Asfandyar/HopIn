@@ -1,15 +1,15 @@
 import { View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import ThemedText from '@/theme/ThemedText'
+import ThemedText from '@/theme/components/ThemedText'
 import { useRouter } from 'expo-router'
-import ThemedButton from '@/theme/ThemedButton'
+import ThemedButton from '@/theme/components/ThemedButton'
 
-const WelcomeView = () => {
+const WelcomeScreen = () => {
 const router = useRouter()
   return (
     <SafeAreaView className="flex-1 bg-white">
         <View className="flex-[0.25] bg-white justify-center items-center">
-            <Image source={require('../assets/logos/hopin_light.png')}
+            <Image source={require('../../../assets/logos/hopin_light.png')}
             style={{ width:'45%', height: '35%' }}
             resizeMode="contain"/>
             <ThemedText className="text-xl text-gray-500" weight="semiBold">Share a ride.</ThemedText>
@@ -17,7 +17,7 @@ const router = useRouter()
         </View>
 
       <View className="flex-[0.6] bg-white justify-center items-center">
-        <Image source={require('../assets/illustrations/hopin_cab.png')} 
+        <Image source={require('../../../assets/illustrations/hopin_cab.png')}
           style={{width: '100%', height: '100%'}}
           resizeMode="cover" />
       </View>
@@ -48,4 +48,4 @@ const router = useRouter()
   )
 }
 
-export default WelcomeView
+export default WelcomeScreen

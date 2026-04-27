@@ -1,5 +1,5 @@
-import { useLogin } from '@/hooks/useLogin'
-import LoginView from '@/app/(screens)/LoginView'
+import { useLogin } from '@/features/auth/hooks/useLogin'
+import LoginScreen from '@/features/auth/screens/LoginScreen'
 import { useRouter } from 'expo-router'
 
 
@@ -8,7 +8,7 @@ const login = () => {
   const router = useRouter()
 
   return (
-    <LoginView 
+    <LoginScreen
       phone={formik.values.phone}
       password={formik.values.password}
       phoneError={formik.errors.phone}

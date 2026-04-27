@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import { ThemedTextProps, FontWeight} from './types'
+import { ThemedTextProps, FontWeight} from '../types'
 import React from 'react'
 
 

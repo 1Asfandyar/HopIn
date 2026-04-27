@@ -1,6 +1,6 @@
 import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { ThemedButtonProps } from './types'
+import { ThemedButtonProps } from '../types'
 import ThemedText from './ThemedText'
 
 const fontMap = {

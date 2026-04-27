@@ -1,5 +1,5 @@
-import { useRegister } from '@/hooks/useRegister'
-import RegisterView from '@/app/(screens)/RegisterView'
+import { useRegister } from '@/features/auth/hooks/useRegister'
+import RegisterScreen from '@/features/auth/screens/RegisterScreen'
 
 const register = () => {
     const {
@@ -14,7 +14,7 @@ const register = () => {
     } = useRegister()
   
   return (
-    <RegisterView 
+    <RegisterScreen
       fullName={values.fullName}
       phone={values.phone}
       email={values.email}

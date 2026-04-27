@@ -1,4 +1,4 @@
-# NativeWind Setup Guide for Hopin Tracker
+# NativeWind Setup Guide for Hopin
 
 ## ✅ Installation Complete
 
@@ -6,7 +6,7 @@ NativeWind (Tailwind CSS for React Native) is now configured in your project.
 
 ### Configuration Files
 - ✅ `tailwind.config.js` - Theme configuration
-- ✅ `babel.config.js` - Updated with nativewind/babel plugin
+- ✅ `babel.config.js` - Babel + module alias configuration
 - ✅ `metro.config.js` - Metro bundler configured
 
 ---
@@ -130,14 +130,15 @@ const styles = StyleSheet.create({
 ## 📋 Color Reference (from tailwind.config.js)
 
 ```
-bg-primary          → #007AFF (blue)
-bg-secondary        → #5AC8FA (light blue)
-bg-success          → #34C759 (green)
-bg-error            → #FF3B30 (red)
-bg-warning          → #FF9500 (orange)
-bg-background       → #F5F5F5 (light gray)
-bg-surface          → #FFFFFF (white)
-text-text-*         → text colors
+bg-primary          → #16A34A
+bg-primary-dark     → #158D1D
+bg-secondary        → #2563EB
+bg-light-blue       → #EFFFF7
+text-gray-900       → #111827
+text-gray-700       → #374151
+text-gray-600       → #4B5563
+text-gray-500       → #8F8290
+border-gray-200     → #E5E7EB
 ```
 
 ---
@@ -145,12 +146,13 @@ text-text-*         → text colors
 ## 📐 Spacing Reference
 
 ```
-gap-xs / p-xs / m-xs    → 4px
-gap-sm / p-sm / m-sm    → 8px
-gap-md / p-md / m-md    → 16px
-gap-lg / p-lg / m-lg    → 24px
-gap-xl / p-xl / m-xl    → 32px
-gap-xxl / p-xxl / m-xxl → 48px
+*-xs    → 4px
+*-sm    → 8px
+*-md    → 12px
+*-base  → 16px
+*-lg    → 24px
+*-xl    → 32px
+*-2xl   → 48px
 ```
 
 ---
@@ -168,10 +170,10 @@ gap-xxl / p-xxl / m-xxl → 48px
 
 ## 🚀 Next Steps
 
-1. Start using `className` instead of StyleSheet
-2. Reference `tailwind.config.js` for available utilities
-3. Override/extend theme values as needed
-4. Delete unused `theme/` files as you transition (colors.ts, typography.ts, etc.)
+1. Keep screen routes in `src/app` and UI implementation in `src/features`
+2. Reuse `src/theme/components` for shared button, input, and text primitives
+3. Reference `tailwind.config.js` for project colors, spacing, radius, and fonts
+4. Add feature-specific components under `src/features/<feature>/components` as screens grow
 
 ---
 
