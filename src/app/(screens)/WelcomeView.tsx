@@ -4,7 +4,7 @@ import ThemedText from '@/theme/ThemedText'
 import { useRouter } from 'expo-router'
 import ThemedButton from '@/theme/ThemedButton'
 
-const Welcome = () => {
+const WelcomeView = () => {
 const router = useRouter()
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -48,4 +48,4 @@ const router = useRouter()
   )
 }
 
-export default Welcome
+export default WelcomeView

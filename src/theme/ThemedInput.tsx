@@ -20,10 +20,11 @@ const ThemedInput = ({
   secureTextEntry,
   containerClassName = '',
   inputClassName = '',
+  borderClassName = '',
   ...props
 }: ThemedTextInputProps) => {
   return (
-    <View className={`mb-4 ${containerClassName}`}>
+    <View className={`mb-2 ${containerClassName} `}>
       
       {label && (
         <ThemedText className="text-gray-600 text-sm mb-1">
@@ -31,7 +32,7 @@ const ThemedInput = ({
         </ThemedText>
       )}
 
-      <View className="flex-row items-center border border-gray-200 rounded-xl px-4 py-4 bg-white">
+      <View className={`flex-row items-center border border-gray-200 rounded-xl px-4 py-4 bg-white + ${borderClassName}`}>
         
         {leftIcon && (
           <Ionicons

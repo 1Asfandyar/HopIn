@@ -1,5 +1,5 @@
 import { useLogin } from '@/hooks/useLogin'
-import LoginView from '@/(screens)/LoginView'
+import LoginView from '@/app/(screens)/LoginView'
 import { useRouter } from 'expo-router'
 
 

@@ -5,7 +5,6 @@ import { Image, View } from "react-native"
 import ThemedInput from "@/theme/ThemedInput"
 import ThemedButton from "@/theme/ThemedButton"
 
-
 const RegisterView = (RegisterParams: RegisterViewProps) => {
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -80,8 +79,9 @@ const RegisterView = (RegisterParams: RegisterViewProps) => {
                 onChangeText={RegisterParams.onPasswordChange}
                 onBlur={RegisterParams.onPasswordBlur}
                 leftIcon="lock-closed"
-                containerClassName="pb-4"
+                containerClassName='pb-4'
             />
+
             <ThemedButton
                 title="Register"
                 disabled={RegisterParams.isSubmitting}

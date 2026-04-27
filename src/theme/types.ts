@@ -16,6 +16,7 @@ export interface ThemedTextInputProps extends TextInputProps {
   onRightIconPress?: () => void
   containerClassName?: string
   inputClassName?: string
+  borderClassName?: string
 }
 
 export interface ThemedButtonProps extends TouchableOpacityProps {

@@ -1,7 +1,7 @@
-import Welcome from "@/(screens)/Welcome";
+import WelcomeView from "@/app/(screens)/WelcomeView";
 
 export default function Page() {
   return (
-    <Welcome />
+    <WelcomeView />
   );
 }

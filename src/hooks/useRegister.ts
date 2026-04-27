@@ -1,5 +1,5 @@
+import { useRouter } from 'expo-router'
 import {useFormik} from 'formik'
-import { FullWindowOverlay } from 'react-native-screens'
 import * as Yup from 'yup'
 
 const validationSchema = Yup.object({
@@ -18,11 +18,14 @@ const validationSchema = Yup.object({
     .required('Email is required'),
 
     password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters')
+    .matches(/[a-zA-Z]/, 'Password must contain letter')
+    .matches(/[0-9]/, 'Password must contain number')
+    .required('Password is required'),
 })
 
 export const useRegister = () =>{
+    const router = useRouter()
     const formik = useFormik({
         initialValues: {
             fullName: '',
@@ -39,8 +42,10 @@ export const useRegister = () =>{
             //   method: 'POST',
             //   body: JSON.stringify(values),
             // })
+
+            router.replace('/dashboard')
         
         }
     })
-    return formik
+    return {...formik, router}
 }
