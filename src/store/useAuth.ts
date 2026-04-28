@@ -11,6 +11,7 @@ export const useAuth = create<AuthState>(set => ({
 
     set({
       user: { id: '1', email },
+      isLoading: false,
     });
 
     console.log('Logged in:', email, password);

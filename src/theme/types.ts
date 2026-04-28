@@ -1,4 +1,10 @@
-import { TextInputProps, TextProps, TouchableOpacityProps } from 'react-native';
+import {
+  StyleProp,
+  TextInputProps,
+  TextProps,
+  TouchableOpacityProps,
+  ViewStyle,
+} from 'react-native';
 import { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -30,4 +36,27 @@ export interface ThemedButtonProps extends TouchableOpacityProps {
   iconSize?: number;
   containerClassName?: string;
   textClassName?: string;
+}
+
+export interface ThemedCardProps extends TouchableOpacityProps {
+  heading: string;
+  subHeading?: string;
+
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  touchable?: boolean;
+  disabled?: boolean;
+
+  leftIcon?: ComponentProps<typeof Ionicons>['name'];
+  rightIcon?: ComponentProps<typeof Ionicons>['name'];
+  iconSize?: number;
+
+  containerClassName?: string;
+  iconContainerClassName?: string;
+  leftIconContainerClassName?: string;
+  rightIconContainerClassName?: string;
+  iconContainerStyle?: StyleProp<ViewStyle>;
+  leftIconContainerStyle?: StyleProp<ViewStyle>;
+  rightIconContainerStyle?: StyleProp<ViewStyle>;
+  headingClassName?: string;
+  subHeadingClassName?: string;
 }

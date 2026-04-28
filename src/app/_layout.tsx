@@ -3,6 +3,7 @@ import '../../global.css'; // Make sure this is imported FIRST
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { FONT_SOURCES } from '../assets/fonts/font.config';
+import { fontFamilies, themeColors } from '@/theme/tokens';
 
 export default function RootLayout() {
   const [loaded] = useFonts(FONT_SOURCES);
@@ -15,13 +16,13 @@ export default function RootLayout() {
     <Stack
       screenOptions={{
         contentStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: themeColors.white,
         },
         headerTitleStyle: {
-          fontFamily: 'Poppins_600SemiBold',
+          fontFamily: fontFamilies.semiBold,
         },
         headerStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: themeColors.white,
         },
         headerShown: false,
       }}

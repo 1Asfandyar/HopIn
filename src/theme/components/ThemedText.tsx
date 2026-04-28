@@ -1,12 +1,6 @@
 import { Text } from 'react-native';
-import { ThemedTextProps, FontWeight } from '../types';
-
-const fontMap: Record<FontWeight, string> = {
-  regular: 'Poppins_400Regular',
-  medium: 'Poppins_500Medium',
-  semiBold: 'Poppins_600SemiBold',
-  bold: 'Poppins_700Bold',
-};
+import { ThemedTextProps } from '../types';
+import { fontFamilies } from '../tokens';
 
 const ThemedText = ({
   weight = 'regular',
@@ -18,7 +12,7 @@ const ThemedText = ({
       {...props}
       style={[
         {
-          fontFamily: fontMap[weight],
+          fontFamily: fontFamilies[weight],
         },
         style,
       ]}

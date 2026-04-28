@@ -25,6 +25,7 @@ export const useLogin = () => {
       try {
         console.log('Login values:', values);
         await login(values.phone, values.password);
+        router.replace('/');
       } catch (error) {
         console.error('Login error:', error);
       }

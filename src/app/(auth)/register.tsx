@@ -1,7 +1,7 @@
 import { useRegister } from '@/features/auth/hooks/useRegister';
 import RegisterScreen from '@/features/auth/screens/RegisterScreen';
 
-const register = () => {
+const Register = () => {
   const {
     values,
     errors,
@@ -42,4 +42,4 @@ const register = () => {
   );
 };
 
-export default register;
+export default Register;

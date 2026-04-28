@@ -15,6 +15,7 @@ export interface LoginViewProps {
   onPasswordBlur: () => void; // When user leaves password field
   onLoginPress: () => void;
   router: Router;
+  isKeyboardVisible: boolean;
 }
 
 export interface RegisterViewProps {

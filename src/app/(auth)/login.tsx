@@ -1,7 +1,9 @@
 import { useLogin } from '@/features/auth/hooks/useLogin';
 import LoginScreen from '@/features/auth/screens/LoginScreen';
+import { useEffect, useState } from 'react';
+import { Keyboard } from 'react-native';
 
-const login = () => {
+const Login = () => {
   const {
     values,
     errors,
@@ -12,6 +14,27 @@ const login = () => {
     handleSubmit,
     router,
   } = useLogin();
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
     <LoginScreen
@@ -28,8 +51,9 @@ const login = () => {
       onPasswordBlur={() => setFieldTouched('password', true)}
       onLoginPress={() => handleSubmit()}
       router={router}
+      isKeyboardVisible={isKeyboardVisible}
     />
   );
 };
 
-export default login;
+export default Login;

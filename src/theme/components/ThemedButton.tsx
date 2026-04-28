@@ -2,13 +2,7 @@ import { TouchableOpacity, ActivityIndicator, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedButtonProps } from '../types';
 import ThemedText from './ThemedText';
-
-const fontMap = {
-  regular: 'Poppins_400Regular',
-  medium: 'Poppins_500Medium',
-  semiBold: 'Poppins_600SemiBold',
-  bold: 'Poppins_700Bold',
-};
+import { themeColors } from '../tokens';
 
 const ThemedButton = ({
   title,
@@ -27,19 +21,19 @@ const ThemedButton = ({
 
   const variantStyles = {
     primary: {
-      container: 'bg-green-600',
+      container: 'bg-primary',
       text: 'text-white',
-      icon: '#ffffff',
+      icon: themeColors.white,
     },
     outline: {
-      container: 'border border-green-600 bg-transparent',
-      text: 'text-green-600',
-      icon: '#16A34A',
+      container: 'border border-primary bg-transparent',
+      text: 'text-primary',
+      icon: themeColors.primary,
     },
     ghost: {
       container: 'bg-transparent',
-      text: 'text-green-600',
-      icon: '#16A34A',
+      text: 'text-primary',
+      icon: themeColors.primary,
     },
   };
 
@@ -68,8 +62,8 @@ const ThemedButton = ({
           )}
 
           <ThemedText
+            weight={weight}
             className={`text-base ${colors.text} ${textClassName}`}
-            style={{ fontFamily: fontMap[weight] }}
           >
             {title}
           </ThemedText>

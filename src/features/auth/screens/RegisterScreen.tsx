@@ -120,7 +120,7 @@ const RegisterScreen = (RegisterParams: RegisterViewProps) => {
             title="Login"
             variant="ghost"
             weight="medium"
-            onPress={() => RegisterParams.router.navigate('/login')}
+            onPress={() => RegisterParams.router.replace('/login')}
             containerClassName="self-start py-1"
             textClassName="text-l text-primary"
           />

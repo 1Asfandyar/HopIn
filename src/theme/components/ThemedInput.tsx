@@ -1,14 +1,8 @@
 import { View, TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { FontWeight, ThemedTextInputProps } from '../types';
+import { ThemedTextInputProps } from '../types';
 import ThemedText from './ThemedText';
-
-const fontMap: Record<FontWeight, string> = {
-  regular: 'Poppins_400Regular',
-  medium: 'Poppins_500Medium',
-  semiBold: 'Poppins_600SemiBold',
-  bold: 'Poppins_700Bold',
-};
+import { fontFamilies, themeColors } from '../tokens';
 
 const ThemedInput = ({
   weight = 'regular',
@@ -30,13 +24,13 @@ const ThemedInput = ({
       )}
 
       <View
-        className={`flex-row items-center border border-gray-200 rounded-xl px-4 py-4 bg-white + ${borderClassName}`}
+        className={`flex-row items-center border border-gray-200 rounded-xl px-4 py-4 bg-white ${borderClassName}`}
       >
         {leftIcon && (
           <Ionicons
             name={leftIcon}
             size={18}
-            color="#9CA3AF"
+            color={themeColors.gray400}
             style={{ marginRight: 8 }}
           />
         )}
@@ -44,11 +38,11 @@ const ThemedInput = ({
         <TextInput
           {...props}
           secureTextEntry={secureTextEntry}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={themeColors.gray400}
           className={`text-xl flex-1 text-gray-800 ${inputClassName}`}
           style={[
             {
-              fontFamily: fontMap[weight],
+              fontFamily: fontFamilies[weight],
             },
             style,
           ]}
@@ -56,7 +50,7 @@ const ThemedInput = ({
 
         {rightIcon && (
           <TouchableOpacity onPress={onRightIconPress}>
-            <Ionicons name={rightIcon} size={18} color="#9CA3AF" />
+            <Ionicons name={rightIcon} size={18} color={themeColors.gray400} />
           </TouchableOpacity>
         )}
       </View>

@@ -10,7 +10,7 @@ const WelcomeScreen = () => {
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-[0.25] bg-white justify-center items-center">
         <Image
-          source={require('../../../assets/logos/hopin_light.png')}
+          source={require('../../../../assets/logos/hopin_light.png')}
           style={{ width: '45%', height: '35%' }}
           resizeMode="contain"
         />
@@ -24,7 +24,7 @@ const WelcomeScreen = () => {
 
       <View className="flex-[0.6] bg-white justify-center items-center">
         <Image
-          source={require('../../../assets/illustrations/hopin_cab.png')}
+          source={require('../../../../assets/illustrations/hopin_cab.png')}
           style={{ width: '100%', height: '100%' }}
           resizeMode="cover"
         />

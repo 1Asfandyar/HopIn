@@ -8,7 +8,7 @@ import ThemedButton from '@/theme/components/ThemedButton';
 const LoginScreen = (LoginParams: LoginViewProps) => {
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-[0.175]  bg-white justify-center items-center">
+      <View className="flex-[0.15]  bg-white justify-center items-center">
         <Image
           source={require('../../../assets/logos/hopin_light.png')}
           style={{ width: '55%', height: '45%' }}
@@ -18,14 +18,15 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
           Welcome Back!
         </ThemedText>
       </View>
-
-      <View className=" flex-[0.35]  justify-center items-center">
-        <Image
-          source={require('../../../assets/illustrations/hopin_cab.png')}
-          style={{ width: '70%', height: '100%' }}
-          resizeMode="contain"
-        />
-      </View>
+      {!LoginParams.isKeyboardVisible && (
+        <View className=" flex-[0.375]  justify-center items-center">
+          <Image
+            source={require('../../../assets/illustrations/hopin_cab.png')}
+            style={{ width: '70%', height: '100%' }}
+            resizeMode="contain"
+          />
+        </View>
+      )}
 
       <View className=" flex-[0.3]  mx-6">
         <View>
@@ -46,6 +47,7 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
             onChangeText={LoginParams.onPhoneChange}
             onBlur={LoginParams.onPhoneBlur}
             leftIcon="phone-portrait"
+            editable={!LoginParams.isSubmitting}
           />
         </View>
         <View className="mb-2">
@@ -64,6 +66,8 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
             onChangeText={LoginParams.onPasswordChange}
             onBlur={LoginParams.onPasswordBlur}
             containerClassName="rounded-l"
+            editable={!LoginParams.isSubmitting}
+            secureTextEntry
           />
         </View>
         <ThemedButton
@@ -86,6 +90,7 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
             leftIcon="logo-google"
             containerClassName="bg-primary py-4 rounded-2xl justify-center items-center"
             textClassName="text-lg text-primary"
+            disabled={LoginParams.isSubmitting}
           />
         </View>
         <View className="mt-4 flex-row justify-center items-center">
@@ -96,7 +101,7 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
             title="Register"
             variant="ghost"
             weight="medium"
-            onPress={() => LoginParams.router.navigate('/register')}
+            onPress={() => LoginParams.router.replace('/register')}
             containerClassName="self-start py-1"
             textClassName="text-l text-primary"
           />
