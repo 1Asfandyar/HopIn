@@ -1,9 +1,7 @@
-import WelcomeScreen from '@/features/home/screens/WelcomeScreen'
+import WelcomeScreen from '@/features/home/screens/WelcomeScreen';
 
 const welcome = () => {
-  return (
-    <WelcomeScreen />
-  )
-}
+  return <WelcomeScreen />;
+};
 
-export default welcome
+export default welcome;

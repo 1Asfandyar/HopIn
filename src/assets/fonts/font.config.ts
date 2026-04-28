@@ -11,4 +11,4 @@ export const FONT_SOURCES = {
   Poppins_700Bold: {
     uri: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf',
   },
-} as const
+} as const;

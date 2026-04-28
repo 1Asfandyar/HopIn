@@ -1,30 +1,38 @@
-import ThemedText from '@/theme/components/ThemedText'
-import { Image, View  } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { LoginViewProps } from '../types'
-import ThemedInput from '@/theme/components/ThemedInput'
-import ThemedButton from '@/theme/components/ThemedButton'
+import ThemedText from '@/theme/components/ThemedText';
+import { Image, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LoginViewProps } from '../types';
+import ThemedInput from '@/theme/components/ThemedInput';
+import ThemedButton from '@/theme/components/ThemedButton';
 
 const LoginScreen = (LoginParams: LoginViewProps) => {
   return (
-    <SafeAreaView className='flex-1 bg-white'>
+    <SafeAreaView className="flex-1 bg-white">
       <View className="flex-[0.175]  bg-white justify-center items-center">
-        <Image source={require('../../../assets/logos/hopin_light.png')}
-        style={{ width:'55%', height: '45%' }}
-        resizeMode="contain"/>
-        <ThemedText className="text-2xl" weight="semiBold">Welcome Back!</ThemedText>
+        <Image
+          source={require('../../../assets/logos/hopin_light.png')}
+          style={{ width: '55%', height: '45%' }}
+          resizeMode="contain"
+        />
+        <ThemedText className="text-2xl" weight="semiBold">
+          Welcome Back!
+        </ThemedText>
       </View>
 
-      <View className=' flex-[0.35]  justify-center items-center'>
-        <Image source={require('../../../assets/illustrations/hopin_cab.png')}
-          style={{width: '70%', height: '100%'}}
-          resizeMode="contain" />
+      <View className=" flex-[0.35]  justify-center items-center">
+        <Image
+          source={require('../../../assets/illustrations/hopin_cab.png')}
+          style={{ width: '70%', height: '100%' }}
+          resizeMode="contain"
+        />
       </View>
 
-      <View className=' flex-[0.3]  mx-6'>
+      <View className=" flex-[0.3]  mx-6">
         <View>
-          <View className='flex-row'>
-            <ThemedText className='text-gray-700 pr-2'>Mobile Number</ThemedText>
+          <View className="flex-row">
+            <ThemedText className="text-gray-700 pr-2">
+              Mobile Number
+            </ThemedText>
             {LoginParams.phoneTouched && LoginParams.phoneError && (
               <ThemedText className="text-red-500">
                 ({LoginParams.phoneError})
@@ -32,17 +40,17 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
             )}
           </View>
           <ThemedInput
-            placeholder='+923456789101'
+            placeholder="+923456789101"
             keyboardType="numeric"
             value={LoginParams.phone}
             onChangeText={LoginParams.onPhoneChange}
             onBlur={LoginParams.onPhoneBlur}
-            leftIcon='phone-portrait'
+            leftIcon="phone-portrait"
           />
         </View>
-        <View className='mb-2'>
-          <View className='flex-row'>
-            <ThemedText className='text-gray-700 pr-2'>Password</ThemedText>
+        <View className="mb-2">
+          <View className="flex-row">
+            <ThemedText className="text-gray-700 pr-2">Password</ThemedText>
             {LoginParams.passwordTouched && LoginParams.passwordError && (
               <ThemedText className="text-red-500">
                 ({LoginParams.passwordError})
@@ -51,11 +59,11 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
           </View>
           <ThemedInput
             placeholder="••••••••"
-            leftIcon= 'lock-closed'
+            leftIcon="lock-closed"
             value={LoginParams.password}
             onChangeText={LoginParams.onPasswordChange}
             onBlur={LoginParams.onPasswordBlur}
-            containerClassName ='rounded-l'
+            containerClassName="rounded-l"
           />
         </View>
         <ThemedButton
@@ -69,8 +77,8 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
         />
       </View>
 
-      <View className=' flex-[0.175] mx-6'>
-        <View className='pt-2'>
+      <View className=" flex-[0.175] mx-6">
+        <View className="pt-2">
           <ThemedButton
             title="Google"
             variant="outline"
@@ -93,9 +101,9 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
             textClassName="text-l text-primary"
           />
         </View>
-      </View>      
+      </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default LoginScreen
+export default LoginScreen;

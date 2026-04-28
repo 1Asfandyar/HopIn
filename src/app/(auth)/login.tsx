@@ -1,17 +1,17 @@
-import { useLogin } from '@/features/auth/hooks/useLogin'
-import LoginScreen from '@/features/auth/screens/LoginScreen'
+import { useLogin } from '@/features/auth/hooks/useLogin';
+import LoginScreen from '@/features/auth/screens/LoginScreen';
 
 const login = () => {
   const {
-    values, 
-    errors, 
-    touched, 
-    isSubmitting, 
-    setFieldValue, 
-    setFieldTouched, 
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    setFieldValue,
+    setFieldTouched,
     handleSubmit,
-    router
-  } = useLogin()
+    router,
+  } = useLogin();
 
   return (
     <LoginScreen
@@ -22,14 +22,14 @@ const login = () => {
       phoneTouched={touched.phone}
       passwordTouched={touched.password}
       isSubmitting={isSubmitting}
-      onPhoneChange={(phone) => setFieldValue('phone', phone)}
-      onPasswordChange={(password) => setFieldValue('password', password)}
+      onPhoneChange={phone => setFieldValue('phone', phone)}
+      onPasswordChange={password => setFieldValue('password', password)}
       onPhoneBlur={() => setFieldTouched('phone', true)}
       onPasswordBlur={() => setFieldTouched('password', true)}
       onLoginPress={() => handleSubmit()}
       router={router}
     />
-  )
-}
+  );
+};
 
-export default login
+export default login;

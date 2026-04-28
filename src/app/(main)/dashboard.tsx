@@ -1,9 +1,7 @@
-import DashboardScreen from '@/features/home/screens/DashboardScreen'
+import DashboardScreen from '@/features/home/screens/DashboardScreen';
 
 const dashboard = () => {
-  return (
-    <DashboardScreen />
-  )
-}
+  return <DashboardScreen />;
+};
 
-export default dashboard
+export default dashboard;

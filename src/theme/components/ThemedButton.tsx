@@ -1,14 +1,14 @@
-import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
-import { ThemedButtonProps } from '../types'
-import ThemedText from './ThemedText'
+import { TouchableOpacity, ActivityIndicator, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { ThemedButtonProps } from '../types';
+import ThemedText from './ThemedText';
 
 const fontMap = {
   regular: 'Poppins_400Regular',
   medium: 'Poppins_500Medium',
   semiBold: 'Poppins_600SemiBold',
   bold: 'Poppins_700Bold',
-}
+};
 
 const ThemedButton = ({
   title,
@@ -23,7 +23,7 @@ const ThemedButton = ({
   textClassName = '',
   ...props
 }: ThemedButtonProps) => {
-  const isDisabled = disabled || loading
+  const isDisabled = disabled || loading;
 
   const variantStyles = {
     primary: {
@@ -41,9 +41,9 @@ const ThemedButton = ({
       text: 'text-green-600',
       icon: '#16A34A',
     },
-  }
+  };
 
-  const colors = variantStyles[variant]
+  const colors = variantStyles[variant];
 
   return (
     <TouchableOpacity
@@ -58,7 +58,6 @@ const ThemedButton = ({
         <ActivityIndicator color={colors.icon} />
       ) : (
         <View className="flex-row items-center">
-          
           {leftIcon && (
             <Ionicons
               name={leftIcon}
@@ -86,7 +85,7 @@ const ThemedButton = ({
         </View>
       )}
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default ThemedButton
+export default ThemedButton;

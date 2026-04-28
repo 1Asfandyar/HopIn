@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { Redirect } from "expo-router";
-import { useAuth } from "@/store/useAuth";
+import { useEffect } from 'react';
+import { Redirect } from 'expo-router';
+import { useAuth } from '@/store/useAuth';
 
 export default function Index() {
   const { user, isLoading, checkAuth } = useAuth();
