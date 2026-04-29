@@ -8,12 +8,12 @@ export default function Index() {
 
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   if (isLoading) return null;
   if (!user) {
     return <WelcomeScreen />;
   }
 
-  return <Redirect href="/(main)/home" />;
+  return <Redirect href="/(main)/(tabs)/home" />;
 }

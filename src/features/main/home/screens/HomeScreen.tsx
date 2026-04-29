@@ -2,11 +2,9 @@ import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HomeScreen = () => {
   return (
-    <SafeAreaView edges={['left', 'right', 'bottom']} className="flex-1 ">
       <View className="flex-1 px-4 mt-6">
         <View className="mb-6">
           <ThemedText className="text-2xl">
@@ -83,7 +81,6 @@ const HomeScreen = () => {
           />
         </View>
       </View>
-    </SafeAreaView>
   );
 };
 
