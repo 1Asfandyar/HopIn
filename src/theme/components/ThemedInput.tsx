@@ -15,9 +15,11 @@ const ThemedInput = ({
   containerClassName = '',
   inputClassName = '',
   borderClassName = '',
+  selectDate = false,
   ...props
 }: ThemedTextInputProps) => {
   return (
+
     <View className={`mb-2 ${containerClassName} `}>
       {label && (
         <ThemedText className="text-gray-600 text-sm mb-1">{label}</ThemedText>
@@ -38,6 +40,7 @@ const ThemedInput = ({
         <TextInput
           {...props}
           secureTextEntry={secureTextEntry}
+          pointerEvents={selectDate ? 'none' : 'auto'}
           placeholderTextColor={themeColors.gray400}
           className={`text-xl flex-1 text-gray-800 ${inputClassName}`}
           style={[

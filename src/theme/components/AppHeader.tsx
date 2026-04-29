@@ -2,14 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { fontFamilies, themeColors } from '../tokens';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-type AppHeaderProps = {
-  title?: string;
-  leftIcon?: React.ComponentProps<typeof Ionicons>['name'];
-  rightIcon?: React.ComponentProps<typeof Ionicons>['name'];
-  onLeftPress?: () => void;
-  onRightPress?: () => void;
-};
+import { AppHeaderProps } from '../types';
 
 const HeaderIconButton = ({
   icon,
@@ -46,7 +39,7 @@ const AppHeader = ({
   onRightPress,
 }: AppHeaderProps) => {
   return (
-    <SafeAreaView edges={['top']} style={{paddingTop: 0}}>
+    <SafeAreaView edges={['top']} style={{ paddingTop: 0 }}>
       <View
         style={{
           height: 56,

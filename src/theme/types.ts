@@ -24,6 +24,7 @@ export interface ThemedTextInputProps extends TextInputProps {
   containerClassName?: string;
   inputClassName?: string;
   borderClassName?: string;
+  selectDate?: boolean
 }
 
 export interface ThemedButtonProps extends TouchableOpacityProps {
@@ -62,3 +63,11 @@ export interface ThemedCardProps extends TouchableOpacityProps {
   headingClassName?: string;
   subHeadingClassName?: string;
 }
+
+export type AppHeaderProps = {
+  title?: string;
+  leftIcon?: React.ComponentProps<typeof Ionicons>['name'];
+  rightIcon?: React.ComponentProps<typeof Ionicons>['name'];
+  onLeftPress?: () => void;
+  onRightPress?: () => void;
+};

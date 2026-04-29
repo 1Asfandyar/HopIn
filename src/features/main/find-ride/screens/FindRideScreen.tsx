@@ -1,14 +1,28 @@
-import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import LocationSelector from "@/components/LocationSelector";
+import { RideProps } from "../../types";
 
-const FindRideScreen = () => {
+const FindRideScreen = ({
+    dateTime,
+    setDateTime,
+    formateDateAndTime,
+    openDateTimePicker,
+    closeDateTimePicker,
+    handleDateTimeConfirm,
+    isOpen,
+    minDateTime
+  }: RideProps
+  )  => {
   return (
-    <SafeAreaView
-      edges={['left', 'right', 'bottom']}
-      className="flex-1 bg-white"
-    >
-      <View className="flex-1 bg-white" />
-    </SafeAreaView>
+    <LocationSelector
+      dateTime={dateTime}
+      setDateTime={setDateTime}
+      formateDateAndTime={formateDateAndTime}
+      openDateTimePicker={openDateTimePicker}
+      closeDateTimePicker={closeDateTimePicker}
+      handleDateTimeConfirm={handleDateTimeConfirm}
+      isOpen={isOpen}
+      minDateTime={minDateTime}
+    />
   );
 };
 
