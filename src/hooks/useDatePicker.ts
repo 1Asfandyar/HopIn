@@ -1,40 +1,40 @@
-import { useState } from "react"
+import { useState } from 'react';
 
 export const useDateTimePicker = () => {
-  const [dateTime, setDateTime] = useState<Date | null>(null)
-  const [isPickerOpen, setIsPickerOpen] = useState(false)
-  
+  const [dateTime, setDateTime] = useState<Date | null>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
   const formateDateAndTime = (selectedDateTime: Date | null) => {
-    if (!selectedDateTime) return ''
+    if (!selectedDateTime) return '';
     return selectedDateTime.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true
-    })
-  }
+      hour12: true,
+    });
+  };
 
   const openDateTimePicker = () => {
-    setIsPickerOpen(true)
-  }
+    setIsPickerOpen(true);
+  };
 
   const closeDateTimePicker = () => {
-    setIsPickerOpen(false)
-  }
+    setIsPickerOpen(false);
+  };
 
   const handleDateTimeConfirm = (selectedDateTime: Date) => {
-    const now = new Date()
-    
+    const now = new Date();
+
     if (selectedDateTime < now) {
-      alert('Please select today or a future date and time')
-      return
+      alert('Please select today or a future date and time');
+      return;
     }
-    
-    setDateTime(selectedDateTime)
-    setIsPickerOpen(false)
-  }
+
+    setDateTime(selectedDateTime);
+    setIsPickerOpen(false);
+  };
 
   return {
     dateTime,
@@ -44,6 +44,6 @@ export const useDateTimePicker = () => {
     closeDateTimePicker,
     handleDateTimeConfirm,
     isOpen: isPickerOpen,
-    minDateTime: new Date()
-  }
-}
+    minDateTime: new Date(),
+  };
+};

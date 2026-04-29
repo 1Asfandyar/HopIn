@@ -19,7 +19,6 @@ const ThemedInput = ({
   ...props
 }: ThemedTextInputProps) => {
   return (
-
     <View className={`mb-2 ${containerClassName} `}>
       {label && (
         <ThemedText className="text-gray-600 text-sm mb-1">{label}</ThemedText>

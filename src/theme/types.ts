@@ -24,7 +24,7 @@ export interface ThemedTextInputProps extends TextInputProps {
   containerClassName?: string;
   inputClassName?: string;
   borderClassName?: string;
-  selectDate?: boolean
+  selectDate?: boolean;
 }
 
 export interface ThemedButtonProps extends TouchableOpacityProps {

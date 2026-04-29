@@ -10,11 +10,11 @@ const OfferRide = () => {
     closeDateTimePicker,
     handleDateTimeConfirm,
     isOpen,
-    minDateTime
+    minDateTime,
   } = useDateTimePicker();
 
   return (
-    <OfferRideScreen 
+    <OfferRideScreen
       dateTime={dateTime}
       setDateTime={setDateTime}
       formateDateAndTime={formateDateAndTime}

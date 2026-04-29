@@ -10,10 +10,10 @@ const FindRide = () => {
     closeDateTimePicker,
     handleDateTimeConfirm,
     isOpen,
-    minDateTime
-  } = useDateTimePicker()
+    minDateTime,
+  } = useDateTimePicker();
 
-  return(
+  return (
     <FindRideScreen
       dateTime={dateTime}
       setDateTime={setDateTime}

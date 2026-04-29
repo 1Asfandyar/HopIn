@@ -1,7 +1,7 @@
-import { View, TouchableOpacity } from 'react-native'
-import ThemedInput from '@/theme/components/ThemedInput'
-import DateTimePickerModal from "react-native-modal-datetime-picker"
-import { RideProps } from '@/features/main/types'
+import { View, TouchableOpacity } from 'react-native';
+import ThemedInput from '@/theme/components/ThemedInput';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { RideProps } from '@/features/main/types';
 
 const LocationSelector = ({
   dateTime,
@@ -27,7 +27,7 @@ const LocationSelector = ({
         containerClassName="mb-6"
         rightIcon="search"
       />
-      
+
       <TouchableOpacity onPress={openDateTimePicker} activeOpacity={0.7}>
         <ThemedInput
           placeholder="Date & Time"
@@ -49,7 +49,7 @@ const LocationSelector = ({
         is24Hour={false}
       />
     </View>
-  )
-}
+  );
+};
 
-export default LocationSelector
+export default LocationSelector;
