@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { Href } from 'expo-router';
 
 export type FontWeight = 'regular' | 'medium' | 'semiBold' | 'bold';
 
@@ -45,6 +46,7 @@ export interface ThemedCardProps extends TouchableOpacityProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   touchable?: boolean;
   disabled?: boolean;
+  href?: Href;
 
   leftIcon?: ComponentProps<typeof Ionicons>['name'];
   rightIcon?: ComponentProps<typeof Ionicons>['name'];

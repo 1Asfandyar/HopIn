@@ -1,5 +1,6 @@
 import { View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import ThemedText from './ThemedText';
 import { ThemedCardProps } from '../types';
 import { themeColors } from '../tokens';
@@ -10,6 +11,7 @@ const ThemedCard = ({
   variant = 'primary',
   touchable = false,
   disabled = false,
+  href,
   leftIcon,
   rightIcon,
   iconSize = 24,
@@ -24,7 +26,9 @@ const ThemedCard = ({
   subHeadingClassName = '',
   ...props
 }: ThemedCardProps) => {
+  const router = useRouter();
   const isDisabled = disabled;
+  const isPressable = touchable || Boolean(href) || Boolean(props.onPress);
 
   const variantStyles = {
     primary: {
@@ -121,9 +125,22 @@ const ThemedCard = ({
     </View>
   );
 
-  if (touchable) {
+  const handlePress: ThemedCardProps['onPress'] = event => {
+    props.onPress?.(event);
+
+    if (!event?.defaultPrevented && href) {
+      router.push(href);
+    }
+  };
+
+  if (isPressable) {
     return (
-      <TouchableOpacity activeOpacity={0.85} disabled={isDisabled} {...props}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        disabled={isDisabled}
+        {...props}
+        onPress={handlePress}
+      >
         {CardContent}
       </TouchableOpacity>
     );

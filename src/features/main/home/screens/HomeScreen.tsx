@@ -25,10 +25,10 @@ const HomeScreen = () => {
               subHeading="Offer a ride"
               variant="primary"
               rightIcon="car"
+              href="/(main)/offer-ride"
               headingClassName="text-2xl"
               subHeadingClassName=" text-xl"
               iconSize={40}
-              containerClassName="1"
               rightIconContainerClassName="ml-3 pt-20"
             />
           </View>
@@ -37,7 +37,7 @@ const HomeScreen = () => {
               heading="I need a ride"
               subHeading="Find a ride"
               variant="secondary"
-              containerClassName="flex-1"
+              href="/(main)/find-ride"
               rightIcon="person"
               headingClassName="text-2xl"
               subHeadingClassName=" text-xl"
