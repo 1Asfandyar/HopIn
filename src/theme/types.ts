@@ -5,7 +5,7 @@ import {
   TouchableOpacityProps,
   ViewStyle,
 } from 'react-native';
-import { ComponentProps } from 'react';
+import { ComponentProps, ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Href } from 'expo-router';
 
@@ -43,6 +43,7 @@ export interface ThemedButtonProps extends TouchableOpacityProps {
 export interface ThemedCardProps extends TouchableOpacityProps {
   heading: string;
   subHeading?: string;
+  middleElement?: ReactNode;
 
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   touchable?: boolean;

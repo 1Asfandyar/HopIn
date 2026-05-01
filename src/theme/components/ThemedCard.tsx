@@ -8,6 +8,7 @@ import { themeColors } from '../tokens';
 const ThemedCard = ({
   heading,
   subHeading,
+  middleElement,
   variant = 'primary',
   touchable = false,
   disabled = false,
@@ -103,6 +104,7 @@ const ThemedCard = ({
           >
             {heading}
           </ThemedText>
+          {middleElement}
           {subHeading && (
             <ThemedText
               weight="regular"

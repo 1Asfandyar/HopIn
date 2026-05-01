@@ -13,11 +13,10 @@ const LocationSelector = ({
   minDateTime,
 }: RideProps) => {
   return (
-    <View className="flex-1 bg-white px-5 py-0">
+    <View className="bg-white">
       <ThemedInput
         placeholder="From"
         leftIcon="radio-button-on"
-        containerClassName="mt-4"
         rightIcon="search"
       />
       <View className="w-0.5 h-10 bg-primary ml-3 mb-2" />

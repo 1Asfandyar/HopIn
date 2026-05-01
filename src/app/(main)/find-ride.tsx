@@ -25,6 +25,6 @@ const FindRide = () => {
       minDateTime={minDateTime}
     />
   );
-};
+};  
 
 export default FindRide;
