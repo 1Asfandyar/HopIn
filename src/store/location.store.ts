@@ -3,6 +3,7 @@ import { locationService } from '@/services/locationService';
 import { logger } from '@/services/logger';
 import type { AppError, LocationStore } from '@/types/types';
 import { createAppError, getErrorMessage } from '@/utils/errors';
+import { FEEDBACK_MESSAGES } from '@/config/constants';
 
 export const useLocationStore = create<LocationStore>(set => ({
   currentLocation: null,
@@ -27,7 +28,7 @@ export const useLocationStore = create<LocationStore>(set => ({
           ? (error as AppError)
           : createAppError(
               'LOCATION_GEOCODE_FAILED',
-              getErrorMessage(error, 'Unable to get current location.'),
+              getErrorMessage(error, FEEDBACK_MESSAGES.locationUnavailable),
               error,
             );
 

@@ -1,14 +1,9 @@
 import { create } from 'zustand';
-import type { RideDraft, RidesStore } from '@/types/types';
-
-const initialDraft: RideDraft = {
-  pickup: null,
-  destination: null,
-  departureTime: null,
-};
+import type { RidesStore } from '@/types/types';
+import { initialRideDraft } from '@/features/rides/constants/rideDraft';
 
 export const useRidesStore = create<RidesStore>(set => ({
-  draft: initialDraft,
+  draft: initialRideDraft,
 
   setPickup: pickup => {
     set(state => ({ draft: { ...state.draft, pickup } }));
@@ -28,7 +23,7 @@ export const useRidesStore = create<RidesStore>(set => ({
   },
 
   resetDraft: () => {
-    set({ draft: initialDraft });
+    set({ draft: initialRideDraft });
   },
 }));
 

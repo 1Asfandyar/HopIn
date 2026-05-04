@@ -2,28 +2,20 @@ import { useAuth } from '@/store/useAuth';
 import { useLocation } from '@/store/useLocation';
 import { useRouter } from 'expo-router';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { showFeedback } from '@/utils/errors';
-
-const validationSchema = Yup.object({
-  phone: Yup.string()
-    .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits')
-    .required('Phone number is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
-});
+import { FEEDBACK_MESSAGES } from '@/config/constants';
+import {
+  loginInitialValues,
+  loginValidationSchema,
+} from '../validation/auth.validation';
 
 export const useLogin = () => {
   const router = useRouter();
   const login = useAuth(state => state.login);
   const fetchCurrentLocation = useLocation(state => state.fetchCurrentLocation);
   const formik = useFormik({
-    initialValues: {
-      phone: '',
-      password: '',
-    },
-    validationSchema,
+    initialValues: loginInitialValues,
+    validationSchema: loginValidationSchema,
     onSubmit: async values => {
       try {
         await login({
@@ -34,7 +26,9 @@ export const useLogin = () => {
         router.replace('/');
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Unable to log in.';
+          error instanceof Error
+            ? error.message
+            : FEEDBACK_MESSAGES.loginFailed;
         showFeedback('Login failed', message);
       }
     },

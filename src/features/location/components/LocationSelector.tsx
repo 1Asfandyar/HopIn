@@ -12,33 +12,11 @@ import ThemedText from '@/theme/components/ThemedText';
 import { useRideDateTime } from '@/features/rides/hooks/useRideDateTime';
 import { useRideDraft } from '@/features/rides/hooks/useRideDraft';
 import { useLocationStore } from '@/store/location.store';
-import type {
-  AppLocation,
-  GooglePlaceData,
-  GooglePlaceDetails,
-} from '@/types/types';
+import type { GooglePlaceData, GooglePlaceDetails } from '@/types/types';
+import { FEEDBACK_MESSAGES } from '@/config/constants';
+import { mapGooglePlaceToLocation } from '../helpers/location.helpers';
 import { useLocationSearch } from '../hooks/useLocationSearch';
 import LocationInput from './LocationInput';
-
-const mapPlaceToLocation = (
-  data: GooglePlaceData,
-  details: GooglePlaceDetails | null,
-): AppLocation | null => {
-  const location = details?.geometry?.location;
-
-  if (!location) {
-    return null;
-  }
-
-  return {
-    latitude: location.lat,
-    longitude: location.lng,
-    address: details?.formatted_address ?? data.description,
-    city: null,
-    country: null,
-    countryCode: null,
-  };
-};
 
 const LocationSelector = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -82,7 +60,7 @@ const LocationSelector = () => {
 
   const handlePickupSelected = useCallback(
     (data: GooglePlaceData, details: GooglePlaceDetails | null) => {
-      const location = mapPlaceToLocation(data, details);
+      const location = mapGooglePlaceToLocation(data, details);
 
       if (!location) {
         return;
@@ -96,7 +74,7 @@ const LocationSelector = () => {
 
   const handleDestinationSelected = useCallback(
     (data: GooglePlaceData, details: GooglePlaceDetails | null) => {
-      const location = mapPlaceToLocation(data, details);
+      const location = mapGooglePlaceToLocation(data, details);
 
       if (!location) {
         return;
@@ -148,12 +126,12 @@ const LocationSelector = () => {
         <BottomSheetView className="flex-1 px-2 rounded-lg pt-2 mt-2 mx-2 bg-gray-100">
           {!hasGooglePlacesApiKey && (
             <ThemedText className="text-red-500 text-sm px-2 pb-2">
-              Google Places API key is missing.
+              {FEEDBACK_MESSAGES.missingGooglePlacesKey}
             </ThemedText>
           )}
           {isLoading && (
             <ThemedText className="text-gray-500 text-sm px-2 pb-2">
-              Detecting your current location...
+              {FEEDBACK_MESSAGES.currentLocationLoading}
             </ThemedText>
           )}
           {error && (

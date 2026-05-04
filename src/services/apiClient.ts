@@ -1,6 +1,7 @@
 import { env } from '@/config/env';
 import type { ApiResult, AppError, RequestOptions } from '@/types/types';
 import { createAppError, getErrorMessage } from '@/utils/errors';
+import { FEEDBACK_MESSAGES } from '@/config/constants';
 
 const buildUrl = (path: string) => {
   if (path.startsWith('http')) {
@@ -32,7 +33,7 @@ const request = async <T>(
   } catch (error) {
     const appError: AppError = createAppError(
       'NETWORK_ERROR',
-      getErrorMessage(error, 'Unable to reach the server.'),
+      getErrorMessage(error, FEEDBACK_MESSAGES.networkUnavailable),
       error,
     );
 

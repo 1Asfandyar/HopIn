@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRideDraft } from './useRideDraft';
 import { formatDateAndTime, isFutureDateTime } from '@/utils/date';
 import { showFeedback } from '@/utils/errors';
+import { FEEDBACK_MESSAGES } from '@/config/constants';
 
 export const useRideDateTime = () => {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -18,10 +19,7 @@ export const useRideDateTime = () => {
 
   const handleDateTimeConfirm = (selectedDateTime: Date) => {
     if (!isFutureDateTime(selectedDateTime)) {
-      showFeedback(
-        'Invalid date',
-        'Please select today or a future date and time.',
-      );
+      showFeedback('Invalid date', FEEDBACK_MESSAGES.invalidRideDate);
       return;
     }
 

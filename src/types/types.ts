@@ -1,5 +1,6 @@
 import type { Ionicons } from '@expo/vector-icons';
 import type { Router, Href } from 'expo-router';
+import type * as ExpoLocation from 'expo-location';
 import type { ComponentProps, ReactNode } from 'react';
 import type {
   StyleProp,
@@ -122,6 +123,8 @@ export type LocationInputProps = {
   rightButtonLabel?: string;
   onRightButtonPress?: () => void;
 };
+
+export type LocationGeocodedAddress = ExpoLocation.LocationGeocodedAddress;
 
 export type AuthStore = {
   user: User | null;

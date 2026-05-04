@@ -3,12 +3,16 @@ import type {
   LoginCredentials,
   RegisterPayload,
 } from '@/types/types';
+import {
+  AUTH_SESSION_STORAGE_KEY,
+  MOCK_ACCESS_TOKEN,
+  MOCK_AUTH_DELAY_MS,
+  MOCK_USER_ID,
+} from '@/config/constants';
 import { storageService } from './storageService';
 
-const SESSION_KEY = 'hopin.auth.session';
-const MOCK_DELAY_MS = 600;
-
-const wait = () => new Promise(resolve => setTimeout(resolve, MOCK_DELAY_MS));
+const wait = () =>
+  new Promise(resolve => setTimeout(resolve, MOCK_AUTH_DELAY_MS));
 
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthSession> => {
@@ -16,14 +20,17 @@ export const authService = {
 
     const session: AuthSession = {
       user: {
-        id: 'mock-user',
+        id: MOCK_USER_ID,
         email: credentials.identifier,
         phone: credentials.identifier,
       },
-      accessToken: 'mock-access-token',
+      accessToken: MOCK_ACCESS_TOKEN,
     };
 
-    await storageService.setString(SESSION_KEY, JSON.stringify(session));
+    await storageService.setString(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify(session),
+    );
 
     return session;
   },
@@ -33,25 +40,28 @@ export const authService = {
 
     const session: AuthSession = {
       user: {
-        id: 'mock-user',
+        id: MOCK_USER_ID,
         email: payload.email,
         fullName: payload.fullName,
         phone: payload.phone,
       },
-      accessToken: 'mock-access-token',
+      accessToken: MOCK_ACCESS_TOKEN,
     };
 
-    await storageService.setString(SESSION_KEY, JSON.stringify(session));
+    await storageService.setString(
+      AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify(session),
+    );
 
     return session;
   },
 
   logout: async () => {
-    await storageService.remove(SESSION_KEY);
+    await storageService.remove(AUTH_SESSION_STORAGE_KEY);
   },
 
   getSession: async (): Promise<AuthSession | null> => {
-    const session = await storageService.getString(SESSION_KEY);
+    const session = await storageService.getString(AUTH_SESSION_STORAGE_KEY);
 
     return session ? (JSON.parse(session) as AuthSession) : null;
   },
