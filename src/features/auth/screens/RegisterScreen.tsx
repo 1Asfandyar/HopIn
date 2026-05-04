@@ -48,7 +48,7 @@ const RegisterScreen = (RegisterParams: RegisterViewProps) => {
           placeholder="+923456789101"
           keyboardType="numeric"
           leftIcon="phone-portrait"
-          value={RegisterParams.phone ? String(RegisterParams.phone) : ''}
+          value={RegisterParams.phone}
           onChangeText={RegisterParams.onPhoneChange}
           onBlur={RegisterParams.onPhoneBlur}
         />

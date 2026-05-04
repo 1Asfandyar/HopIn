@@ -3,6 +3,7 @@ import { useLocation } from '@/store/useLocation';
 import { useRouter } from 'expo-router';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { showFeedback } from '@/utils/errors';
 
 const validationSchema = Yup.object({
   phone: Yup.string()
@@ -25,12 +26,16 @@ export const useLogin = () => {
     validationSchema,
     onSubmit: async values => {
       try {
-        console.log('Login values:', values);
-        await login(values.phone, values.password);
+        await login({
+          identifier: values.phone,
+          password: values.password,
+        });
         await fetchCurrentLocation();
         router.replace('/');
       } catch (error) {
-        console.error('Login error:', error);
+        const message =
+          error instanceof Error ? error.message : 'Unable to log in.';
+        showFeedback('Login failed', message);
       }
     },
   });

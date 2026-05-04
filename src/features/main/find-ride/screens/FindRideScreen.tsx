@@ -1,28 +1,7 @@
-import LocationSelector from '@/components/LocationSelector';
-import { RideProps } from '../../types';
+import LocationSelector from '@/features/location/components/LocationSelector';
 
-const FindRideScreen = ({
-  dateTime,
-  setDateTime,
-  formateDateAndTime,
-  openDateTimePicker,
-  closeDateTimePicker,
-  handleDateTimeConfirm,
-  isOpen,
-  minDateTime,
-}: RideProps) => {
-  return (
-    <LocationSelector
-      dateTime={dateTime}
-      setDateTime={setDateTime}
-      formateDateAndTime={formateDateAndTime}
-      openDateTimePicker={openDateTimePicker}
-      closeDateTimePicker={closeDateTimePicker}
-      handleDateTimeConfirm={handleDateTimeConfirm}
-      isOpen={isOpen}
-      minDateTime={minDateTime}
-    />
-  );
+const FindRideScreen = () => {
+  return <LocationSelector />;
 };
 
 export default FindRideScreen;

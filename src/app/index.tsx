@@ -1,10 +1,16 @@
 import { useEffect } from 'react';
 import { Redirect } from 'expo-router';
-import { useAuth } from '@/store/useAuth';
+import {
+  selectAuthLoading,
+  selectAuthUser,
+  useAuthStore,
+} from '@/store/auth.store';
 import WelcomeScreen from '@/features/main/home/screens/WelcomeScreen';
 
 export default function Index() {
-  const { user, isLoading, checkAuth } = useAuth();
+  const user = useAuthStore(selectAuthUser);
+  const isLoading = useAuthStore(selectAuthLoading);
+  const checkAuth = useAuthStore(state => state.checkAuth);
 
   useEffect(() => {
     checkAuth();

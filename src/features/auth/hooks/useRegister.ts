@@ -2,20 +2,16 @@ import { useAuth } from '@/store/useAuth';
 import { useRouter } from 'expo-router';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { showFeedback } from '@/utils/errors';
 
 const validationSchema = Yup.object({
   fullName: Yup.string()
     .min(3, 'Full name must be at least 3 characters')
     .required('Full name is required'),
 
-  phone: Yup.number().test(
-    'len',
-    'Phone number must be exactly 10 digits',
-    value => {
-      if (!value) return false;
-      return String(value).length === 10;
-    },
-  ),
+  phone: Yup.string()
+    .matches(/^[0-9]{10}$/, 'Phone number must be exactly 10 digits')
+    .required('Phone number is required'),
 
   email: Yup.string()
     .email('Invalid email address')
@@ -34,18 +30,19 @@ export const useRegister = () => {
   const formik = useFormik({
     initialValues: {
       fullName: '',
-      phone: null,
+      phone: '',
       email: '',
       password: '',
     },
     validationSchema,
     onSubmit: async values => {
       try {
-        console.log('Registration values:', values);
-        await register(values.email, values.password);
+        await register(values);
         router.replace('/');
       } catch (error) {
-        console.error('Registration error:', error);
+        const message =
+          error instanceof Error ? error.message : 'Unable to register.';
+        showFeedback('Registration failed', message);
       }
     },
   });
