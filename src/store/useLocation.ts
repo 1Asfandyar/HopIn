@@ -15,6 +15,7 @@ type LocationState = {
   error: string | null;
   isLoading: boolean;
   fetchCurrentLocation: () => Promise<UserLocation | null>;
+  setCurrentLocation: (location: UserLocation) => void;
 };
 
 const formatAddress = (address?: Location.LocationGeocodedAddress) => {
@@ -42,6 +43,10 @@ export const useLocation = create<LocationState>(set => ({
   currentLocation: null,
   error: null,
   isLoading: false,
+
+  setCurrentLocation: location => {
+    set({ currentLocation: location, error: null });
+  },
 
   fetchCurrentLocation: async () => {
     set({ error: null, isLoading: true });

@@ -1,6 +1,9 @@
-import { useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { useEffect, useRef } from 'react';
+import { TouchableOpacity, View } from 'react-native';
+import {
+  GooglePlacesAutocomplete,
+  GooglePlacesAutocompleteRef,
+} from 'react-native-google-places-autocomplete';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import ThemedText from '../theme/components/ThemedText';
@@ -12,11 +15,14 @@ const GOOGLE_KEY = Constants.expoConfig?.extra?.googlePlacesApiKey;
 const LocationInput = ({
   label,
   placeholder = 'Search location...',
+  initialValue,
   leftIcon,
   onPlaceSelected,
   containerClassName = '',
+  rightButtonLabel,
+  onRightButtonPress,
 }: LocationInputProps) => {
-  const ref = useRef(null);
+  const ref = useRef<GooglePlacesAutocompleteRef>(null);
   const currentLocation = useLocation(state => state.currentLocation);
   const locationBias = currentLocation
     ? {
@@ -30,17 +36,20 @@ const LocationInput = ({
       }
     : {};
 
+  useEffect(() => {
+    if (initialValue) {
+      ref.current?.setAddressText(initialValue);
+    }
+  }, [initialValue]);
+
   return (
     <View className={`mb-2 ${containerClassName}`}>
       {label && (
         <ThemedText className="text-gray-600 text-sm mb-1">{label}</ThemedText>
       )}
-      <View
-        className="flex-row items-center border border-gray-200 rounded-xl bg-white"
-        style={styles.container}
-      >
+      <View className="flex-row items-center border border-gray-200 rounded-xl bg-white overflow-visible">
         {leftIcon && (
-          <View style={styles.leftIcon}>
+          <View className="pl-4">
             <Ionicons name={leftIcon} size={18} color={themeColors.gray400} />
           </View>
         )}
@@ -59,6 +68,9 @@ const LocationInput = ({
             ...countryRestriction,
           }}
           styles={{
+            container: {
+              flex: 1,
+            },
             textInputContainer: {
               backgroundColor: 'transparent',
             },
@@ -113,18 +125,20 @@ const LocationInput = ({
           keyboardShouldPersistTaps="handled"
           listViewDisplayed="auto"
         />
+        {rightButtonLabel && onRightButtonPress && (
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onRightButtonPress}
+            className="px-3 py-2"
+          >
+            <ThemedText weight="semiBold" className="text-primary text-[13px] bg-light-blue p-2 rounded-md">
+              {rightButtonLabel}
+            </ThemedText>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
 };
 
 export default LocationInput;
-
-const styles = StyleSheet.create({
-  container: {
-    overflow: 'visible',
-  },
-  leftIcon: {
-    paddingLeft: 16,
-  },
-});

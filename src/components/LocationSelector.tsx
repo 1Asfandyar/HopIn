@@ -22,6 +22,7 @@ const LocationSelector = ({
   minDateTime,
 }: RideProps) => {
   const currentLocation = useLocation(state => state.currentLocation);
+  const setCurrentLocation = useLocation(state => state.setCurrentLocation);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['80%'], []);
 
@@ -80,17 +81,35 @@ const LocationSelector = ({
         enablePanDownToClose
       >
         <BottomSheetView className="flex-1 px-2 rounded-lg  pt-2 mt-2 mx-2 bg-gray-100 ">
-          <ThemedInput
+          <LocationInput
+            initialValue={currentLocation?.address}
             placeholder="Current Location"
             leftIcon="locate"
-            value={currentLocation?.address}
-            editable={false}
-            containerClassName="mb-2"
+            onRightButtonPress={() => console.log('Open map pressed')}
+            onPlaceSelected={(data, details) => {
+              const location = details?.geometry?.location;
+
+              if (!location) {
+                return;
+              }
+
+              setCurrentLocation({
+                latitude: location.lat,
+                longitude: location.lng,
+                address: data.description,
+                city: null,
+                country: null,
+                countryCode: null,
+              });
+            }}
+            rightButtonLabel="Map"
           />
           <LocationInput
             leftIcon="location"
             onPlaceSelected={() => console.log('where to changed')}
+            onRightButtonPress={() => console.log('Open map pressed')}
             placeholder="Where to?"
+            rightButtonLabel="Map"
           />
         </BottomSheetView>
       </BottomSheetModal>
