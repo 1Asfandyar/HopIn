@@ -1,4 +1,4 @@
-import { useAuth } from '@/store/useAuth';
+import { useAuthStore } from '@/store/auth.store';
 import { useRouter } from 'expo-router';
 import { useFormik } from 'formik';
 import { showFeedback } from '@/utils/errors';
@@ -10,7 +10,7 @@ import {
 
 export const useRegister = () => {
   const router = useRouter();
-  const register = useAuth(state => state.register);
+  const register = useAuthStore(state => state.register);
   const formik = useFormik({
     initialValues: registerInitialValues,
     validationSchema: registerValidationSchema,

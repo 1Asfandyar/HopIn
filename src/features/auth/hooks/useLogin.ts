@@ -1,5 +1,5 @@
-import { useAuth } from '@/store/useAuth';
-import { useLocation } from '@/store/useLocation';
+import { useAuthStore } from '@/store/auth.store';
+import { useLocationStore } from '@/store/location.store';
 import { useRouter } from 'expo-router';
 import { useFormik } from 'formik';
 import { showFeedback } from '@/utils/errors';
@@ -11,8 +11,10 @@ import {
 
 export const useLogin = () => {
   const router = useRouter();
-  const login = useAuth(state => state.login);
-  const fetchCurrentLocation = useLocation(state => state.fetchCurrentLocation);
+  const login = useAuthStore(state => state.login);
+  const fetchCurrentLocation = useLocationStore(
+    state => state.fetchCurrentLocation,
+  );
   const formik = useFormik({
     initialValues: loginInitialValues,
     validationSchema: loginValidationSchema,
