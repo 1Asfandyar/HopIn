@@ -31,7 +31,9 @@
       "favicon": "./src/assets/icons/hopin_icon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

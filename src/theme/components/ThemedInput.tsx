@@ -30,7 +30,7 @@ const ThemedInput = ({
         {leftIcon && (
           <Ionicons
             name={leftIcon}
-            size={18}
+            size={20}
             color={themeColors.gray400}
             style={{ marginRight: 8 }}
           />
@@ -52,7 +52,7 @@ const ThemedInput = ({
 
         {rightIcon && (
           <TouchableOpacity onPress={onRightIconPress}>
-            <Ionicons name={rightIcon} size={18} color={themeColors.gray400} />
+            <Ionicons name={rightIcon} size={20} color={themeColors.gray400} />
           </TouchableOpacity>
         )}
       </View>
