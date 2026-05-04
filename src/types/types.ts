@@ -229,6 +229,19 @@ export type AppHeaderProps = {
   onRightPress?: () => void;
 };
 
+export type MainMenuProps = {
+  visible: boolean;
+  isLoggingOut: boolean;
+  onClose: () => void;
+  onLogout: () => void;
+};
+
+export type BrandedLoaderProps = {
+  label?: string;
+  variant?: 'screen' | 'splash' | 'inline' | 'button';
+  onFinish?: () => void;
+};
+
 export type LoginViewProps = {
   phone: string;
   password: string;

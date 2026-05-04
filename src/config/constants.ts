@@ -1,5 +1,7 @@
 export const AUTH_SESSION_STORAGE_KEY = 'hopin.auth.session';
-export const MOCK_AUTH_DELAY_MS = 600;
+export const MOCK_AUTH_DELAY_MS = 6000;
+export const STARTUP_LOADER_MIN_MS = 12000;
+export const AUTH_LOADER_MIN_MS = 6000;
 export const MOCK_USER_ID = 'mock-user';
 export const MOCK_ACCESS_TOKEN = 'mock-access-token';
 

@@ -9,6 +9,7 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ThemedInput from '@/theme/components/ThemedInput';
 import ThemedText from '@/theme/components/ThemedText';
+import BrandedLoader from '@/components/feedback/BrandedLoader';
 import { useRideDateTime } from '@/features/rides/hooks/useRideDateTime';
 import { useRideDraft } from '@/features/rides/hooks/useRideDraft';
 import { useLocationStore } from '@/store/location.store';
@@ -130,9 +131,12 @@ const LocationSelector = () => {
             </ThemedText>
           )}
           {isLoading && (
-            <ThemedText className="text-gray-500 text-sm px-2 pb-2">
-              {FEEDBACK_MESSAGES.currentLocationLoading}
-            </ThemedText>
+            <View className="px-2 pb-2 items-start">
+              <BrandedLoader
+                variant="inline"
+                label={FEEDBACK_MESSAGES.currentLocationLoading}
+              />
+            </View>
           )}
           {error && (
             <ThemedText className="text-red-500 text-sm px-2 pb-2">

@@ -12,9 +12,9 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./src/assets/logos/hopin_light.png",
+      "image": "./src/assets/icons/hopin_icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#16A34A"
     },
     "ios": {
       "supportsTablet": true
@@ -22,7 +22,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/icons/hopin_icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#16A34A"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false

@@ -1,8 +1,9 @@
-import { TouchableOpacity, ActivityIndicator, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedButtonProps } from '../types';
 import ThemedText from './ThemedText';
 import { themeColors } from '../tokens';
+import BrandedLoader from '@/components/feedback/BrandedLoader';
 
 const ThemedButton = ({
   title,
@@ -49,7 +50,7 @@ const ThemedButton = ({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={colors.icon} />
+        <BrandedLoader variant="button" label="" />
       ) : (
         <View className="flex-row items-center">
           {leftIcon && (
