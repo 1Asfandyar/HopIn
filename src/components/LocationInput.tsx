@@ -1,11 +1,12 @@
 import { useRef } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import ThemedText from '../theme/components/ThemedText';
 import { fontFamilies, themeColors } from '../theme/tokens';
 import { LocationInputProps } from './types';
+import { useLocation } from '@/store/useLocation';
 
 const GOOGLE_KEY = Constants.expoConfig?.extra?.googlePlacesApiKey;
 const LocationInput = ({
@@ -16,20 +17,30 @@ const LocationInput = ({
   containerClassName = '',
 }: LocationInputProps) => {
   const ref = useRef(null);
+  const currentLocation = useLocation(state => state.currentLocation);
+  const locationBias = currentLocation
+    ? {
+        location: `${currentLocation.latitude},${currentLocation.longitude}`,
+        radius: 50000,
+      }
+    : {};
+  const countryRestriction = currentLocation?.countryCode
+    ? {
+        components: `country:${currentLocation.countryCode}`,
+      }
+    : {};
 
   return (
     <View className={`mb-2 ${containerClassName}`}>
       {label && (
-        <ThemedText className="text-gray-600 text-sm mb-1">
-          {label}
-        </ThemedText>
+        <ThemedText className="text-gray-600 text-sm mb-1">{label}</ThemedText>
       )}
       <View
         className="flex-row items-center border border-gray-200 rounded-xl bg-white"
-        style={{ overflow: 'visible' }}
+        style={styles.container}
       >
         {leftIcon && (
-          <View style={{ paddingLeft: 16 }}>
+          <View style={styles.leftIcon}>
             <Ionicons name={leftIcon} size={18} color={themeColors.gray400} />
           </View>
         )}
@@ -44,6 +55,8 @@ const LocationInput = ({
             key: GOOGLE_KEY,
             language: 'en',
             types: 'geocode',
+            ...locationBias,
+            ...countryRestriction,
           }}
           styles={{
             textInputContainer: {
@@ -65,8 +78,8 @@ const LocationInput = ({
               borderColor: themeColors.gray200,
               borderRadius: 12,
               marginTop: 4,
-              elevation: 5,          // Android shadow
-              shadowColor: '#000',   // iOS shadow
+              elevation: 5,
+              shadowColor: '#000',
               shadowOpacity: 0.08,
               shadowOffset: { width: 0, height: 2 },
               shadowRadius: 8,
@@ -106,3 +119,12 @@ const LocationInput = ({
 };
 
 export default LocationInput;
+
+const styles = StyleSheet.create({
+  container: {
+    overflow: 'visible',
+  },
+  leftIcon: {
+    paddingLeft: 16,
+  },
+});

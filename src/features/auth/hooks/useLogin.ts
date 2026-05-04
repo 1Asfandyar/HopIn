@@ -1,4 +1,5 @@
 import { useAuth } from '@/store/useAuth';
+import { useLocation } from '@/store/useLocation';
 import { useRouter } from 'expo-router';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -15,6 +16,7 @@ const validationSchema = Yup.object({
 export const useLogin = () => {
   const router = useRouter();
   const login = useAuth(state => state.login);
+  const fetchCurrentLocation = useLocation(state => state.fetchCurrentLocation);
   const formik = useFormik({
     initialValues: {
       phone: '',
@@ -25,6 +27,7 @@ export const useLogin = () => {
       try {
         console.log('Login values:', values);
         await login(values.phone, values.password);
+        await fetchCurrentLocation();
         router.replace('/');
       } catch (error) {
         console.error('Login error:', error);

@@ -9,6 +9,7 @@ import {
 import ThemedInput from '@/theme/components/ThemedInput';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { RideProps } from '@/features/main/types';
+import { useLocation } from '@/store/useLocation';
 import LocationInput from './LocationInput';
 
 const LocationSelector = ({
@@ -20,7 +21,7 @@ const LocationSelector = ({
   isOpen,
   minDateTime,
 }: RideProps) => {
-
+  const currentLocation = useLocation(state => state.currentLocation);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['80%'], []);
 
@@ -79,15 +80,17 @@ const LocationSelector = ({
         enablePanDownToClose
       >
         <BottomSheetView className="flex-1 px-2 rounded-lg  pt-2 mt-2 mx-2 bg-gray-100 ">
-          <LocationInput
-            placeholder='Current Location'
-            leftIcon= 'locate'
-            onPlaceSelected={()=> console.log('Current location changed')}
+          <ThemedInput
+            placeholder="Current Location"
+            leftIcon="locate"
+            value={currentLocation?.address}
+            editable={false}
+            containerClassName="mb-2"
           />
           <LocationInput
-            leftIcon='location'
-            onPlaceSelected={()=>console.log('where to changed')}
-            placeholder='Where to?'
+            leftIcon="location"
+            onPlaceSelected={() => console.log('where to changed')}
+            placeholder="Where to?"
           />
         </BottomSheetView>
       </BottomSheetModal>

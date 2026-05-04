@@ -33,7 +33,13 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow HopIn to use your location so we can set your current pickup point."
+        }
+      ]
     ]
   }
 }
