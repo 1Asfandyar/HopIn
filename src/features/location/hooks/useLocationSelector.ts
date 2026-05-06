@@ -26,6 +26,7 @@ import {
   LOCATION_SEARCH_MIN_QUERY_LENGTH,
   LOCATION_SHEET_SNAP_POINTS,
   MAP_PREVIEW_DELAY_MS,
+  MAP_PREVIEW_MIN_DISTANCE_METERS,
 } from '../constants/location.constants';
 import { mapGooglePlaceToLocation } from '../helpers/location.helpers';
 import { useLocationSearch } from './useLocationSearch';
@@ -33,6 +34,7 @@ import { useLocationSearch } from './useLocationSearch';
 export const useLocationSelector = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const mapPreviewRequestRef = useRef(0);
+  const lastQueuedMapPreviewCoordinateRef = useRef<MapCoordinate | null>(null);
   const mapPreviewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -104,19 +106,37 @@ export const useLocationSelector = () => {
   const shouldShowResults =
     activeInput !== null &&
     activeQuery.trim().length >= LOCATION_SEARCH_MIN_QUERY_LENGTH;
+  const selectedActiveAddress =
+    activeInput === 'pickup'
+      ? (currentLocation?.address ?? pickup?.address)
+      : activeInput === 'destination'
+        ? destination?.address
+        : null;
 
   useEffect(() => {
-    if (!activeInput) {
+    const trimmedQuery = activeQuery.trim();
+
+    if (
+      !activeInput ||
+      trimmedQuery.length < LOCATION_SEARCH_MIN_QUERY_LENGTH ||
+      trimmedQuery === selectedActiveAddress
+    ) {
       clearResults();
       return;
     }
 
     const timer = setTimeout(() => {
-      searchPlaces(activeQuery.trim());
+      searchPlaces(trimmedQuery);
     }, LOCATION_SEARCH_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [activeInput, activeQuery, clearResults, searchPlaces]);
+  }, [
+    activeInput,
+    activeQuery,
+    clearResults,
+    searchPlaces,
+    selectedActiveAddress,
+  ]);
 
   const openLocationSheet = () => {
     bottomSheetRef.current?.present();
@@ -282,6 +302,8 @@ export const useLocationSelector = () => {
         clearTimeout(mapPreviewTimeoutRef.current);
       }
 
+      lastQueuedMapPreviewCoordinateRef.current = coordinate;
+
       setMapError(null);
       setMapPreviewLocation(null);
       setIsWaitingForMapPreview(true);
@@ -318,6 +340,7 @@ export const useLocationSelector = () => {
       }));
       setMapCameraRequestKey(currentKey => currentKey + 1);
       setMapPickerInput(input);
+      lastQueuedMapPreviewCoordinateRef.current = null;
       queueMapPreviewLocationResolve(initialCoordinate);
     },
     [
@@ -350,6 +373,7 @@ export const useLocationSelector = () => {
         }));
         setMapCameraRequestKey(currentKey => currentKey + 1);
         setMapPreviewLocation(location);
+        lastQueuedMapPreviewCoordinateRef.current = location;
       }
     } catch (caughtError) {
       setMapPreviewLocation(null);
@@ -367,10 +391,18 @@ export const useLocationSelector = () => {
         latitude: region.latitude,
         longitude: region.longitude,
       };
+      const lastQueuedCoordinate = lastQueuedMapPreviewCoordinateRef.current;
+      const hasMovedEnoughForPreview =
+        !lastQueuedCoordinate ||
+        getDistanceInMeters(lastQueuedCoordinate, coordinate) >=
+          MAP_PREVIEW_MIN_DISTANCE_METERS;
 
       setMapRegion(region);
       setMapCoordinate(coordinate);
-      queueMapPreviewLocationResolve(coordinate);
+
+      if (hasMovedEnoughForPreview) {
+        queueMapPreviewLocationResolve(coordinate);
+      }
     },
     [queueMapPreviewLocationResolve],
   );
@@ -469,4 +501,28 @@ export const useLocationSelector = () => {
     confirmMapLocation,
     handlePlaceSelected,
   };
+};
+
+const getDistanceInMeters = (
+  from: MapCoordinate,
+  to: MapCoordinate,
+): number => {
+  const earthRadiusMeters = 6371000;
+  const degreesToRadians = Math.PI / 180;
+  const fromLatitude = from.latitude * degreesToRadians;
+  const toLatitude = to.latitude * degreesToRadians;
+  const latitudeDelta = (to.latitude - from.latitude) * degreesToRadians;
+  const longitudeDelta = (to.longitude - from.longitude) * degreesToRadians;
+  const haversine =
+    Math.sin(latitudeDelta / 2) * Math.sin(latitudeDelta / 2) +
+    Math.cos(fromLatitude) *
+      Math.cos(toLatitude) *
+      Math.sin(longitudeDelta / 2) *
+      Math.sin(longitudeDelta / 2);
+
+  return (
+    earthRadiusMeters *
+    2 *
+    Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+  );
 };

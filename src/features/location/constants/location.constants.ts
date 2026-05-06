@@ -1,9 +1,14 @@
 import type { MapRegion } from '../types';
 
 export const LOCATION_SEARCH_MIN_QUERY_LENGTH = 3;
-export const LOCATION_SEARCH_DEBOUNCE_MS = 300;
+export const LOCATION_SEARCH_DEBOUNCE_MS = 450;
 export const LOCATION_SEARCH_RADIUS_METERS = 50000;
-export const MAP_PREVIEW_DELAY_MS = 2000;
+export const LOCATION_SEARCH_CACHE_TTL_MS = 5 * 60 * 1000;
+export const LOCATION_SEARCH_CACHE_MAX_ENTRIES = 40;
+export const PLACE_DETAILS_CACHE_TTL_MS = 30 * 60 * 1000;
+export const PLACE_DETAILS_CACHE_MAX_ENTRIES = 80;
+export const MAP_PREVIEW_DELAY_MS = 1200;
+export const MAP_PREVIEW_MIN_DISTANCE_METERS = 35;
 export const LOCATION_SHEET_SNAP_POINTS = ['80%'] as const;
 export const LOCATION_SELECTOR_CONTENT_Z_INDEX = 9999;
 
