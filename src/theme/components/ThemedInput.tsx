@@ -2,7 +2,7 @@ import { View, TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedTextInputProps } from '../types';
 import ThemedText from './ThemedText';
-import { fontFamilies, themeColors } from '../tokens';
+import { fontFamilies, fontSizes, themeColors } from '../tokens';
 
 const ThemedInput = ({
   weight = 'regular',
@@ -21,11 +21,13 @@ const ThemedInput = ({
   return (
     <View className={`mb-2 ${containerClassName} `}>
       {label && (
-        <ThemedText className="text-gray-600 text-sm mb-1">{label}</ThemedText>
+        <ThemedText size="sm" className="text-gray-600 mb-1">
+          {label}
+        </ThemedText>
       )}
 
       <View
-        className={`flex-row items-center border border-gray-200 rounded-xl px-4 py-4 bg-white ${borderClassName}`}
+        className={`flex-row items-center border border-gray-200 rounded-xl px-4 py-4 bg-white overflow-hidden ${borderClassName}`}
       >
         {leftIcon && (
           <Ionicons
@@ -41,17 +43,23 @@ const ThemedInput = ({
           secureTextEntry={secureTextEntry}
           pointerEvents={selectDate ? 'none' : 'auto'}
           placeholderTextColor={themeColors.gray400}
-          className={`text-xl flex-1 text-gray-800 ${inputClassName}`}
+          className={`flex-1 min-w-0 text-gray-800 ${inputClassName}`}
           style={[
             {
               fontFamily: fontFamilies[weight],
+              ...fontSizes.md,
+              flexShrink: 1,
+              minWidth: 0,
             },
             style,
           ]}
         />
 
         {rightIcon && (
-          <TouchableOpacity onPress={onRightIconPress}>
+          <TouchableOpacity
+            onPress={onRightIconPress}
+            style={{ flexShrink: 0 }}
+          >
             <Ionicons name={rightIcon} size={20} color={themeColors.gray400} />
           </TouchableOpacity>
         )}

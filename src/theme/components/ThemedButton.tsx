@@ -64,7 +64,8 @@ const ThemedButton = ({
 
           <ThemedText
             weight={weight}
-            className={`text-base ${colors.text} ${textClassName}`}
+            size="md"
+            className={`${colors.text} ${textClassName}`}
           >
             {title}
           </ThemedText>

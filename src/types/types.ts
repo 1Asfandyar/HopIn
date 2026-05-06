@@ -53,6 +53,8 @@ export type RideFlowMode = 'offer' | 'find';
 export type AppErrorCode =
   | 'AUTH_FAILED'
   | 'LOCATION_PERMISSION_DENIED'
+  | 'PLACES_SEARCH_FAILED'
+  | 'PLACE_DETAILS_FAILED'
   | 'LOCATION_GEOCODE_FAILED'
   | 'CONFIG_MISSING'
   | 'NETWORK_ERROR'
@@ -89,6 +91,7 @@ export type RegisterPayload = {
 export type GooglePlaceData = {
   description: string;
   place_id?: string;
+  types?: string[];
   structured_formatting?: {
     main_text?: string;
     secondary_text?: string;
@@ -102,6 +105,9 @@ export type GooglePlaceDetails = {
       lng: number;
     };
   };
+  name?: string;
+  vicinity?: string;
+  types?: string[];
   formatted_address?: string;
   address_components?: Array<{
     long_name: string;
@@ -113,13 +119,12 @@ export type GooglePlaceDetails = {
 export type LocationInputProps = {
   label?: string;
   placeholder?: string;
-  initialValue?: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  onFocus?: () => void;
   leftIcon?: keyof typeof Ionicons.glyphMap;
-  onPlaceSelected: (
-    data: GooglePlaceData,
-    details: GooglePlaceDetails | null,
-  ) => void;
   containerClassName?: string;
+  isSearching?: boolean;
   rightButtonLabel?: string;
   onRightButtonPress?: () => void;
 };
@@ -144,10 +149,21 @@ export type LocationStore = {
   setCurrentLocation: (location: AppLocation) => void;
 };
 
+export type PlacesStore = {
+  searchResults: GooglePlaceData[];
+  isLoading: boolean;
+  error: AppError | null;
+
+  searchPlaces: (query: string) => Promise<GooglePlaceData[]>;
+  getPlaceDetailsById: (placeId: string) => Promise<GooglePlaceDetails | null>;
+  clearResults: () => void;
+};
+
 export type RidesStore = {
   draft: RideDraft;
   setPickup: (pickup: AppLocation) => void;
   setDestination: (destination: AppLocation) => void;
+  clearDestination: () => void;
   setDepartureTime: (departureTime: Date | null) => void;
   resetDraft: () => void;
 };
@@ -159,6 +175,7 @@ export type ProfileStore = {
 
 export type ExpoExtra = {
   apiUrl?: string;
+  googleMapsApiKey?: string;
   googlePlacesApiKey?: string;
 };
 
@@ -170,8 +187,11 @@ export type RequestOptions = RequestInit & {
 
 export type FontWeight = 'regular' | 'medium' | 'semiBold' | 'bold';
 
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+
 export type ThemedTextProps = TextProps & {
   weight?: FontWeight;
+  size?: FontSize;
 };
 
 export type ThemedTextInputProps = TextInputProps & {
@@ -217,6 +237,8 @@ export type ThemedCardProps = TouchableOpacityProps & {
   iconContainerStyle?: StyleProp<ViewStyle>;
   leftIconContainerStyle?: StyleProp<ViewStyle>;
   rightIconContainerStyle?: StyleProp<ViewStyle>;
+  headingSize?: FontSize;
+  subHeadingSize?: FontSize;
   headingClassName?: string;
   subHeadingClassName?: string;
 };

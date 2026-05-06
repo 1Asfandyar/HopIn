@@ -1,4 +1,4 @@
-import { FontWeight } from './types';
+import { FontSize, FontWeight } from './types';
 
 export const themeColors = {
   primary: '#16A34A',
@@ -22,4 +22,38 @@ export const fontFamilies: Record<FontWeight, string> = {
   medium: 'Poppins_500Medium',
   semiBold: 'Poppins_600SemiBold',
   bold: 'Poppins_700Bold',
+};
+
+export const fontSizes: Record<
+  FontSize,
+  { fontSize: number; lineHeight: number }
+> = {
+  xs: {
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  sm: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  md: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  lg: {
+    fontSize: 18,
+    lineHeight: 26,
+  },
+  xl: {
+    fontSize: 20,
+    lineHeight: 28,
+  },
+  '2xl': {
+    fontSize: 24,
+    lineHeight: 32,
+  },
+  '3xl': {
+    fontSize: 28,
+    lineHeight: 36,
+  },
 };

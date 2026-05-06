@@ -40,7 +40,11 @@ export const mapGooglePlaceToLocation = (
   return {
     latitude: location.lat,
     longitude: location.lng,
-    address: details?.formatted_address ?? data.description,
+    address:
+      details?.name ??
+      details?.formatted_address ??
+      data.structured_formatting?.main_text ??
+      data.description,
     city: null,
     country: null,
     countryCode: null,

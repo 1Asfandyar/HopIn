@@ -1,7 +1,12 @@
-import LocationSelector from '@/features/location/components/LocationSelector';
+import LocationSelectorScreen from '@/features/location/screens/LocationSelectorScreen';
+import LocationSelectorLayout from '@/features/location/components/LocationSelectorLayout';
 
 const FindRideScreen = () => {
-  return <LocationSelector />;
+  return (
+    <LocationSelectorLayout>
+      <LocationSelectorScreen />
+    </LocationSelectorLayout>
+  );
 };
 
 export default FindRideScreen;

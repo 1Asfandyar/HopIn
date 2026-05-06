@@ -6,6 +6,7 @@ import {
   useLocationStore,
 } from '@/store/location.store';
 import { hasGooglePlacesApiKey } from '@/config/env';
+import { LOCATION_SEARCH_RADIUS_METERS } from '../constants/location.constants';
 
 export const useLocationSearch = () => {
   const currentLocation = useLocationStore(selectCurrentLocation);
@@ -17,7 +18,7 @@ export const useLocationSearch = () => {
       currentLocation
         ? {
             location: `${currentLocation.latitude},${currentLocation.longitude}`,
-            radius: 50000,
+            radius: LOCATION_SEARCH_RADIUS_METERS,
           }
         : {},
     [currentLocation],

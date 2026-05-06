@@ -5,6 +5,7 @@ const extra = (Constants.expoConfig?.extra ?? {}) as ExpoExtra;
 
 export const env = {
   apiUrl: extra.apiUrl ?? '',
+  googleMapsApiKey: extra.googleMapsApiKey ?? '',
   googlePlacesApiKey: extra.googlePlacesApiKey ?? '',
 };
 

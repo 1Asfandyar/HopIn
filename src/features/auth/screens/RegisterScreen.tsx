@@ -1,5 +1,5 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RegisterViewProps } from '../types';
+import type { RegisterViewProps } from '@/types/types';
 import ThemedText from '@/theme/components/ThemedText';
 import { Image, View } from 'react-native';
 import ThemedInput from '@/theme/components/ThemedInput';

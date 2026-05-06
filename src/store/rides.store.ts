@@ -13,6 +13,10 @@ export const useRidesStore = create<RidesStore>(set => ({
     set(state => ({ draft: { ...state.draft, destination } }));
   },
 
+  clearDestination: () => {
+    set(state => ({ draft: { ...state.draft, destination: null } }));
+  },
+
   setDepartureTime: departureTime => {
     set(state => ({
       draft: {

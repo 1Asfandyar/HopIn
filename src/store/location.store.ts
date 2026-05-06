@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { locationService } from '@/services/locationService';
+import { currentLocationService } from '@/services/currentLocationService';
 import { logger } from '@/services/logger';
 import type { AppError, LocationStore } from '@/types/types';
 import { createAppError, getErrorMessage } from '@/utils/errors';
@@ -18,7 +18,7 @@ export const useLocationStore = create<LocationStore>(set => ({
     set({ error: null, isLoading: true });
 
     try {
-      const currentLocation = await locationService.getCurrentLocation();
+      const currentLocation = await currentLocationService.getCurrentLocation();
       set({ currentLocation, isLoading: false });
 
       return currentLocation;

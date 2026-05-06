@@ -13,6 +13,7 @@ export const useRideDraft = () => {
   const departureTime = useRidesStore(selectRideDepartureTime);
   const setPickup = useRidesStore(state => state.setPickup);
   const setDestination = useRidesStore(state => state.setDestination);
+  const clearDestination = useRidesStore(state => state.clearDestination);
   const setDepartureTime = useRidesStore(state => state.setDepartureTime);
   const resetDraft = useRidesStore(state => state.resetDraft);
 
@@ -23,6 +24,7 @@ export const useRideDraft = () => {
     departureTime,
     setPickup,
     setDestination,
+    clearDestination,
     setDepartureTime,
     resetDraft,
   };

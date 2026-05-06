@@ -36,4 +36,17 @@ describe('rides store', () => {
       '2026-05-04T10:30:00.000Z',
     );
   });
+
+  it('clears only the destination', () => {
+    useRidesStore.getState().setPickup(location);
+    useRidesStore.getState().setDestination({
+      ...location,
+      address: 'Clifton',
+    });
+
+    useRidesStore.getState().clearDestination();
+
+    expect(useRidesStore.getState().draft.pickup?.address).toBe('Karachi');
+    expect(useRidesStore.getState().draft.destination).toBeNull();
+  });
 });

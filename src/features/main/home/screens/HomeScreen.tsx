@@ -7,11 +7,11 @@ const HomeScreen = () => {
   return (
     <View className="flex-1 px-4 ">
       <View className="mb-6">
-        <ThemedText className="text-2xl">
+        <ThemedText size="2xl">
           Good Morning,{' '}
           <Ionicons name="sunny-outline" size={30} color="#FFA500" />
         </ThemedText>
-        <ThemedText weight="semiBold" className="text-2xl">
+        <ThemedText weight="semiBold" size="2xl">
           Where are you going?
         </ThemedText>
       </View>
@@ -24,8 +24,8 @@ const HomeScreen = () => {
             variant="primary"
             rightIcon="car"
             href="/(main)/offer-ride"
-            headingClassName="text-2xl"
-            subHeadingClassName=" text-xl"
+            headingSize="xl"
+            subHeadingSize="xl"
             iconSize={40}
             rightIconContainerClassName="ml-3 pt-20"
           />
@@ -37,8 +37,8 @@ const HomeScreen = () => {
             variant="secondary"
             href="/(main)/find-ride"
             rightIcon="person"
-            headingClassName="text-2xl"
-            subHeadingClassName=" text-xl"
+            headingSize="xl"
+            subHeadingSize="xl"
             iconSize={40}
             rightIconContainerClassName="ml-3 pt-20"
           />

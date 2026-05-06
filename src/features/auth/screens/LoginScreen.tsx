@@ -1,7 +1,7 @@
 import ThemedText from '@/theme/components/ThemedText';
+import type { LoginViewProps } from '@/types/types';
 import { Image, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LoginViewProps } from '../types';
 import ThemedInput from '@/theme/components/ThemedInput';
 import ThemedButton from '@/theme/components/ThemedButton';
 

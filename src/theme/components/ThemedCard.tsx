@@ -23,6 +23,8 @@ const ThemedCard = ({
   iconContainerStyle,
   leftIconContainerStyle,
   rightIconContainerStyle,
+  headingSize = 'lg',
+  subHeadingSize = 'md',
   headingClassName = '',
   subHeadingClassName = '',
   ...props
@@ -100,6 +102,7 @@ const ThemedCard = ({
         <View className="flex-1 self-start">
           <ThemedText
             weight="semiBold"
+            size={headingSize}
             className={`${headingClassName} ${colors.heading}`}
           >
             {heading}
@@ -108,6 +111,7 @@ const ThemedCard = ({
           {subHeading && (
             <ThemedText
               weight="regular"
+              size={subHeadingSize}
               className={`${colors.subHeading} ${subHeadingClassName}`}
             >
               {subHeading}

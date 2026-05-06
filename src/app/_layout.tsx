@@ -32,18 +32,16 @@ export default function RootLayout() {
           headerShown: false,
         }}
       >
-        <Stack>
-          <Stack.Screen name="index" options={{ title: 'Home' }} />
-          <Stack.Screen
-            name="(auth)/login"
-            options={{ title: 'Login', gestureEnabled: true }}
-          />
-          <Stack.Screen
-            name="(auth)/register"
-            options={{ title: 'Sign Up', gestureEnabled: true }}
-          />
-          <Stack.Screen name="(main)/welcome" options={{ title: 'Welcome' }} />
-        </Stack>
+        <Stack.Screen name="index" options={{ title: 'Home' }} />
+        <Stack.Screen
+          name="(auth)/login"
+          options={{ title: 'Login', gestureEnabled: true }}
+        />
+        <Stack.Screen
+          name="(auth)/register"
+          options={{ title: 'Sign Up', gestureEnabled: true }}
+        />
+        <Stack.Screen name="(main)" options={{ headerShown: false }} />
       </Stack>
       {isSplashVisible && (
         <View className="absolute inset-0">

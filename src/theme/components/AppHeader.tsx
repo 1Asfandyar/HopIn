@@ -1,8 +1,9 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { fontFamilies, themeColors } from '../tokens';
+import { themeColors } from '../tokens';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeaderProps } from '../types';
+import ThemedText from './ThemedText';
 
 const HeaderIconButton = ({
   icon,
@@ -54,15 +55,13 @@ const AppHeader = ({
         </View>
 
         <View style={{ flex: 1, alignItems: 'center' }}>
-          <Text
-            style={{
-              fontFamily: fontFamilies.semiBold,
-              fontSize: 20,
-              color: themeColors.gray900,
-            }}
+          <ThemedText
+            weight="semiBold"
+            size="xl"
+            style={{ color: themeColors.gray900 }}
           >
             {title}
-          </Text>
+          </ThemedText>
         </View>
 
         <View style={{ width: 40, alignItems: 'flex-end' }}>

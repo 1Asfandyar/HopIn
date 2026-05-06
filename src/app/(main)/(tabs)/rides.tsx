@@ -1,10 +1,11 @@
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import React from 'react';
+import ThemedText from '@/theme/components/ThemedText';
 
 const Rides = () => {
   return (
     <View>
-      <Text>Rides</Text>
+      <ThemedText size="lg">Rides</ThemedText>
     </View>
   );
 };

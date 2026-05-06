@@ -1,9 +1,10 @@
 import { Text } from 'react-native';
 import { ThemedTextProps } from '../types';
-import { fontFamilies } from '../tokens';
+import { fontFamilies, fontSizes } from '../tokens';
 
 const ThemedText = ({
   weight = 'regular',
+  size = 'md',
   style,
   ...props
 }: ThemedTextProps) => {
@@ -13,6 +14,7 @@ const ThemedText = ({
       style={[
         {
           fontFamily: fontFamilies[weight],
+          ...fontSizes[size],
         },
         style,
       ]}
