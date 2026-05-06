@@ -49,6 +49,7 @@ export const useLocationSelector = () => {
     longitude: DEFAULT_MAP_REGION.longitude,
   });
   const [mapRegion, setMapRegion] = useState<MapRegion>(DEFAULT_MAP_REGION);
+  const [mapCameraRequestKey, setMapCameraRequestKey] = useState(0);
   const [mapPreviewLocation, setMapPreviewLocation] =
     useState<AppLocation | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -315,6 +316,7 @@ export const useLocationSelector = () => {
         latitude: initialCoordinate.latitude,
         longitude: initialCoordinate.longitude,
       }));
+      setMapCameraRequestKey(currentKey => currentKey + 1);
       setMapPickerInput(input);
       queueMapPreviewLocationResolve(initialCoordinate);
     },
@@ -346,6 +348,7 @@ export const useLocationSelector = () => {
           latitude: location.latitude,
           longitude: location.longitude,
         }));
+        setMapCameraRequestKey(currentKey => currentKey + 1);
         setMapPreviewLocation(location);
       }
     } catch (caughtError) {
@@ -446,6 +449,7 @@ export const useLocationSelector = () => {
     shouldShowResults,
     mapPickerInput,
     mapRegion,
+    mapCameraRequestKey,
     mapPreviewLocation,
     mapError,
     isWaitingForMapPreview,

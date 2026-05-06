@@ -32,6 +32,7 @@ export type MapLocationPickerProps = {
   visible: boolean;
   inputType: ActiveLocationInput | null;
   region: MapRegion;
+  cameraRequestKey: number;
   previewLocation: AppLocation | null;
   isWaitingForPreview: boolean;
   isLoadingPreview: boolean;
@@ -62,6 +63,7 @@ export type LocationSelectorViewProps = {
   shouldShowResults: boolean;
   mapPickerInput: ActiveLocationInput | null;
   mapRegion: MapRegion;
+  mapCameraRequestKey: number;
   mapPreviewLocation: AppLocation | null;
   mapError: string | null;
   isWaitingForMapPreview: boolean;

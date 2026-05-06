@@ -38,6 +38,7 @@ const LocationSelector = ({
   shouldShowResults,
   mapPickerInput,
   mapRegion,
+  mapCameraRequestKey,
   mapPreviewLocation,
   mapError,
   isWaitingForMapPreview,
@@ -231,6 +232,7 @@ const LocationSelector = ({
         visible={mapPickerInput !== null}
         inputType={mapPickerInput}
         region={mapRegion}
+        cameraRequestKey={mapCameraRequestKey}
         previewLocation={mapPreviewLocation}
         isWaitingForPreview={isWaitingForMapPreview}
         isLoadingPreview={isLoadingMapPreview}

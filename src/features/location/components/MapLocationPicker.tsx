@@ -19,6 +19,7 @@ const MapLocationPicker = ({
   visible,
   inputType,
   region,
+  cameraRequestKey,
   previewLocation,
   isWaitingForPreview,
   isLoadingPreview,
@@ -30,6 +31,7 @@ const MapLocationPicker = ({
   onClose,
 }: MapLocationPickerProps) => {
   const mapRef = useRef<MapView | null>(null);
+  const latestRegionRef = useRef(region);
   const title =
     inputType === 'pickup'
       ? MAP_LOCATION_PICKER_COPY.pickupTitle
@@ -42,18 +44,28 @@ const MapLocationPicker = ({
     previewLocation?.address ?? MAP_LOCATION_PICKER_COPY.idleDescription;
 
   useEffect(() => {
+    latestRegionRef.current = region;
+  }, [region]);
+
+  useEffect(() => {
     if (!visible) {
       return;
     }
 
-    mapRef.current?.animateToRegion(region as Region, 250);
-  }, [region, visible]);
+    mapRef.current?.animateToRegion(latestRegionRef.current as Region, 250);
+  }, [cameraRequestKey, visible]);
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <SafeAreaView style={styles.container}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      statusBarTranslucent={false}
+      onRequestClose={onClose}
+    >
+      <SafeAreaView edges={['top', 'bottom']} style={styles.container}>
         <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-          <Pressable onPress={onClose} hitSlop={12}>
+          <Pressable onPress={onClose} hitSlop={16} style={styles.closeButton}>
             <Ionicons name="close" size={24} color={themeColors.gray700} />
           </Pressable>
           <ThemedText weight="semiBold" className="text-base text-gray-900">
@@ -134,6 +146,14 @@ const styles = StyleSheet.create({
   },
   headerSpacer: {
     width: 24,
+  },
+  closeButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: -10,
+    marginLeft: -10,
   },
   mapContainer: {
     flex: 1,

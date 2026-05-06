@@ -37,6 +37,7 @@ export const useLocationSelectorScreenProps = (): LocationSelectorViewProps => {
     shouldShowResults: locationSelector.shouldShowResults,
     mapPickerInput: locationSelector.mapPickerInput,
     mapRegion: locationSelector.mapRegion,
+    mapCameraRequestKey: locationSelector.mapCameraRequestKey,
     mapPreviewLocation: locationSelector.mapPreviewLocation,
     mapError: locationSelector.mapError,
     isWaitingForMapPreview: locationSelector.isWaitingForMapPreview,
