@@ -11,7 +11,7 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
       <View className="flex-[0.15]  bg-white justify-center items-center">
         <Image
           source={require('../../../assets/logos/hopin_light.png')}
-          style={{ width: '55%', height: '45%' }}
+          className="h-[45%] w-[55%]"
           resizeMode="contain"
         />
         <ThemedText className="text-2xl" weight="semiBold">
@@ -22,7 +22,7 @@ const LoginScreen = (LoginParams: LoginViewProps) => {
         <View className=" flex-[0.375]  justify-center items-center">
           <Image
             source={require('../../../assets/illustrations/hopin_cab.png')}
-            style={{ width: '70%', height: '100%' }}
+            className="h-full w-[70%]"
             resizeMode="contain"
           />
         </View>

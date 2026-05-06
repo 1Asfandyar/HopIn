@@ -45,7 +45,9 @@ export const currentLocationService = {
     longitude: number;
   }): Promise<AppLocation> => {
     const [address] = await Location.reverseGeocodeAsync(coords);
-    const nearbyPlaceLabel = await getNearbyPlaceLabel(coords).catch(() => null);
+    const nearbyPlaceLabel = await getNearbyPlaceLabel(coords).catch(
+      () => null,
+    );
 
     return {
       latitude: coords.latitude,

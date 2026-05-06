@@ -1,12 +1,8 @@
 import LocationSelectorScreen from '@/features/location/screens/LocationSelectorScreen';
-import LocationSelectorLayout from '@/features/location/components/LocationSelectorLayout';
+import type { LocationSelectorViewProps } from '@/features/location/types';
 
-const FindRideScreen = () => {
-  return (
-    <LocationSelectorLayout>
-      <LocationSelectorScreen />
-    </LocationSelectorLayout>
-  );
+const FindRideScreen = (props: LocationSelectorViewProps) => {
+  return <LocationSelectorScreen {...props} />;
 };
 
 export default FindRideScreen;

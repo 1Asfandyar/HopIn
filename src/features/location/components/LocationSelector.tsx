@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -80,13 +80,7 @@ const LocationSelector = ({
         <View
           pointerEvents="none"
           className="mb-2 rounded-3xl border border-gray-200 bg-white p-4"
-          style={{
-            shadowColor: themeColors.black,
-            shadowOpacity: 0.05,
-            shadowRadius: 10,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 2,
-          }}
+          style={styles.routeSummaryCard}
         >
           <View className="mb-4 flex-row items-center justify-between">
             <ThemedText weight="semiBold" className="text-base text-gray-900">
@@ -164,7 +158,7 @@ const LocationSelector = ({
         android_keyboardInputMode="adjustResize"
       >
         <BottomSheetView className="flex-1 gap-2 mx-2">
-          <View className='bg-gray-100 rounded-lg p-2 pt-4'>
+          <View className="bg-gray-100 rounded-lg p-2 pt-4">
             {isLoadingCurrentLocation && (
               <View className="px-2 pb-2 items-start">
                 <BrandedLoader
@@ -183,27 +177,30 @@ const LocationSelector = ({
                 {FEEDBACK_MESSAGES.missingGooglePlacesKey}
               </ThemedText>
             )}
-          <LocationInput
-            value={pickupQuery.length > 30 ? pickupQuery.slice(0, 30) + "..." : pickupQuery}
-            onChangeText={onPickupChange}
-            onFocus={() => onActiveInputChange('pickup')}
-            placeholder={LOCATION_SELECTOR_COPY.pickupPlaceholder}
+            <LocationInput
+              value={pickupQuery}
+              onChangeText={onPickupChange}
+              onFocus={() => onActiveInputChange('pickup')}
+              placeholder={LOCATION_SELECTOR_COPY.pickupPlaceholder}
               leftIcon="locate"
               onRightButtonPress={() => onOpenMapPicker('pickup')}
               isSearching={activeInput === 'pickup' && isSearchingPlaces}
               rightButtonLabel={LOCATION_SELECTOR_COPY.mapButtonLabel}
-          />
+            />
             <LocationInput
-            value={destinationQuery.length > 30 ? destinationQuery.slice(0, 30) + "..." : destinationQuery}
-            onChangeText={onDestinationChange}
-            onFocus={() => onActiveInputChange('destination')}
-            leftIcon="location"
+              value={destinationQuery}
+              onChangeText={onDestinationChange}
+              onFocus={() => onActiveInputChange('destination')}
+              leftIcon="location"
               onRightButtonPress={() => onOpenMapPicker('destination')}
               placeholder={LOCATION_SELECTOR_COPY.destinationPlaceholder}
               isSearching={activeInput === 'destination' && isSearchingPlaces}
               rightButtonLabel={LOCATION_SELECTOR_COPY.mapButtonLabel}
             />
-            <TouchableOpacity onPress={onOpenDateTimePicker} activeOpacity={0.7}>
+            <TouchableOpacity
+              onPress={onOpenDateTimePicker}
+              activeOpacity={0.7}
+            >
               <View pointerEvents="none">
                 <ThemedInput
                   placeholder={LOCATION_SELECTOR_COPY.dateTimeLabel}
@@ -217,7 +214,7 @@ const LocationSelector = ({
               </View>
             </TouchableOpacity>
           </View>
-          <View className='bg-gray-100 p-2 rounded-lg'>
+          <View className="bg-gray-100 p-2 rounded-lg">
             {shouldShowResults && (
               <PlaceResultsList
                 results={searchResults}
@@ -256,5 +253,15 @@ const LocationSelector = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  routeSummaryCard: {
+    shadowColor: themeColors.black,
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
+  },
+});
 
 export default LocationSelector;

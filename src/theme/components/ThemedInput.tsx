@@ -1,4 +1,4 @@
-import { View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedTextInputProps } from '../types';
 import ThemedText from './ThemedText';
@@ -34,7 +34,7 @@ const ThemedInput = ({
             name={leftIcon}
             size={20}
             color={themeColors.gray400}
-            style={{ marginRight: 8 }}
+            style={styles.leftIcon}
           />
         )}
 
@@ -45,12 +45,9 @@ const ThemedInput = ({
           placeholderTextColor={themeColors.gray400}
           className={`flex-1 min-w-0 text-gray-800 ${inputClassName}`}
           style={[
-            {
-              fontFamily: fontFamilies[weight],
-              ...fontSizes.md,
-              flexShrink: 1,
-              minWidth: 0,
-            },
+            styles.input,
+            fontSizes.md,
+            { fontFamily: fontFamilies[weight] },
             style,
           ]}
         />
@@ -58,7 +55,7 @@ const ThemedInput = ({
         {rightIcon && (
           <TouchableOpacity
             onPress={onRightIconPress}
-            style={{ flexShrink: 0 }}
+            style={styles.rightIconButton}
           >
             <Ionicons name={rightIcon} size={20} color={themeColors.gray400} />
           </TouchableOpacity>
@@ -67,5 +64,18 @@ const ThemedInput = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  leftIcon: {
+    marginRight: 8,
+  },
+  input: {
+    flexShrink: 1,
+    minWidth: 0,
+  },
+  rightIconButton: {
+    flexShrink: 0,
+  },
+});
 
 export default ThemedInput;

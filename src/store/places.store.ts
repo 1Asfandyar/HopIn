@@ -6,6 +6,8 @@ import { createAppError, getErrorMessage } from '@/utils/errors';
 import { logger } from '@/services/logger';
 import { LOCATION_SEARCH_RADIUS_METERS } from '@/features/location/constants/location.constants';
 
+let searchRequestId = 0;
+
 export const usePlacesStore = create<PlacesStore>(set => ({
   searchResults: [],
   isLoading: false,
@@ -16,6 +18,19 @@ export const usePlacesStore = create<PlacesStore>(set => ({
       set({ searchResults: [], error: null });
       return [];
     }
+
+    if (!env.googlePlacesApiKey.trim()) {
+      const appError = createAppError(
+        'CONFIG_MISSING',
+        'Google Places API key is missing.',
+      );
+
+      set({ searchResults: [], isLoading: false, error: appError });
+      return [];
+    }
+
+    const requestId = searchRequestId + 1;
+    searchRequestId = requestId;
 
     set({ isLoading: true, error: null });
 
@@ -40,6 +55,10 @@ export const usePlacesStore = create<PlacesStore>(set => ({
 
       const data = await response.json();
 
+      if (requestId !== searchRequestId) {
+        return [];
+      }
+
       if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
         throw new Error(`Google Places API error: ${data.status}`);
       }
@@ -51,6 +70,10 @@ export const usePlacesStore = create<PlacesStore>(set => ({
 
       return data.predictions || [];
     } catch (error) {
+      if (requestId !== searchRequestId) {
+        return [];
+      }
+
       const appError = createAppError(
         'PLACES_SEARCH_FAILED',
         getErrorMessage(error, 'Failed to search places'),
@@ -73,12 +96,23 @@ export const usePlacesStore = create<PlacesStore>(set => ({
       return null;
     }
 
+    if (!env.googlePlacesApiKey.trim()) {
+      const appError = createAppError(
+        'CONFIG_MISSING',
+        'Google Places API key is missing.',
+      );
+
+      set({ error: appError, isLoading: false });
+      return null;
+    }
+
     try {
       const params = new URLSearchParams({
         place_id: placeId,
         key: env.googlePlacesApiKey,
         language: 'en',
-        fields: 'name,geometry,formatted_address,address_components,vicinity,types',
+        fields:
+          'name,geometry,formatted_address,address_components,vicinity,types',
       });
 
       const response = await fetch(

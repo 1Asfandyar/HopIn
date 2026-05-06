@@ -1,4 +1,4 @@
-import { TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedButtonProps } from '../types';
 import ThemedText from './ThemedText';
@@ -58,7 +58,7 @@ const ThemedButton = ({
               name={leftIcon}
               size={iconSize}
               color={colors.icon}
-              style={{ marginRight: 8 }}
+              style={styles.leftIcon}
             />
           )}
 
@@ -75,7 +75,7 @@ const ThemedButton = ({
               name={rightIcon}
               size={iconSize}
               color={colors.icon}
-              style={{ marginLeft: 8 }}
+              style={styles.rightIcon}
             />
           )}
         </View>
@@ -83,5 +83,14 @@ const ThemedButton = ({
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  leftIcon: {
+    marginRight: 8,
+  },
+  rightIcon: {
+    marginLeft: 8,
+  },
+});
 
 export default ThemedButton;

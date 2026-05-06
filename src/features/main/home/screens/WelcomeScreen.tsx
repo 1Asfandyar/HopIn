@@ -11,7 +11,7 @@ const WelcomeScreen = () => {
       <View className="flex-[0.25] bg-white justify-center items-center">
         <Image
           source={require('../../../../assets/logos/hopin_light.png')}
-          style={{ width: '45%', height: '35%' }}
+          className="h-[35%] w-[45%]"
           resizeMode="contain"
         />
         <ThemedText className="text-xl text-gray-500" weight="semiBold">
@@ -25,7 +25,7 @@ const WelcomeScreen = () => {
       <View className="flex-[0.6] bg-white justify-center items-center">
         <Image
           source={require('../../../../assets/illustrations/hopin_cab.png')}
-          style={{ width: '100%', height: '100%' }}
+          className="h-full w-full"
           resizeMode="cover"
         />
       </View>

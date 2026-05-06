@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Image, View } from 'react-native';
+import { Animated, Image, StyleSheet, View } from 'react-native';
 import type { BrandedLoaderProps } from '@/types/types';
 
 const BrandedLoader = ({
@@ -106,36 +106,31 @@ const BrandedLoader = ({
     : isInline
       ? 'w-5 h-5'
       : 'w-[42px] h-[42px]';
+  const containerStyle = isSplash
+    ? { opacity: overlayOpacity }
+    : styles.visible;
+  const revealStyle = {
+    opacity: 1,
+    transform: [{ scale: revealScale }],
+  };
+  const iconStyle = isSplash
+    ? {
+        transform: [{ scale: 1 }, { rotate: spin }],
+      }
+    : {
+        opacity: iconOpacity,
+      };
 
   return (
-    <Animated.View
-      className={containerClassName}
-      style={{ opacity: isSplash ? overlayOpacity : 1 }}
-    >
+    <Animated.View className={containerClassName} style={containerStyle}>
       <View className={markWrapClassName}>
         {isSplash && (
           <Animated.View
-            style={[
-              {
-                opacity: 1,
-                transform: [{ scale: revealScale }],
-              },
-            ]}
+            style={revealStyle}
             className="absolute h-24 w-24 rounded-full bg-white"
           />
         )}
-        <Animated.View
-          style={[
-            isSplash
-              ? {
-                  transform: [{ scale: 1 }, { rotate: spin }],
-                }
-              : {
-                  opacity: iconOpacity,
-                },
-          ]}
-          className={iconWrapClassName}
-        >
+        <Animated.View style={iconStyle} className={iconWrapClassName}>
           <Image
             source={require('../../assets/icons/hopin_icon.png')}
             className={iconClassName}
@@ -146,5 +141,11 @@ const BrandedLoader = ({
     </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  visible: {
+    opacity: 1,
+  },
+});
 
 export default BrandedLoader;

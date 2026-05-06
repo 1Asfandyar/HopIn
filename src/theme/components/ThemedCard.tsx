@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import ThemedText from './ThemedText';
@@ -79,15 +79,7 @@ const ThemedCard = ({
       className={`w-full rounded-2xl p-4 ${
         colors.container
       } ${isDisabled ? 'opacity-60' : ''} ${containerClassName}`}
-      style={{
-        minHeight: 100,
-        elevation: variant === 'outline' ? 0 : 2,
-        shadowColor: themeColors.black,
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 2 },
-        minWidth: 0,
-      }}
+      style={[styles.card, variant === 'outline' ? styles.outlineCard : null]}
     >
       <View className="flex-row items-start">
         {hasLeadingIcon && (
@@ -154,5 +146,20 @@ const ThemedCard = ({
 
   return CardContent;
 };
+
+const styles = StyleSheet.create({
+  card: {
+    minHeight: 100,
+    elevation: 2,
+    shadowColor: themeColors.black,
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    minWidth: 0,
+  },
+  outlineCard: {
+    elevation: 0,
+  },
+});
 
 export default ThemedCard;

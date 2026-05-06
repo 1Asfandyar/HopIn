@@ -11,7 +11,7 @@ const RegisterScreen = (RegisterParams: RegisterViewProps) => {
       <View className="flex-[1]  bg-white justify-center items-center">
         <Image
           source={require('../../../assets/logos/hopin_light.png')}
-          style={{ width: '55%', height: '45%' }}
+          className="h-[45%] w-[55%]"
           resizeMode="contain"
         />
         <ThemedText className="text-2xl" weight="semiBold">
