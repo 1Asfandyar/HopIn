@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "HopIn",
+    "scheme": "hopin",
     "experiments": {
       "typedRoutes": true
     },
@@ -17,9 +17,11 @@
       "backgroundColor": "#16A34A"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.asfu.hopin"
     },
     "android": {
+      "package": "com.asfu.hopin",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/icons/hopin_icon.png",
         "backgroundColor": "#16A34A"

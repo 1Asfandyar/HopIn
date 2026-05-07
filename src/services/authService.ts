@@ -5,6 +5,7 @@ import { AUTH_SESSION_STORAGE_KEY } from '@/config/constants';
 import { storageService } from './storageService';
 import { supabase } from './supabaseClient';
 import {
+  APP_SCHEME,
   getOAuthCode,
   GOOGLE_AUTH_REDIRECT_PATH,
   mapSupabaseSession,
@@ -19,7 +20,9 @@ const persistSession = async (session: AuthSession) => {
 
 export const authService = {
   signInWithGoogle: async () => {
-    const redirectTo = ExpoLinking.createURL(GOOGLE_AUTH_REDIRECT_PATH);
+    const redirectTo = ExpoLinking.createURL(GOOGLE_AUTH_REDIRECT_PATH, {
+      scheme: APP_SCHEME,
+    });
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

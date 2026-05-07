@@ -1,6 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
 import type { AuthSession, User } from '@/types/types';
 
+export const APP_SCHEME = 'hopin';
 export const GOOGLE_AUTH_REDIRECT_PATH = 'auth/callback';
 
 export const getOAuthCode = (url: string) => {
