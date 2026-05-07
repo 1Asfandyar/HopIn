@@ -38,19 +38,7 @@ const WelcomeScreen = () => {
           containerClassName="bg-primary py-5 mx-4 rounded-3xl justify-center items-center"
           textClassName="text-white text-l"
         />
-        <View className="mt-4 flex-row justify-center items-center">
-          <ThemedText className="text-l text-gray-500">
-            Have an account?{' '}
-          </ThemedText>
-          <ThemedButton
-            title="Login"
-            variant="ghost"
-            weight="medium"
-            onPress={() => router.push('/login')}
-            containerClassName="self-start py-1"
-            textClassName="text-l text-primary"
-          />
-        </View>
+
       </View>
     </SafeAreaView>
   );

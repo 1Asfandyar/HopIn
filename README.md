@@ -1,6 +1,6 @@
 # Hopin
 
-Hopin is an Expo + React Native app with Expo Router, NativeWind, Formik, and Yup. The current codebase is organized around feature modules, with routing kept inside `src/app` and screen logic/UI grouped under `src/features`.
+Hopin is an Expo + React Native app with Expo Router, NativeWind, Supabase Auth, and Zustand. The current codebase is organized around feature modules, with routing kept inside `src/app` and screen logic/UI grouped under `src/features`.
 
 ## Tech Stack
 
@@ -9,8 +9,7 @@ Hopin is an Expo + React Native app with Expo Router, NativeWind, Formik, and Yu
 - Expo Router 6
 - TypeScript
 - NativeWind
-- Formik
-- Yup
+- Supabase Auth
 - Zustand
 
 ## Project Structure
@@ -19,31 +18,28 @@ Hopin is an Expo + React Native app with Expo Router, NativeWind, Formik, and Yu
 src/
 ├── app/                            # Expo Router routes only
 │   ├── (auth)/
-│   │   ├── login.tsx
-│   │   └── register.tsx
+│   │   └── register.tsx             # Google-only get started route
+│   ├── auth/
+│   │   └── callback.tsx             # OAuth callback loading route
 │   ├── (main)/                     # Reserved for main app routes
 │   ├── _layout.tsx
 │   └── index.tsx
 ├── features/
 │   ├── auth/
-│   │   ├── components/
+│   │   ├── helpers/
 │   │   ├── hooks/
-│   │   │   ├── useLogin.ts
+│   │   │   ├── useOAuthRedirectHandler.ts
 │   │   │   └── useRegister.ts
 │   │   ├── screens/
-│   │   │   ├── LoginScreen.tsx
 │   │   │   └── RegisterScreen.tsx
-│   │   ├── services/
 │   │   └── types.ts
-│   ├── home/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   └── screens/
-│   │       ├── DashboardScreen.tsx
-│   │       └── WelcomeScreen.tsx
+│   ├── main/
+│   │   └── home/
+│   │       └── screens/
+│   │           ├── HomeScreen.tsx
+│   │           └── WelcomeScreen.tsx
 │   └── menu/
-│       ├── components/
-│       └── hooks/
+│       └── components/
 ├── components/                     # Global reusable components
 │   ├── layout/
 │   └── ui/
@@ -56,7 +52,7 @@ src/
 │   ├── components/                 # ThemedButton, ThemedInput, ThemedText
 │   └── types.ts
 ├── hooks/                          # Global hooks only
-├── services/                       # Shared services only
+├── services/                       # Shared services and external clients
 ├── store/
 ├── types/
 └── utils/
@@ -65,8 +61,8 @@ src/
 ## Current App Flow
 
 - `src/app/index.tsx` renders the welcome experience
-- `src/app/(auth)/login.tsx` connects the login hook to the login screen
-- `src/app/(auth)/register.tsx` connects the register hook to the register screen
+- `src/app/(auth)/register.tsx` connects the Google sign-in hook to the get-started screen
+- `src/app/auth/callback.tsx` provides the OAuth callback loading route
 - feature screen components live under `src/features/.../screens`
 
 ## Architecture Notes
@@ -84,7 +80,7 @@ The project uses `@` aliases configured in `tsconfig.json` and `babel.config.js`
 Examples:
 
 ```ts
-import LoginScreen from '@/features/auth/screens/LoginScreen'
+import RegisterScreen from '@/features/auth/screens/RegisterScreen'
 import ThemedButton from '@/theme/components/ThemedButton'
 ```
 

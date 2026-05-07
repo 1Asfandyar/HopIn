@@ -6,10 +6,12 @@ import { View } from 'react-native';
 import { FONT_SOURCES } from '../assets/fonts/font.config';
 import { fontFamilies, themeColors } from '@/theme/tokens';
 import BrandedLoader from '@/components/feedback/BrandedLoader';
+import { useOAuthRedirectHandler } from '@/features/auth/hooks/useOAuthRedirectHandler';
 
 export default function RootLayout() {
   const [loaded] = useFonts(FONT_SOURCES);
   const [isSplashVisible, setSplashVisible] = useState(true);
+  useOAuthRedirectHandler();
 
   if (!loaded) {
     return <BrandedLoader />;
@@ -34,12 +36,12 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: 'Home' }} />
         <Stack.Screen
-          name="(auth)/login"
-          options={{ title: 'Login', gestureEnabled: true }}
-        />
-        <Stack.Screen
           name="(auth)/register"
           options={{ title: 'Sign Up', gestureEnabled: true }}
+        />
+        <Stack.Screen
+          name="auth/callback"
+          options={{ title: 'Signing In', gestureEnabled: false }}
         />
         <Stack.Screen name="(main)" options={{ headerShown: false }} />
       </Stack>

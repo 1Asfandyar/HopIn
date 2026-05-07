@@ -9,39 +9,39 @@ export const useAuthStore = create<AuthStore>(set => ({
   isLoading: true,
   error: null,
 
-  login: async credentials => {
+  signInWithGoogle: async () => {
     set({ error: null, isLoading: true });
 
     try {
-      const session = await authService.login(credentials);
-      set({ user: session.user, isLoading: false });
+      await authService.signInWithGoogle();
+      set({ isLoading: false });
     } catch (error) {
       const appError = createAppError(
         'AUTH_FAILED',
-        getErrorMessage(error, 'Unable to log in.'),
+        getErrorMessage(error, 'Unable to continue with Google.'),
         error,
       );
 
-      logger.error('Login failed', error);
+      logger.error('Google sign-in failed', error);
       set({ error: appError, isLoading: false });
       throw appError;
     }
   },
 
-  register: async payload => {
+  handleOAuthCallback: async url => {
     set({ error: null, isLoading: true });
 
     try {
-      const session = await authService.register(payload);
-      set({ user: session.user, isLoading: false });
+      const session = await authService.handleOAuthCallback(url);
+      set({ user: session?.user ?? null, isLoading: false });
     } catch (error) {
       const appError = createAppError(
         'AUTH_FAILED',
-        getErrorMessage(error, 'Unable to register.'),
+        getErrorMessage(error, 'Unable to complete Google sign-in.'),
         error,
       );
 
-      logger.error('Registration failed', error);
+      logger.error('Google OAuth callback failed', error);
       set({ error: appError, isLoading: false });
       throw appError;
     }

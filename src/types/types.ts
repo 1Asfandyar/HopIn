@@ -1,5 +1,5 @@
 import type { Ionicons } from '@expo/vector-icons';
-import type { Router, Href } from 'expo-router';
+import type { Href } from 'expo-router';
 import type * as ExpoLocation from 'expo-location';
 import type { ComponentProps, ReactNode } from 'react';
 import type {
@@ -76,18 +76,6 @@ export type ApiResult<T> =
       error: AppError;
     };
 
-export type LoginCredentials = {
-  identifier: string;
-  password: string;
-};
-
-export type RegisterPayload = {
-  fullName: string;
-  phone: string;
-  email: string;
-  password: string;
-};
-
 export type GooglePlaceData = {
   description: string;
   place_id?: string;
@@ -135,8 +123,8 @@ export type AuthStore = {
   user: User | null;
   isLoading: boolean;
   error: AppError | null;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  handleOAuthCallback: (url: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 };
@@ -262,47 +250,4 @@ export type BrandedLoaderProps = {
   label?: string;
   variant?: 'screen' | 'splash' | 'inline' | 'button';
   onFinish?: () => void;
-};
-
-export type LoginViewProps = {
-  phone: string;
-  password: string;
-  phoneError: string | undefined;
-  passwordError: string | undefined;
-  phoneTouched: boolean | undefined;
-  passwordTouched: boolean | undefined;
-  isSubmitting: boolean;
-  onPhoneChange: (phone: string) => void;
-  onPasswordChange: (password: string) => void;
-  onPhoneBlur: () => void;
-  onPasswordBlur: () => void;
-  onLoginPress: () => void;
-  router: Router;
-  isKeyboardVisible: boolean;
-};
-
-export type RegisterViewProps = {
-  fullName: string;
-  phone: string;
-  email: string;
-  password: string;
-  fullNameError: string | undefined;
-  phoneError: string | undefined;
-  emailError: string | undefined;
-  passwordError: string | undefined;
-  fullNameTouched: boolean | undefined;
-  phoneTouched: boolean | undefined;
-  emailTouched: boolean | undefined;
-  passwordTouched: boolean | undefined;
-  isSubmitting: boolean;
-  onFullNameChange: (fullName: string) => void;
-  onPhoneChange: (phone: string) => void;
-  onEmailChange: (email: string) => void;
-  onPasswordChange: (password: string) => void;
-  onFullNameBlur: () => void;
-  onPhoneBlur: () => void;
-  onEmailBlur: () => void;
-  onPasswordBlur: () => void;
-  onRegisterPress: () => void;
-  router: Router;
 };
