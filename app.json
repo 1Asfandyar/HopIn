@@ -42,6 +42,14 @@
           "locationWhenInUsePermission": "Allow HopIn to use your location so we can set your current pickup point."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "googleMapsApiKey": "AIzaSyDa18ohWW0XLQghZN0ZzXTO_7u5cmBStvw",
+      "googlePlacesApiKey": "AIzaSyDa18ohWW0XLQghZN0ZzXTO_7u5cmBStvw",
+      "router": {},
+      "eas": {
+        "projectId": "87817b6f-78f3-43e2-aee5-1be06de296fc"
+      }
+    }
   }
 }
