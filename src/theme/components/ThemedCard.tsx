@@ -10,6 +10,7 @@ const ThemedCard = ({
   subHeading,
   middleElement,
   variant = 'primary',
+  colorScheme,
   touchable = false,
   disabled = false,
   href,
@@ -32,31 +33,43 @@ const ThemedCard = ({
   const router = useRouter();
   const isDisabled = disabled;
   const isPressable = touchable || Boolean(href) || Boolean(props.onPress);
+  const schemeColor =
+    colorScheme === 'secondary' ? themeColors.secondary : themeColors.primary;
+  const schemeLightColor =
+    colorScheme === 'secondary'
+      ? themeColors.secondaryLight
+      : themeColors.primaryLight;
+  const schemeTextClass =
+    colorScheme === 'secondary' ? 'text-secondary' : 'text-primary';
 
   const variantStyles = {
     primary: {
-      container: 'bg-light-blue',
-      heading: 'text-primary',
+      container: '',
+      heading: schemeTextClass,
       subHeading: 'text-gray-600',
-      icon: themeColors.primary,
+      icon: schemeColor,
+      style: { backgroundColor: schemeLightColor },
     },
     secondary: {
       container: 'bg-blue-100',
       heading: 'text-secondary',
       subHeading: 'text-blue-700',
       icon: themeColors.secondary,
+      style: null,
     },
     outline: {
       container: 'bg-white border border-gray-200',
       heading: 'text-gray-900',
       subHeading: 'text-gray-500',
-      icon: themeColors.gray600,
+      icon: colorScheme ? schemeColor : themeColors.gray600,
+      style: null,
     },
     ghost: {
       container: 'bg-transparent',
       heading: 'text-gray-900',
       subHeading: 'text-gray-500',
-      icon: themeColors.gray600,
+      icon: colorScheme ? schemeColor : themeColors.gray600,
+      style: null,
     },
   };
 
@@ -79,7 +92,11 @@ const ThemedCard = ({
       className={`w-full rounded-2xl p-4 ${
         colors.container
       } ${isDisabled ? 'opacity-60' : ''} ${containerClassName}`}
-      style={[styles.card, variant === 'outline' ? styles.outlineCard : null]}
+      style={[
+        styles.card,
+        colors.style,
+        variant === 'outline' ? styles.outlineCard : null,
+      ]}
     >
       <View className="flex-row items-start">
         {hasLeadingIcon && (

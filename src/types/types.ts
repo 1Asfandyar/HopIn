@@ -22,6 +22,14 @@ export type User = {
   isProfileComplete?: boolean;
 };
 
+export type UserProfile = {
+  id: string;
+  fullName: string;
+  role?: UserRole;
+  photoUrl?: string;
+  updatedAt?: string;
+};
+
 export type AuthSession = {
   user: User;
   accessToken: string;
@@ -36,6 +44,17 @@ export type AppLocation = {
   countryCode: string | null;
 };
 
+export type SavedLocationKind = 'home' | 'office' | 'university' | 'other';
+
+export type SavedLocation = {
+  id: string;
+  userId: string;
+  label: string;
+  kind: SavedLocationKind;
+  location: AppLocation;
+  createdAt: string;
+};
+
 export type RideDraft = {
   pickup: AppLocation | null;
   destination: AppLocation | null;
@@ -48,12 +67,77 @@ export type RideRequest = {
   departureTime: string;
 };
 
-export type RideOffer = RideRequest & {
+export type RideRecordStatus =
+  | 'open'
+  | 'pending'
+  | 'accepted'
+  | 'cancelled'
+  | 'completed'
+  | 'not_completed';
+
+export type RideRecord = RideRequest & {
+  id: string;
+  userId: string | null;
+  status: RideRecordStatus;
+  createdAt: string;
+  userProfile?: UserProfile | null;
+};
+
+export type RideOffer = RideRecord & {
   seats?: number;
   price?: number;
 };
 
+export type RideRequestPost = RideRecord;
+
+export type RideBookingStatus =
+  | 'accepted'
+  | 'cancelled'
+  | 'completed'
+  | 'not_completed';
+
+export type RideBookingSource = 'direct_offer' | 'request_acceptance';
+
+export type RideBooking = {
+  id: string;
+  offerId: string | null;
+  requestId: string | null;
+  riderId: string;
+  driverId: string | null;
+  status: RideBookingStatus;
+  source: RideBookingSource;
+  createdAt: string;
+  offer?: RideOffer | null;
+  request?: RideRequestPost | null;
+};
+
+export type MyRideLifecycle = 'upcoming' | 'completed';
+
+export type MyRideKind = 'request' | 'offer' | 'booking';
+
+export type MyRideRole = 'rider' | 'driver';
+
+export type MyRide = RideRequest & {
+  id: string;
+  kind: MyRideKind;
+  role: MyRideRole;
+  status: RideRecordStatus;
+  lifecycle: MyRideLifecycle;
+  createdAt: string;
+  bookingId?: string;
+  source?: RideBookingSource;
+  offerId?: string | null;
+  requestId?: string | null;
+};
+
+export type MyRidesSummary = {
+  upcoming: MyRide[];
+  completed: MyRide[];
+};
+
 export type RideFlowMode = 'offer' | 'find';
+
+export type RideRecordType = 'offer' | 'request';
 
 export type AppErrorCode =
   | 'AUTH_FAILED'
@@ -211,6 +295,7 @@ export type ThemedButtonProps = TouchableOpacityProps & {
   title: string;
   weight?: FontWeight;
   variant?: 'primary' | 'outline' | 'ghost';
+  colorScheme?: 'primary' | 'secondary';
   loading?: boolean;
   disabled?: boolean;
   leftIcon?: ComponentProps<typeof Ionicons>['name'];
@@ -225,6 +310,7 @@ export type ThemedCardProps = TouchableOpacityProps & {
   subHeading?: string;
   middleElement?: ReactNode;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  colorScheme?: 'primary' | 'secondary';
   touchable?: boolean;
   disabled?: boolean;
   href?: Href;

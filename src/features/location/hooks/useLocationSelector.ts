@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
-import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRideDateTime } from '@/features/rides/hooks/useRideDateTime';
 import { useRideDraft } from '@/features/rides/hooks/useRideDraft';
 import { useLocationStore } from '@/store/location.store';
@@ -11,13 +10,15 @@ import {
   usePlacesStore,
 } from '@/store/places.store';
 import { currentLocationService } from '@/services/currentLocationService';
+import { savedLocationsService } from '@/services/savedLocationsService';
 import { createAppError, getErrorMessage } from '@/utils/errors';
 import { FEEDBACK_MESSAGES } from '@/config/constants';
-import { isFutureDateTime } from '@/utils/date';
 import type {
   AppLocation,
   GooglePlaceData,
   GooglePlaceDetails,
+  SavedLocation,
+  SavedLocationKind,
 } from '@/types/types';
 import type { ActiveLocationInput, MapCoordinate, MapRegion } from '../types';
 import {
@@ -25,7 +26,6 @@ import {
   DEFAULT_MAP_REGION,
   LOCATION_SEARCH_DEBOUNCE_MS,
   LOCATION_SEARCH_MIN_QUERY_LENGTH,
-  LOCATION_SHEET_SNAP_POINTS,
   MAP_PREVIEW_DELAY_MS,
   MAP_PREVIEW_MIN_DISTANCE_METERS,
 } from '../constants/location.constants';
@@ -33,13 +33,11 @@ import { mapGooglePlaceToLocation } from '../helpers/location.helpers';
 import { useLocationSearch } from './useLocationSearch';
 
 export const useLocationSelector = () => {
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const mapPreviewRequestRef = useRef(0);
   const lastQueuedMapPreviewCoordinateRef = useRef<MapCoordinate | null>(null);
   const mapPreviewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
-  const snapPoints = useMemo(() => [...LOCATION_SHEET_SNAP_POINTS], []);
   const [activeInput, setActiveInput] = useState<ActiveLocationInput | null>(
     null,
   );
@@ -60,6 +58,9 @@ export const useLocationSelector = () => {
   const [isWaitingForMapPreview, setIsWaitingForMapPreview] = useState(false);
   const [isLoadingMapPreview, setIsLoadingMapPreview] = useState(false);
   const [isConfirmingMapLocation, setIsConfirmingMapLocation] = useState(false);
+  const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([]);
+  const [isLoadingSavedLocations, setIsLoadingSavedLocations] = useState(false);
+  const [isSavingLocation, setIsSavingLocation] = useState(false);
   const setCurrentLocation = useLocationStore(
     state => state.setCurrentLocation,
   );
@@ -83,11 +84,28 @@ export const useLocationSelector = () => {
   const { pickup, destination, setDestination, setPickup } = useRideDraft();
   const rideDateTime = useRideDateTime();
 
+  const loadSavedLocations = useCallback(async () => {
+    setIsLoadingSavedLocations(true);
+
+    try {
+      const locations = await savedLocationsService.list();
+      setSavedLocations(locations);
+    } catch {
+      setSavedLocations([]);
+    } finally {
+      setIsLoadingSavedLocations(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!pickup && currentLocation) {
       setPickup(currentLocation);
     }
   }, [currentLocation, pickup, setPickup]);
+
+  useEffect(() => {
+    loadSavedLocations();
+  }, [loadSavedLocations]);
 
   useEffect(() => {
     if (activeInput !== 'pickup') {
@@ -107,10 +125,6 @@ export const useLocationSelector = () => {
       : activeInput === 'destination'
         ? destinationQuery
         : '';
-  const hasCompletedRideDetails = Boolean(
-    pickup && destination && rideDateTime.dateTime,
-  );
-  const canCloseLocationSheet = hasCompletedRideDetails;
   const shouldShowResults =
     activeInput !== null &&
     activeQuery.trim().length >= LOCATION_SEARCH_MIN_QUERY_LENGTH;
@@ -146,12 +160,9 @@ export const useLocationSelector = () => {
     selectedActiveAddress,
   ]);
 
-  const openLocationSheet = () => {
-    bottomSheetRef.current?.present();
-  };
-
-  const closeLocationSheet = useCallback(() => {
-    bottomSheetRef.current?.dismiss();
+  const handleActiveInputChange = useCallback((input: ActiveLocationInput) => {
+    setActiveInput(input);
+    setMapPickerInput(input);
   }, []);
 
   const applyPickupLocation = useCallback(
@@ -192,11 +203,11 @@ export const useLocationSelector = () => {
       const location = mapGooglePlaceToLocation(data, details);
 
       if (!location) {
-        return false;
+        return null;
       }
 
       applyLocation(input, location);
-      return true;
+      return location;
     },
     [applyLocation],
   );
@@ -215,45 +226,98 @@ export const useLocationSelector = () => {
         setDestinationQuery(place.description);
       }
 
-      setActiveInput(null);
       clearResults();
 
       const details = place.place_id
         ? await getPlaceDetailsById(place.place_id)
         : null;
 
-      const didApplyLocation = mapPlaceSelectionToLocation(
+      const selectedLocation = mapPlaceSelectionToLocation(
         selectedInput,
         place,
         details,
       );
 
-      if (didApplyLocation) {
+      if (selectedLocation) {
         Keyboard.dismiss();
-
-        const nextPickup = selectedInput === 'pickup' ? place : null;
-        const nextDestination = selectedInput === 'destination' ? place : null;
-        const shouldCloseAfterSelection = Boolean(
-          (nextPickup || pickup) &&
-          (nextDestination || destination) &&
-          rideDateTime.dateTime,
-        );
-
-        if (shouldCloseAfterSelection) {
-          closeLocationSheet();
-        }
+        setMapPickerInput(selectedInput);
+        setMapPreviewLocation(selectedLocation);
+        setMapRegion({
+          ...DEFAULT_CURRENT_LOCATION_MAP_REGION,
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude,
+        });
+        setMapCameraRequestKey(currentKey => currentKey + 1);
+        lastQueuedMapPreviewCoordinateRef.current = selectedLocation;
       }
     },
     [
       activeInput,
       clearResults,
-      closeLocationSheet,
-      destination,
       getPlaceDetailsById,
       mapPlaceSelectionToLocation,
-      pickup,
-      rideDateTime.dateTime,
     ],
+  );
+
+  const handleSavedLocationSelected = useCallback(
+    (savedLocation: SavedLocation) => {
+      const input = activeInput ?? 'destination';
+
+      applyLocation(input, savedLocation.location);
+      setMapPickerInput(input);
+      clearResults();
+      Keyboard.dismiss();
+      setMapPreviewLocation(savedLocation.location);
+      setMapRegion({
+        ...DEFAULT_CURRENT_LOCATION_MAP_REGION,
+        latitude: savedLocation.location.latitude,
+        longitude: savedLocation.location.longitude,
+      });
+      setMapCameraRequestKey(currentKey => currentKey + 1);
+      lastQueuedMapPreviewCoordinateRef.current = savedLocation.location;
+    },
+    [activeInput, applyLocation, clearResults],
+  );
+
+  const saveLocation = useCallback(
+    async (
+      input: ActiveLocationInput,
+      label: string,
+      kind: SavedLocationKind,
+    ) => {
+      const location = input === 'pickup' ? pickup : destination;
+
+      if (!location) {
+        throw new Error('Choose a location before saving it.');
+      }
+
+      setIsSavingLocation(true);
+
+      try {
+        const savedLocation = await savedLocationsService.save({
+          label,
+          kind,
+          location,
+        });
+
+        setSavedLocations(currentLocations => {
+          const existingIndex = currentLocations.findIndex(
+            item => item.id === savedLocation.id || item.label === label,
+          );
+
+          if (existingIndex === -1) {
+            return [...currentLocations, savedLocation];
+          }
+
+          return currentLocations.map((item, index) =>
+            index === existingIndex ? savedLocation : item,
+          );
+        });
+      } finally {
+        setIsSavingLocation(false);
+      }
+    },
+    [destination, pickup],
   );
 
   const closeMapPicker = useCallback(() => {
@@ -263,6 +327,7 @@ export const useLocationSelector = () => {
     }
 
     setMapPickerInput(null);
+    setActiveInput(null);
     setMapPreviewLocation(null);
     setMapError(null);
     setIsWaitingForMapPreview(false);
@@ -328,8 +393,7 @@ export const useLocationSelector = () => {
 
   const openMapPicker = useCallback(
     async (input: ActiveLocationInput) => {
-      const existingLocation =
-        input === 'pickup' ? currentLocation : destination;
+      const existingLocation = input === 'pickup' ? pickup : destination;
       let initialCoordinate: MapCoordinate | AppLocation | null =
         existingLocation ?? currentLocation;
 
@@ -359,7 +423,7 @@ export const useLocationSelector = () => {
       };
 
       Keyboard.dismiss();
-      setActiveInput(null);
+      setActiveInput(input);
       clearResults();
       setMapError(nextMapError);
       setMapCoordinate(nextCoordinate);
@@ -378,9 +442,15 @@ export const useLocationSelector = () => {
       currentLocation,
       destination,
       fetchCurrentLocation,
+      pickup,
       queueMapPreviewLocationResolve,
     ],
   );
+
+  const openRouteMapPicker = useCallback(() => {
+    loadSavedLocations();
+    openMapPicker(destination ? 'destination' : 'pickup');
+  }, [destination, loadSavedLocations, openMapPicker]);
 
   const useDeviceLocationOnMap = useCallback(async () => {
     if (mapPreviewTimeoutRef.current) {
@@ -448,19 +518,7 @@ export const useLocationSelector = () => {
 
     try {
       applyLocation(mapPickerInput, mapPreviewLocation);
-      setActiveInput(null);
-
-      const shouldCloseAfterMapSelection = Boolean(
-        (mapPickerInput === 'pickup' ? mapPreviewLocation : pickup) &&
-        (mapPickerInput === 'destination' ? mapPreviewLocation : destination) &&
-        rideDateTime.dateTime,
-      );
-
       closeMapPicker();
-
-      if (shouldCloseAfterMapSelection) {
-        closeLocationSheet();
-      }
     } catch (caughtError) {
       const appError = createAppError(
         'LOCATION_GEOCODE_FAILED',
@@ -472,31 +530,16 @@ export const useLocationSelector = () => {
     } finally {
       setIsConfirmingMapLocation(false);
     }
-  }, [
-    applyLocation,
-    closeLocationSheet,
-    closeMapPicker,
-    destination,
-    mapPickerInput,
-    mapPreviewLocation,
-    pickup,
-    rideDateTime.dateTime,
-  ]);
+  }, [applyLocation, closeMapPicker, mapPickerInput, mapPreviewLocation]);
 
   const handleDateTimeConfirm = useCallback(
     (selectedDateTime: Date) => {
       rideDateTime.handleDateTimeConfirm(selectedDateTime);
-
-      if (pickup && destination && isFutureDateTime(selectedDateTime)) {
-        closeLocationSheet();
-      }
     },
-    [closeLocationSheet, destination, pickup, rideDateTime],
+    [rideDateTime],
   );
 
   return {
-    bottomSheetRef,
-    snapPoints,
     activeInput,
     pickupQuery,
     destinationQuery,
@@ -504,9 +547,11 @@ export const useLocationSelector = () => {
     isSearchingPlaces,
     placesError,
     currentLocation,
-    canCloseLocationSheet,
     destination,
     pickup,
+    savedLocations,
+    isLoadingSavedLocations,
+    isSavingLocation,
     locationError: locationSearchError,
     hasGooglePlacesApiKey,
     isLoadingCurrentLocation: isLoading,
@@ -523,9 +568,8 @@ export const useLocationSelector = () => {
     rideDateTime,
     setPickupQuery,
     setDestinationQuery,
-    setActiveInput,
-    openLocationSheet,
-    closeLocationSheet,
+    setActiveInput: handleActiveInputChange,
+    openRouteMapPicker,
     openMapPicker,
     closeMapPicker,
     handleDateTimeConfirm,
@@ -533,6 +577,8 @@ export const useLocationSelector = () => {
     useDeviceLocationOnMap,
     confirmMapLocation,
     handlePlaceSelected,
+    onSavedLocationSelected: handleSavedLocationSelected,
+    saveLocation,
   };
 };
 

@@ -39,6 +39,7 @@ export const LOCATION_SELECTOR_COPY = {
 } as const;
 
 export const MAP_LOCATION_PICKER_COPY = {
+  routeTitle: 'Set ride details',
   pickupTitle: 'Select current location',
   destinationTitle: 'Select destination',
   pickupHeading: 'Pickup location',

@@ -5,12 +5,16 @@ import { themeColors } from '@/theme/tokens';
 import AppHeader from '@/theme/components/AppHeader';
 import MainMenu from '@/features/menu/components/MainMenu';
 import { useAuthStore } from '@/store/auth.store';
+import { USER_ROLES } from '@/constants/roles';
+import { getRoleTheme } from '@/theme/helpers/roleTheme.helpers';
 
 const MainTabsLayout = () => {
   const router = useRouter();
+  const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
+  const roleTheme = getRoleTheme(user?.role ?? USER_ROLES.rider);
 
   const openMenu = () => {
     setMenuOpen(true);
@@ -36,7 +40,7 @@ const MainTabsLayout = () => {
     <>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: themeColors.primary,
+          tabBarActiveTintColor: roleTheme.color,
           tabBarInactiveTintColor: themeColors.gray300,
           tabBarStyle: {
             backgroundColor: themeColors.white,

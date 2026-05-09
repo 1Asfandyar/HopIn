@@ -1,24 +1,23 @@
-import { useCallback } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
 import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+  Alert,
+  Modal,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ThemedInput from '@/theme/components/ThemedInput';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedText from '@/theme/components/ThemedText';
-import BrandedLoader from '@/components/feedback/BrandedLoader';
-import { FEEDBACK_MESSAGES } from '@/config/constants';
 import { themeColors } from '@/theme/tokens';
 import type { LocationSelectorViewProps } from '../types';
+import type { ActiveLocationInput } from '../types';
+import type { SavedLocationKind } from '@/types/types';
 import { LOCATION_SELECTOR_COPY } from '../constants/location.constants';
-import LocationInput from './LocationInput';
 import MapLocationPicker from './MapLocationPicker';
-import PlaceResultsList from './PlaceResultsList';
 
 const LocationSelector = ({
   flowMode,
@@ -29,9 +28,6 @@ const LocationSelector = ({
   submittingLabel,
   onSubmit,
   isSubmitting,
-  bottomSheetRef,
-  snapPoints,
-  topInset,
   activeInput,
   pickupQuery,
   destinationQuery,
@@ -40,10 +36,12 @@ const LocationSelector = ({
   placesError,
   pickup,
   destination,
+  savedLocations,
+  isLoadingSavedLocations,
+  isSavingLocation,
   locationError,
   hasGooglePlacesApiKey,
   isLoadingCurrentLocation,
-  canCloseLocationSheet,
   shouldShowResults,
   mapPickerInput,
   mapRegion,
@@ -53,7 +51,6 @@ const LocationSelector = ({
   isWaitingForMapPreview,
   isLoadingMapPreview,
   isConfirmingMapLocation,
-  isOpeningMapPicker,
   dateTime,
   isDateTimePickerOpen,
   minDateTime,
@@ -61,40 +58,152 @@ const LocationSelector = ({
   onPickupChange,
   onDestinationChange,
   onActiveInputChange,
-  onOpenLocationSheet,
+  onOpenRouteMap,
+  onOpenLocationMap,
   onOpenDateTimePicker,
   onCloseDateTimePicker,
   onDateTimeConfirm,
-  onOpenMapPicker,
   onCloseMapPicker,
   onMapRegionChange,
   onUseDeviceLocationOnMap,
   onConfirmMapLocation,
   onPlaceSelected,
+  onSavedLocationSelected,
+  onSaveLocation,
 }: LocationSelectorViewProps) => {
-  const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-        opacity={0.45}
-        pressBehavior={canCloseLocationSheet ? 'close' : 'none'}
-      />
-    ),
-    [canCloseLocationSheet],
-  );
+  const [saveTargetInput, setSaveTargetInput] =
+    useState<ActiveLocationInput | null>(null);
+  const [selectedSavedKind, setSelectedSavedKind] =
+    useState<SavedLocationKind>('home');
+  const [customLocationLabel, setCustomLocationLabel] = useState('');
   const canSubmit = Boolean(pickup && destination && dateTime);
+  const saveKindOptions: Array<{ kind: SavedLocationKind; label: string }> = [
+    { kind: 'home', label: 'Home' },
+    { kind: 'office', label: 'Office' },
+    { kind: 'university', label: 'University' },
+    { kind: 'other', label: 'Other' },
+  ];
+  const savedLocationLabel =
+    selectedSavedKind === 'other'
+      ? customLocationLabel.trim()
+      : (saveKindOptions.find(option => option.kind === selectedSavedKind)
+          ?.label ?? '');
+  const canSaveLocation = Boolean(saveTargetInput && savedLocationLabel);
+  const colorScheme = flowMode === 'find' ? 'secondary' : 'primary';
   const modeClasses =
     flowMode === 'offer'
       ? {
           container: 'bg-light-blue',
           label: 'text-primary',
+          routeCard: 'bg-light-blue',
+          routeLabel: 'text-primary',
+          routePlaceholder: 'text-gray-500',
+          selectedSaveKind: 'border-primary bg-light-blue',
+          selectedSaveKindText: 'text-primary',
         }
       : {
           container: 'bg-blue-100',
           label: 'text-secondary',
+          routeCard: 'bg-blue-100',
+          routeLabel: 'text-secondary',
+          routePlaceholder: 'text-blue-700',
+          selectedSaveKind: 'border-secondary bg-blue-100',
+          selectedSaveKindText: 'text-secondary',
         };
+  const openSaveLocationModal = (input: ActiveLocationInput) => {
+    setSaveTargetInput(input);
+    setSelectedSavedKind(input === 'pickup' ? 'home' : 'office');
+    setCustomLocationLabel('');
+  };
+
+  const closeSaveLocationModal = () => {
+    setSaveTargetInput(null);
+    setCustomLocationLabel('');
+  };
+
+  const handleSaveLocation = async () => {
+    if (!saveTargetInput || !savedLocationLabel) {
+      return;
+    }
+
+    try {
+      await onSaveLocation(
+        saveTargetInput,
+        savedLocationLabel,
+        selectedSavedKind,
+      );
+      closeSaveLocationModal();
+    } catch (error) {
+      Alert.alert(
+        "Couldn't save location",
+        error instanceof Error ? error.message : 'Please try again.',
+      );
+    }
+  };
+
+  const renderSaveLocationAction = (
+    input: ActiveLocationInput,
+    isDisabled: boolean,
+  ) => (
+    <TouchableOpacity
+      activeOpacity={0.75}
+      disabled={isDisabled}
+      className={`ml-3 flex-row items-center rounded-full border px-3 py-2 ${
+        isDisabled ? 'border-gray-200 bg-gray-50' : 'border-gray-200 bg-white'
+      }`}
+      style={styles.saveLocationAction}
+      onPress={event => {
+        event.stopPropagation();
+        openSaveLocationModal(input);
+      }}
+    >
+      <Ionicons
+        name="bookmark-outline"
+        size={14}
+        color={isDisabled ? themeColors.gray300 : themeColors.gray600}
+      />
+      <ThemedText
+        weight="semiBold"
+        size="xs"
+        className={`ml-1 ${isDisabled ? 'text-gray-300' : 'text-gray-700'}`}
+      >
+        Save
+      </ThemedText>
+    </TouchableOpacity>
+  );
+
+  const renderRouteLocationCard = (
+    input: ActiveLocationInput,
+    label: string,
+    address: string | undefined,
+    placeholder: string,
+    hasLocation: boolean,
+  ) => (
+    <View className={`rounded-2xl px-3 py-3 ${modeClasses.routeCard}`}>
+      <View className="flex-row items-start justify-between">
+        <TouchableOpacity
+          activeOpacity={0.75}
+          className="min-w-0 flex-1 pr-2"
+          onPress={() => onOpenLocationMap(input)}
+        >
+          <ThemedText
+            weight="semiBold"
+            className={`mb-1 text-[12px] uppercase tracking-wide ${modeClasses.routeLabel}`}
+          >
+            {label}
+          </ThemedText>
+          <ThemedText
+            className={`text-sm ${address ? 'text-gray-900' : modeClasses.routePlaceholder}`}
+            numberOfLines={2}
+          >
+            {address ?? placeholder}
+          </ThemedText>
+        </TouchableOpacity>
+
+        {renderSaveLocationAction(input, !hasLocation)}
+      </View>
+    </View>
+  );
 
   return (
     <View className="bg-white flex-1">
@@ -111,72 +220,52 @@ const LocationSelector = ({
         <ThemedText className="mt-2 text-gray-600">{description}</ThemedText>
       </View>
 
-      <TouchableOpacity onPress={onOpenLocationSheet} activeOpacity={0.7}>
-        <View
-          pointerEvents="none"
-          className="mb-2 rounded-3xl border border-gray-200 bg-white p-4"
-          style={styles.routeSummaryCard}
-        >
-          <View className="mb-4 flex-row items-center justify-between">
-            <ThemedText weight="semiBold" className="text-base text-gray-900">
-              {LOCATION_SELECTOR_COPY.routeSummaryTitle}
-            </ThemedText>
+      <View
+        className="mb-2 rounded-3xl border border-gray-200 bg-white p-4"
+        style={styles.routeSummaryCard}
+      >
+        <View className="mb-4 flex-row items-center justify-between">
+          <ThemedText weight="semiBold" className="text-base text-gray-900">
+            {LOCATION_SELECTOR_COPY.routeSummaryTitle}
+          </ThemedText>
+          <TouchableOpacity activeOpacity={0.75} onPress={onOpenRouteMap}>
             <Ionicons
               name="arrow-forward-circle"
               size={22}
               color={themeColors.gray400}
             />
-          </View>
+          </TouchableOpacity>
+        </View>
 
-          <View className="gap-3">
-            <View className="rounded-2xl bg-light-blue px-3 py-3">
-              <ThemedText
-                weight="semiBold"
-                className="mb-1 text-[12px] uppercase tracking-wide text-primary"
-              >
-                {LOCATION_SELECTOR_COPY.fromLabel}
-              </ThemedText>
-              <ThemedText
-                className={`text-sm ${pickup?.address ? 'text-gray-900' : 'text-gray-500'}`}
-                numberOfLines={2}
-              >
-                {pickup?.address ?? LOCATION_SELECTOR_COPY.pickupPlaceholder}
-              </ThemedText>
-            </View>
+        <View className="gap-3">
+          {renderRouteLocationCard(
+            'pickup',
+            LOCATION_SELECTOR_COPY.fromLabel,
+            pickup?.address,
+            LOCATION_SELECTOR_COPY.pickupPlaceholder,
+            Boolean(pickup),
+          )}
+          {renderRouteLocationCard(
+            'destination',
+            LOCATION_SELECTOR_COPY.toLabel,
+            destination?.address,
+            LOCATION_SELECTOR_COPY.routePlaceholder,
+            Boolean(destination),
+          )}
+        </View>
+      </View>
 
-            <View className="rounded-2xl bg-blue-100 px-3 py-3">
-              <ThemedText
-                weight="semiBold"
-                className="mb-1 text-[12px] uppercase tracking-wide text-secondary"
-              >
-                {LOCATION_SELECTOR_COPY.toLabel}
-              </ThemedText>
-              <ThemedText
-                className={`text-sm ${destination?.address ? 'text-gray-900' : 'text-blue-700'}`}
-                numberOfLines={2}
-              >
-                {destination?.address ??
-                  LOCATION_SELECTOR_COPY.routePlaceholder}
-              </ThemedText>
-            </View>
-
-            <View className="rounded-2xl border border-gray-200 bg-white px-3 py-3">
-              <ThemedText
-                weight="semiBold"
-                className="mb-1 text-[12px] uppercase tracking-wide text-gray-600"
-              >
-                {LOCATION_SELECTOR_COPY.dateTimeLabel}
-              </ThemedText>
-              <ThemedText
-                className={`text-sm ${dateTime ? 'text-gray-900' : 'text-gray-500'}`}
-                numberOfLines={2}
-              >
-                {dateTime
-                  ? formatDateAndTime(dateTime)
-                  : LOCATION_SELECTOR_COPY.dateTimePlaceholder}
-              </ThemedText>
-            </View>
-          </View>
+      <TouchableOpacity onPress={onOpenDateTimePicker} activeOpacity={0.7}>
+        <View pointerEvents="none" className="mt-3">
+          <ThemedInput
+            placeholder={LOCATION_SELECTOR_COPY.dateTimeLabel}
+            leftIcon="calendar"
+            rightIcon="arrow-forward-circle"
+            value={formatDateAndTime(dateTime)}
+            editable={false}
+            weight="regular"
+            inputClassName="pl-2 text-base"
+          />
         </View>
       </TouchableOpacity>
 
@@ -187,96 +276,27 @@ const LocationSelector = ({
         onPress={onSubmit}
         containerClassName="mt-4"
         leftIcon={flowMode === 'offer' ? 'send-outline' : 'search-outline'}
+        colorScheme={colorScheme}
       />
-
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        index={0}
-        snapPoints={snapPoints}
-        topInset={topInset}
-        backdropComponent={renderBackdrop}
-        enableDynamicSizing={false}
-        enablePanDownToClose
-        keyboardBehavior="fillParent"
-        keyboardBlurBehavior="restore"
-        android_keyboardInputMode="adjustResize"
-      >
-        <BottomSheetView className="flex-1 gap-2 mx-2">
-          <View className="bg-gray-100 rounded-lg p-2 pt-4">
-            {isLoadingCurrentLocation && (
-              <View className="px-2 pb-2 items-start">
-                <BrandedLoader
-                  variant="inline"
-                  label={FEEDBACK_MESSAGES.currentLocationLoading}
-                />
-              </View>
-            )}
-            {locationError && (
-              <ThemedText className="text-red-500 text-sm px-2 pb-2">
-                {locationError.message}
-              </ThemedText>
-            )}
-            {!hasGooglePlacesApiKey && (
-              <ThemedText className="text-red-500 text-sm px-2 pb-2">
-                {FEEDBACK_MESSAGES.missingGooglePlacesKey}
-              </ThemedText>
-            )}
-            <LocationInput
-              value={pickupQuery}
-              onChangeText={onPickupChange}
-              onFocus={() => onActiveInputChange('pickup')}
-              placeholder={LOCATION_SELECTOR_COPY.pickupPlaceholder}
-              leftIcon="locate"
-              onRightButtonPress={() => onOpenMapPicker('pickup')}
-              isSearching={
-                isOpeningMapPicker ||
-                (activeInput === 'pickup' && isSearchingPlaces)
-              }
-              rightButtonLabel={LOCATION_SELECTOR_COPY.mapButtonLabel}
-            />
-            <LocationInput
-              value={destinationQuery}
-              onChangeText={onDestinationChange}
-              onFocus={() => onActiveInputChange('destination')}
-              leftIcon="location"
-              onRightButtonPress={() => onOpenMapPicker('destination')}
-              placeholder={LOCATION_SELECTOR_COPY.destinationPlaceholder}
-              isSearching={activeInput === 'destination' && isSearchingPlaces}
-              rightButtonLabel={LOCATION_SELECTOR_COPY.mapButtonLabel}
-            />
-            <TouchableOpacity
-              onPress={onOpenDateTimePicker}
-              activeOpacity={0.7}
-            >
-              <View pointerEvents="none">
-                <ThemedInput
-                  placeholder={LOCATION_SELECTOR_COPY.dateTimeLabel}
-                  leftIcon="calendar"
-                  rightIcon="arrow-forward-circle"
-                  value={formatDateAndTime(dateTime)}
-                  editable={false}
-                  weight="regular"
-                  inputClassName="pl-2 text-base"
-                />
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View className="bg-gray-100 p-2 rounded-lg">
-            {shouldShowResults && (
-              <PlaceResultsList
-                results={searchResults}
-                isLoading={isSearchingPlaces}
-                error={placesError}
-                onPlacePress={onPlaceSelected}
-              />
-            )}
-          </View>
-        </BottomSheetView>
-      </BottomSheetModal>
 
       <MapLocationPicker
         visible={mapPickerInput !== null}
+        flowMode={flowMode}
         inputType={mapPickerInput}
+        activeInput={activeInput}
+        pickupQuery={pickupQuery}
+        destinationQuery={destinationQuery}
+        pickup={pickup}
+        destination={destination}
+        searchResults={searchResults}
+        isSearchingPlaces={isSearchingPlaces}
+        placesError={placesError}
+        shouldShowResults={shouldShowResults}
+        savedLocations={savedLocations}
+        isLoadingSavedLocations={isLoadingSavedLocations}
+        locationError={locationError}
+        hasGooglePlacesApiKey={hasGooglePlacesApiKey}
+        isLoadingCurrentLocation={isLoadingCurrentLocation}
         region={mapRegion}
         cameraRequestKey={mapCameraRequestKey}
         previewLocation={mapPreviewLocation}
@@ -284,6 +304,11 @@ const LocationSelector = ({
         isLoadingPreview={isLoadingMapPreview}
         isConfirming={isConfirmingMapLocation}
         error={mapError}
+        onPickupChange={onPickupChange}
+        onDestinationChange={onDestinationChange}
+        onActiveInputChange={onActiveInputChange}
+        onPlaceSelected={onPlaceSelected}
+        onSavedLocationSelected={onSavedLocationSelected}
         onRegionChange={onMapRegionChange}
         onUseCurrentLocation={onUseDeviceLocationOnMap}
         onConfirm={onConfirmMapLocation}
@@ -298,6 +323,79 @@ const LocationSelector = ({
         minimumDate={minDateTime}
         is24Hour={false}
       />
+
+      <Modal
+        visible={saveTargetInput !== null}
+        animationType="fade"
+        transparent
+        onRequestClose={closeSaveLocationModal}
+      >
+        <Pressable
+          style={styles.modalBackdrop}
+          onPress={closeSaveLocationModal}
+        >
+          <Pressable style={styles.saveLocationModal}>
+            <ThemedText weight="semiBold" size="lg" className="text-gray-900">
+              Save location
+            </ThemedText>
+            <View className="my-4 flex-row flex-wrap gap-2">
+              {saveKindOptions.map(option => {
+                const isSelected = option.kind === selectedSavedKind;
+
+                return (
+                  <TouchableOpacity
+                    key={option.kind}
+                    activeOpacity={0.8}
+                    onPress={() => setSelectedSavedKind(option.kind)}
+                    className={`rounded-xl border px-3 py-2 ${
+                      isSelected
+                        ? modeClasses.selectedSaveKind
+                        : 'border-gray-200 bg-white'
+                    }`}
+                  >
+                    <ThemedText
+                      weight="semiBold"
+                      size="sm"
+                      className={
+                        isSelected
+                          ? modeClasses.selectedSaveKindText
+                          : 'text-gray-700'
+                      }
+                    >
+                      {option.label}
+                    </ThemedText>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            {selectedSavedKind === 'other' && (
+              <ThemedInput
+                value={customLocationLabel}
+                onChangeText={setCustomLocationLabel}
+                placeholder="Label"
+                leftIcon="bookmark-outline"
+              />
+            )}
+            <View className="mt-2 flex-row gap-2">
+              <ThemedButton
+                title="Cancel"
+                variant="outline"
+                colorScheme={colorScheme}
+                onPress={closeSaveLocationModal}
+                containerClassName="flex-1"
+              />
+              <ThemedButton
+                title={isSavingLocation ? 'Saving...' : 'Save'}
+                loading={isSavingLocation}
+                disabled={!canSaveLocation || isSavingLocation}
+                onPress={handleSaveLocation}
+                colorScheme={colorScheme}
+                containerClassName="flex-1"
+              />
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -309,6 +407,23 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
+  },
+  saveLocationAction: {
+    zIndex: 2,
+    elevation: 3,
+  },
+  modalBackdrop: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    padding: 20,
+  },
+  saveLocationModal: {
+    width: '100%',
+    borderRadius: 18,
+    backgroundColor: themeColors.white,
+    padding: 18,
   },
 });
 

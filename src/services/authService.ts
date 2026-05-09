@@ -4,6 +4,7 @@ import { Linking } from 'react-native';
 import { AUTH_SESSION_STORAGE_KEY } from '@/config/constants';
 import { storageService } from './storageService';
 import { supabase } from './supabaseClient';
+import { profileService } from './profileService';
 import {
   APP_SCHEME,
   getOAuthCode,
@@ -178,6 +179,13 @@ export const authService = {
       throw error;
     }
 
+    await profileService.upsertProfile({
+      id: userId,
+      fullName: profile.fullName,
+      role: profile.role,
+      photoUrl: uploadedPhotoUrl ?? undefined,
+    });
+
     const { data: sessionData, error: sessionError } =
       await supabase.auth.getSession();
 
@@ -238,14 +246,26 @@ export const authService = {
       throw error;
     }
 
-    if (data.session) {
-      const session = mapSupabaseSession(data.session);
-      await persistSession(session);
-      return session;
+    if (!data.session) {
+      await storageService.remove(AUTH_SESSION_STORAGE_KEY);
+      return null;
     }
 
-    const session = await storageService.getString(AUTH_SESSION_STORAGE_KEY);
+    const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    return session ? (JSON.parse(session) as AuthSession) : null;
+    if (userError || !userData.user) {
+      await supabase.auth.signOut();
+      await storageService.remove(AUTH_SESSION_STORAGE_KEY);
+      return null;
+    }
+
+    const verifiedSession = {
+      ...data.session,
+      user: userData.user,
+    };
+    const session = mapSupabaseSession(verifiedSession);
+    await persistSession(session);
+
+    return session;
   },
 };

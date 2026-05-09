@@ -1,10 +1,11 @@
-import type { RefObject } from 'react';
-import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import type {
   AppError,
   AppLocation,
   GooglePlaceData,
   LocationInputProps,
+  SavedLocation,
+  SavedLocationKind,
+  RideFlowMode,
 } from '@/types/types';
 
 export type { LocationInputProps };
@@ -30,7 +31,22 @@ export type PlaceResultsListProps = {
 
 export type MapLocationPickerProps = {
   visible: boolean;
+  flowMode: RideFlowMode;
   inputType: ActiveLocationInput | null;
+  activeInput: ActiveLocationInput | null;
+  pickupQuery: string;
+  destinationQuery: string;
+  pickup: AppLocation | null;
+  destination: AppLocation | null;
+  searchResults: GooglePlaceData[];
+  isSearchingPlaces: boolean;
+  placesError: AppError | null;
+  shouldShowResults: boolean;
+  savedLocations: SavedLocation[];
+  isLoadingSavedLocations: boolean;
+  locationError: AppError | null;
+  hasGooglePlacesApiKey: boolean;
+  isLoadingCurrentLocation: boolean;
   region: MapRegion;
   cameraRequestKey: number;
   previewLocation: AppLocation | null;
@@ -38,6 +54,11 @@ export type MapLocationPickerProps = {
   isLoadingPreview: boolean;
   isConfirming: boolean;
   error: string | null;
+  onPickupChange: (text: string) => void;
+  onDestinationChange: (text: string) => void;
+  onActiveInputChange: (input: ActiveLocationInput) => void;
+  onPlaceSelected: (place: GooglePlaceData) => void;
+  onSavedLocationSelected: (savedLocation: SavedLocation) => void;
   onRegionChange: (region: MapRegion) => void;
   onUseCurrentLocation: () => void;
   onConfirm: () => void;
@@ -53,9 +74,6 @@ export type LocationSelectorViewProps = {
   submittingLabel: string;
   onSubmit: () => void;
   isSubmitting: boolean;
-  bottomSheetRef: RefObject<BottomSheetModal | null>;
-  snapPoints: string[];
-  topInset: number;
   activeInput: ActiveLocationInput | null;
   pickupQuery: string;
   destinationQuery: string;
@@ -64,10 +82,12 @@ export type LocationSelectorViewProps = {
   placesError: AppError | null;
   pickup: AppLocation | null;
   destination: AppLocation | null;
+  savedLocations: SavedLocation[];
+  isLoadingSavedLocations: boolean;
+  isSavingLocation: boolean;
   locationError: AppError | null;
   hasGooglePlacesApiKey: boolean;
   isLoadingCurrentLocation: boolean;
-  canCloseLocationSheet: boolean;
   shouldShowResults: boolean;
   mapPickerInput: ActiveLocationInput | null;
   mapRegion: MapRegion;
@@ -77,7 +97,6 @@ export type LocationSelectorViewProps = {
   isWaitingForMapPreview: boolean;
   isLoadingMapPreview: boolean;
   isConfirmingMapLocation: boolean;
-  isOpeningMapPicker: boolean;
   dateTime: Date | null;
   isDateTimePickerOpen: boolean;
   minDateTime: Date;
@@ -85,14 +104,20 @@ export type LocationSelectorViewProps = {
   onPickupChange: (text: string) => void;
   onDestinationChange: (text: string) => void;
   onActiveInputChange: (input: ActiveLocationInput) => void;
-  onOpenLocationSheet: () => void;
+  onOpenRouteMap: () => void;
+  onOpenLocationMap: (input: ActiveLocationInput) => void;
   onOpenDateTimePicker: () => void;
   onCloseDateTimePicker: () => void;
   onDateTimeConfirm: (selectedDateTime: Date) => void;
-  onOpenMapPicker: (input: ActiveLocationInput) => void;
   onCloseMapPicker: () => void;
   onMapRegionChange: (region: MapRegion) => void;
   onUseDeviceLocationOnMap: () => void;
   onConfirmMapLocation: () => void;
   onPlaceSelected: (place: GooglePlaceData) => void;
+  onSavedLocationSelected: (savedLocation: SavedLocation) => void;
+  onSaveLocation: (
+    input: ActiveLocationInput,
+    label: string,
+    kind: SavedLocationKind,
+  ) => Promise<void>;
 };

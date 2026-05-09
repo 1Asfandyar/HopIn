@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import MapView, {
   Marker,
   PROVIDER_GOOGLE,
@@ -14,6 +14,10 @@ import { useLocationStore } from '@/store/location.store';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
+import { getRoleTheme } from '@/theme/helpers/roleTheme.helpers';
+import { themeColors } from '@/theme/tokens';
+
+const mapProvider = Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined;
 
 const FALLBACK_REGION: Region = {
   latitude: 30.3753,
@@ -31,6 +35,7 @@ const HomeScreen = () => {
   );
   const role = user?.role ?? USER_ROLES.rider;
   const isDriver = role === USER_ROLES.driver;
+  const roleTheme = getRoleTheme(role);
   const mapRegion = currentLocation
     ? {
         latitude: currentLocation.latitude,
@@ -50,7 +55,7 @@ const HomeScreen = () => {
     <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}>
       <View className="flex-1">
         <MapView
-          provider={PROVIDER_GOOGLE}
+          provider={mapProvider}
           style={styles.map}
           region={mapRegion}
           scrollEnabled={false}
@@ -69,8 +74,17 @@ const HomeScreen = () => {
                 longitude: currentLocation.longitude,
               }}
             >
-              <View className="h-10 w-10 items-center justify-center rounded-full bg-primary/20">
-                <View className="h-5 w-5 rounded-full border-4 border-white bg-primary" />
+              <View
+                className="h-10 w-10 items-center justify-center rounded-full"
+                style={{ backgroundColor: roleTheme.lightColor }}
+              >
+                <View
+                  className="h-5 w-5 rounded-full border-4"
+                  style={{
+                    backgroundColor: roleTheme.color,
+                    borderColor: themeColors.white,
+                  }}
+                />
               </View>
             </Marker>
           )}
@@ -101,6 +115,7 @@ const HomeScreen = () => {
               <ThemedButton
                 title="Offer Seats"
                 leftIcon="add"
+                colorScheme={roleTheme.colorScheme}
                 onPress={() => router.push(APP_ROUTES.main.offerRide)}
               />
             </View>
@@ -108,6 +123,7 @@ const HomeScreen = () => {
             <View>
               <ThemedButton
                 title="Find Rides"
+                colorScheme={roleTheme.colorScheme}
                 onPress={() => router.push(APP_ROUTES.main.findRide)}
               />
             </View>
@@ -122,6 +138,7 @@ const HomeScreen = () => {
                   : 'Your requested rides will appear here.'
               }
               variant="outline"
+              colorScheme={roleTheme.colorScheme}
               rightIcon="calendar-outline"
               containerClassName="min-h-0"
             />

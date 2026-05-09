@@ -6,7 +6,10 @@ import { useAuthStore } from '@/store/auth.store';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
-import { themeColors } from '@/theme/tokens';
+import {
+  getRoleColorScheme,
+  getRoleTheme,
+} from '@/theme/helpers/roleTheme.helpers';
 import { showFeedback } from '@/utils/errors';
 
 const Profile = () => {
@@ -14,6 +17,7 @@ const Profile = () => {
   const updateUserRole = useAuthStore(state => state.updateUserRole);
   const [isSwitchingRole, setSwitchingRole] = useState(false);
   const role = user?.role ?? USER_ROLES.rider;
+  const roleTheme = getRoleTheme(role);
 
   const switchRole = async (nextRole: UserRole) => {
     if (nextRole === role || isSwitchingRole) {
@@ -36,7 +40,10 @@ const Profile = () => {
   return (
     <View className="flex-1 bg-white px-5 pt-4">
       <View className="items-center py-6">
-        <View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-light-blue">
+        <View
+          className="h-24 w-24 items-center justify-center overflow-hidden rounded-full"
+          style={{ backgroundColor: roleTheme.lightColor }}
+        >
           {user?.photoUrl ? (
             <Image
               source={{ uri: user.photoUrl }}
@@ -44,7 +51,7 @@ const Profile = () => {
               resizeMode="cover"
             />
           ) : (
-            <Ionicons name="person" size={48} color={themeColors.primary} />
+            <Ionicons name="person" size={48} color={roleTheme.color} />
           )}
         </View>
         <ThemedText weight="semiBold" size="2xl" className="text-gray-900 mt-4">
@@ -63,6 +70,7 @@ const Profile = () => {
           <ThemedButton
             title="Driver"
             variant={role === USER_ROLES.driver ? 'primary' : 'outline'}
+            colorScheme={getRoleColorScheme(USER_ROLES.driver)}
             loading={isSwitchingRole && role !== USER_ROLES.driver}
             disabled={isSwitchingRole}
             onPress={() => switchRole(USER_ROLES.driver)}
@@ -73,6 +81,7 @@ const Profile = () => {
           <ThemedButton
             title="Rider"
             variant={role === USER_ROLES.rider ? 'primary' : 'outline'}
+            colorScheme={getRoleColorScheme(USER_ROLES.rider)}
             loading={isSwitchingRole && role !== USER_ROLES.rider}
             disabled={isSwitchingRole}
             onPress={() => switchRole(USER_ROLES.rider)}
@@ -86,6 +95,7 @@ const Profile = () => {
           heading="Saved Places"
           subHeading="Home · Office · University"
           variant="outline"
+          colorScheme={roleTheme.colorScheme}
           leftIcon="location-outline"
           containerClassName="min-h-0"
         />
@@ -95,6 +105,7 @@ const Profile = () => {
           heading="Help & Support"
           subHeading="Get help with rides and account settings."
           variant="outline"
+          colorScheme={roleTheme.colorScheme}
           leftIcon="help-circle-outline"
           containerClassName="min-h-0"
         />

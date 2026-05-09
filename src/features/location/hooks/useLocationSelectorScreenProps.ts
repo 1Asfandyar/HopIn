@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRideDraft } from '@/features/rides/hooks/useRideDraft';
 import type { RideFlowMode } from '@/types/types';
 import type { LocationSelectorViewProps } from '../types';
@@ -27,7 +26,6 @@ export const useLocationSelectorScreenProps = ({
   onSubmit,
   isSubmitting,
 }: UseLocationSelectorScreenPropsParams): LocationSelectorViewProps => {
-  const insets = useSafeAreaInsets();
   const { resetDraft } = useRideDraft();
   const locationSelector = useLocationSelector();
 
@@ -48,9 +46,6 @@ export const useLocationSelectorScreenProps = ({
     submittingLabel,
     onSubmit,
     isSubmitting,
-    bottomSheetRef: locationSelector.bottomSheetRef,
-    snapPoints: locationSelector.snapPoints,
-    topInset: insets.top,
     activeInput: locationSelector.activeInput,
     pickupQuery: locationSelector.pickupQuery,
     destinationQuery: locationSelector.destinationQuery,
@@ -59,10 +54,12 @@ export const useLocationSelectorScreenProps = ({
     placesError: locationSelector.placesError,
     pickup: locationSelector.pickup,
     destination: locationSelector.destination,
+    savedLocations: locationSelector.savedLocations,
+    isLoadingSavedLocations: locationSelector.isLoadingSavedLocations,
+    isSavingLocation: locationSelector.isSavingLocation,
     locationError: locationSelector.locationError,
     hasGooglePlacesApiKey: locationSelector.hasGooglePlacesApiKey,
     isLoadingCurrentLocation: locationSelector.isLoadingCurrentLocation,
-    canCloseLocationSheet: locationSelector.canCloseLocationSheet,
     shouldShowResults: locationSelector.shouldShowResults,
     mapPickerInput: locationSelector.mapPickerInput,
     mapRegion: locationSelector.mapRegion,
@@ -72,7 +69,6 @@ export const useLocationSelectorScreenProps = ({
     isWaitingForMapPreview: locationSelector.isWaitingForMapPreview,
     isLoadingMapPreview: locationSelector.isLoadingMapPreview,
     isConfirmingMapLocation: locationSelector.isConfirmingMapLocation,
-    isOpeningMapPicker: locationSelector.isOpeningMapPicker,
     dateTime: locationSelector.rideDateTime.dateTime,
     isDateTimePickerOpen: locationSelector.rideDateTime.isOpen,
     minDateTime: locationSelector.rideDateTime.minDateTime,
@@ -80,15 +76,17 @@ export const useLocationSelectorScreenProps = ({
     onPickupChange: locationSelector.setPickupQuery,
     onDestinationChange: locationSelector.setDestinationQuery,
     onActiveInputChange: locationSelector.setActiveInput,
-    onOpenLocationSheet: locationSelector.openLocationSheet,
+    onOpenRouteMap: locationSelector.openRouteMapPicker,
+    onOpenLocationMap: locationSelector.openMapPicker,
     onOpenDateTimePicker: locationSelector.rideDateTime.openDateTimePicker,
     onCloseDateTimePicker: locationSelector.rideDateTime.closeDateTimePicker,
     onDateTimeConfirm: locationSelector.handleDateTimeConfirm,
-    onOpenMapPicker: locationSelector.openMapPicker,
     onCloseMapPicker: locationSelector.closeMapPicker,
     onMapRegionChange: locationSelector.onMapRegionChange,
     onUseDeviceLocationOnMap: locationSelector.useDeviceLocationOnMap,
     onConfirmMapLocation: locationSelector.confirmMapLocation,
     onPlaceSelected: locationSelector.handlePlaceSelected,
+    onSavedLocationSelected: locationSelector.onSavedLocationSelected,
+    onSaveLocation: locationSelector.saveLocation,
   };
 };

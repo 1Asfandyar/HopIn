@@ -9,6 +9,7 @@ const ThemedButton = ({
   title,
   weight = 'semiBold',
   variant = 'primary',
+  colorScheme = 'primary',
   loading = false,
   disabled = false,
   leftIcon,
@@ -16,29 +17,36 @@ const ThemedButton = ({
   iconSize = 18,
   containerClassName = '',
   textClassName = '',
+  style,
   ...props
 }: ThemedButtonProps) => {
   const isDisabled = disabled || loading;
+  const schemeColor =
+    colorScheme === 'secondary' ? themeColors.secondary : themeColors.primary;
 
   const variantStyles = {
     primary: {
-      container: 'bg-primary',
+      container: '',
       text: 'text-white',
       icon: themeColors.white,
+      style: { backgroundColor: schemeColor },
     },
     outline: {
-      container: 'border border-primary bg-transparent',
-      text: 'text-primary',
-      icon: themeColors.primary,
+      container: 'border bg-transparent',
+      text: '',
+      icon: schemeColor,
+      style: { borderColor: schemeColor },
     },
     ghost: {
       container: 'bg-transparent',
-      text: 'text-primary',
-      icon: themeColors.primary,
+      text: '',
+      icon: schemeColor,
+      style: null,
     },
   };
 
   const colors = variantStyles[variant];
+  const textStyle = variant === 'primary' ? undefined : { color: schemeColor };
 
   return (
     <TouchableOpacity
@@ -48,6 +56,7 @@ const ThemedButton = ({
         colors.container
       } ${isDisabled ? 'opacity-60' : ''} ${containerClassName}`}
       {...props}
+      style={[colors.style, style]}
     >
       {loading ? (
         <BrandedLoader variant="button" label="" />
@@ -66,6 +75,7 @@ const ThemedButton = ({
             weight={weight}
             size="md"
             className={`${colors.text} ${textClassName}`}
+            style={textStyle}
           >
             {title}
           </ThemedText>

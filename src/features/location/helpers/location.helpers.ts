@@ -5,6 +5,7 @@ import type {
   LocationGeocodedAddress,
 } from '@/types/types';
 import { CURRENT_LOCATION_FALLBACK_LABEL } from '@/config/constants';
+import { Linking } from 'react-native';
 
 export const formatGeocodedAddress = (address?: LocationGeocodedAddress) => {
   if (!address) {
@@ -49,4 +50,40 @@ export const mapGooglePlaceToLocation = (
     country: null,
     countryCode: null,
   };
+};
+
+const getLocationQuery = (location: AppLocation) => {
+  if (location.address.trim()) {
+    return location.address;
+  }
+
+  if (
+    Number.isFinite(location.latitude) &&
+    Number.isFinite(location.longitude)
+  ) {
+    return `${location.latitude},${location.longitude}`;
+  }
+
+  return location.address;
+};
+
+export const getMapsRouteUrl = (
+  pickup: AppLocation,
+  destination: AppLocation,
+) => {
+  const params = new URLSearchParams({
+    api: '1',
+    origin: getLocationQuery(pickup),
+    destination: getLocationQuery(destination),
+    travelmode: 'driving',
+  });
+
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
+};
+
+export const openRouteInMaps = async (
+  pickup: AppLocation,
+  destination: AppLocation,
+) => {
+  await Linking.openURL(getMapsRouteUrl(pickup, destination));
 };

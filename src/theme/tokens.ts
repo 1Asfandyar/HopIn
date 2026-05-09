@@ -3,7 +3,9 @@ import { FontSize, FontWeight } from './types';
 export const themeColors = {
   primary: '#16A34A',
   primaryDark: '#158D1D',
+  primaryLight: '#EFFFF7',
   secondary: '#2563EB',
+  secondaryLight: '#DBEAFE',
   lightBlue: '#EFFFF7',
   white: '#FFFFFF',
   black: '#000000',
