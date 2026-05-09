@@ -1,12 +1,8 @@
-import { useRegister } from '@/features/auth/hooks/useRegister';
-import RegisterScreen from '@/features/auth/screens/RegisterScreen';
+import { Redirect } from 'expo-router';
+import { APP_ROUTES } from '@/constants/appRoutes';
 
 const Register = () => {
-  const { isSubmitting, onGooglePress } = useRegister();
-
-  return (
-    <RegisterScreen isSubmitting={isSubmitting} onGooglePress={onGooglePress} />
-  );
+  return <Redirect href={APP_ROUTES.auth.welcome} />;
 };
 
 export default Register;

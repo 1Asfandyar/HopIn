@@ -1,5 +1,6 @@
 import type { Session } from '@supabase/supabase-js';
 import type { AuthSession, User } from '@/types/types';
+import { isUserRole } from '../schemas/authValidation';
 
 export const APP_SCHEME = 'hopin';
 export const GOOGLE_AUTH_REDIRECT_PATH = 'auth/callback';
@@ -33,6 +34,14 @@ export const mapSupabaseSession = (session: Session): AuthSession => {
       typeof session.user.phone === 'string' && session.user.phone.length > 0
         ? session.user.phone
         : undefined,
+    role:
+      typeof metadata.role === 'string' && isUserRole(metadata.role)
+        ? metadata.role
+        : undefined,
+    photoUrl:
+      typeof metadata.photo_url === 'string' ? metadata.photo_url : undefined,
+    isEmailVerified: Boolean(session.user.email_confirmed_at),
+    isProfileComplete: Boolean(metadata.full_name && metadata.role),
   };
 
   return {

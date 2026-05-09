@@ -2,6 +2,7 @@ import type { Ionicons } from '@expo/vector-icons';
 import type { Href } from 'expo-router';
 import type * as ExpoLocation from 'expo-location';
 import type { ComponentProps, ReactNode } from 'react';
+import type { UserRole } from '@/constants/roles';
 import type {
   StyleProp,
   TextInputProps,
@@ -15,6 +16,10 @@ export type User = {
   email: string;
   fullName?: string;
   phone?: string;
+  role?: UserRole;
+  photoUrl?: string;
+  isEmailVerified?: boolean;
+  isProfileComplete?: boolean;
 };
 
 export type AuthSession = {
@@ -124,6 +129,14 @@ export type AuthStore = {
   isLoading: boolean;
   error: AppError | null;
   signInWithGoogle: () => Promise<void>;
+  sendEmailOtp: (email: string) => Promise<void>;
+  verifyEmailOtp: (email: string, otp: string) => Promise<User | null>;
+  completeProfile: (profile: {
+    fullName: string;
+    role?: UserRole;
+    photoUrl?: string;
+  }) => Promise<void>;
+  updateUserRole: (role: UserRole) => Promise<void>;
   handleOAuthCallback: (url: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;

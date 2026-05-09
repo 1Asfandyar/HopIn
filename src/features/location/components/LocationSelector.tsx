@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ThemedInput from '@/theme/components/ThemedInput';
+import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedText from '@/theme/components/ThemedText';
 import BrandedLoader from '@/components/feedback/BrandedLoader';
 import { FEEDBACK_MESSAGES } from '@/config/constants';
@@ -20,6 +21,14 @@ import MapLocationPicker from './MapLocationPicker';
 import PlaceResultsList from './PlaceResultsList';
 
 const LocationSelector = ({
+  flowMode,
+  roleLabel,
+  heading,
+  description,
+  submitLabel,
+  submittingLabel,
+  onSubmit,
+  isSubmitting,
   bottomSheetRef,
   snapPoints,
   topInset,
@@ -44,6 +53,7 @@ const LocationSelector = ({
   isWaitingForMapPreview,
   isLoadingMapPreview,
   isConfirmingMapLocation,
+  isOpeningMapPicker,
   dateTime,
   isDateTimePickerOpen,
   minDateTime,
@@ -74,9 +84,33 @@ const LocationSelector = ({
     ),
     [canCloseLocationSheet],
   );
+  const canSubmit = Boolean(pickup && destination && dateTime);
+  const modeClasses =
+    flowMode === 'offer'
+      ? {
+          container: 'bg-light-blue',
+          label: 'text-primary',
+        }
+      : {
+          container: 'bg-blue-100',
+          label: 'text-secondary',
+        };
 
   return (
     <View className="bg-white flex-1">
+      <View className={`mb-4 rounded-3xl p-4 ${modeClasses.container}`}>
+        <ThemedText
+          weight="semiBold"
+          className={`mb-1 text-[12px] uppercase tracking-wide ${modeClasses.label}`}
+        >
+          {roleLabel}
+        </ThemedText>
+        <ThemedText weight="semiBold" size="xl" className="text-gray-900">
+          {heading}
+        </ThemedText>
+        <ThemedText className="mt-2 text-gray-600">{description}</ThemedText>
+      </View>
+
       <TouchableOpacity onPress={onOpenLocationSheet} activeOpacity={0.7}>
         <View
           pointerEvents="none"
@@ -146,6 +180,15 @@ const LocationSelector = ({
         </View>
       </TouchableOpacity>
 
+      <ThemedButton
+        title={isSubmitting ? submittingLabel : submitLabel}
+        loading={isSubmitting}
+        disabled={!canSubmit || isSubmitting}
+        onPress={onSubmit}
+        containerClassName="mt-4"
+        leftIcon={flowMode === 'offer' ? 'send-outline' : 'search-outline'}
+      />
+
       <BottomSheetModal
         ref={bottomSheetRef}
         index={0}
@@ -185,7 +228,10 @@ const LocationSelector = ({
               placeholder={LOCATION_SELECTOR_COPY.pickupPlaceholder}
               leftIcon="locate"
               onRightButtonPress={() => onOpenMapPicker('pickup')}
-              isSearching={activeInput === 'pickup' && isSearchingPlaces}
+              isSearching={
+                isOpeningMapPicker ||
+                (activeInput === 'pickup' && isSearchingPlaces)
+              }
               rightButtonLabel={LOCATION_SELECTOR_COPY.mapButtonLabel}
             />
             <LocationInput

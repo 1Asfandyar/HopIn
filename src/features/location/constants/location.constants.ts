@@ -13,10 +13,17 @@ export const LOCATION_SHEET_SNAP_POINTS = ['80%'] as const;
 export const LOCATION_SELECTOR_CONTENT_Z_INDEX = 9999;
 
 export const DEFAULT_MAP_REGION: MapRegion = {
+  latitude: 30.3753,
+  longitude: 69.3451,
+  latitudeDelta: 14,
+  longitudeDelta: 14,
+};
+
+export const DEFAULT_CURRENT_LOCATION_MAP_REGION: MapRegion = {
   latitude: 31.5204,
   longitude: 74.3587,
-  latitudeDelta: 0.01,
-  longitudeDelta: 0.01,
+  latitudeDelta: 0.04,
+  longitudeDelta: 0.04,
 };
 
 export const LOCATION_SELECTOR_COPY = {

@@ -1,87 +1,141 @@
+import { useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { Image, StyleSheet, View } from 'react-native';
+import MapView, {
+  Marker,
+  PROVIDER_GOOGLE,
+  type Region,
+} from 'react-native-maps';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { APP_ROUTES } from '@/constants/appRoutes';
+import { USER_ROLES } from '@/constants/roles';
+import { useAuthStore } from '@/store/auth.store';
+import { useLocationStore } from '@/store/location.store';
+import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
-import { View } from 'react-native';
+
+const FALLBACK_REGION: Region = {
+  latitude: 30.3753,
+  longitude: 69.3451,
+  latitudeDelta: 14,
+  longitudeDelta: 14,
+};
 
 const HomeScreen = () => {
+  const router = useRouter();
+  const user = useAuthStore(state => state.user);
+  const currentLocation = useLocationStore(state => state.currentLocation);
+  const fetchCurrentLocation = useLocationStore(
+    state => state.fetchCurrentLocation,
+  );
+  const role = user?.role ?? USER_ROLES.rider;
+  const isDriver = role === USER_ROLES.driver;
+  const mapRegion = currentLocation
+    ? {
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
+        latitudeDelta: 0.04,
+        longitudeDelta: 0.04,
+      }
+    : FALLBACK_REGION;
+
+  useEffect(() => {
+    if (!currentLocation) {
+      fetchCurrentLocation();
+    }
+  }, [currentLocation, fetchCurrentLocation]);
+
   return (
-    <View className="flex-1 px-4 ">
-      <View className="mb-6">
-        <ThemedText size="2xl">
-          Good Morning,{' '}
-          <Ionicons name="sunny-outline" size={30} color="#FFA500" />
-        </ThemedText>
-        <ThemedText weight="semiBold" size="2xl">
-          Where are you going?
-        </ThemedText>
-      </View>
+    <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}>
+      <View className="flex-1">
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          region={mapRegion}
+          scrollEnabled={false}
+          zoomEnabled={false}
+          rotateEnabled={false}
+          pitchEnabled={false}
+          showsUserLocation={Boolean(currentLocation)}
+          showsMyLocationButton={false}
+          showsCompass={false}
+          toolbarEnabled={false}
+        >
+          {currentLocation && (
+            <Marker
+              coordinate={{
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude,
+              }}
+            >
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-primary/20">
+                <View className="h-5 w-5 rounded-full border-4 border-white bg-primary" />
+              </View>
+            </Marker>
+          )}
+        </MapView>
 
-      <View className="flex-row items-stretch gap-3 mb-8">
-        <View className="flex-1 self-stretch">
-          <ThemedCard
-            heading="I'm driving"
-            subHeading="Offer a ride"
-            variant="primary"
-            rightIcon="car"
-            href="/(main)/offer-ride"
-            headingSize="xl"
-            subHeadingSize="xl"
-            iconSize={40}
-            rightIconContainerClassName="ml-3 pt-20"
-          />
+        <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-5 pb-6 pt-5">
+          <View className="mb-5 flex-row items-center">
+            <Image
+              source={require('../../../../assets/icons/hopin_icon.png')}
+              className="h-11 w-11 rounded-full"
+              resizeMode="contain"
+            />
+            <View className="ml-3 flex-1">
+              <ThemedText size="sm" className="text-gray-500">
+                {isDriver ? 'Driver mode' : 'Rider mode'}
+              </ThemedText>
+              <ThemedText weight="semiBold" size="xl" className="text-gray-900">
+                {isDriver ? 'Offer seats in your car' : 'Where are you going?'}
+              </ThemedText>
+            </View>
+          </View>
+
+          {isDriver ? (
+            <View>
+              <ThemedText className="text-gray-500 mb-5">
+                Earn by sharing your daily route with people going the same way.
+              </ThemedText>
+              <ThemedButton
+                title="Offer Seats"
+                leftIcon="add"
+                onPress={() => router.push(APP_ROUTES.main.offerRide)}
+              />
+            </View>
+          ) : (
+            <View>
+              <ThemedButton
+                title="Find Rides"
+                onPress={() => router.push(APP_ROUTES.main.findRide)}
+              />
+            </View>
+          )}
+
+          <View className="mt-5">
+            <ThemedCard
+              heading="No upcoming rides"
+              subHeading={
+                isDriver
+                  ? 'Your published rides will appear here.'
+                  : 'Your requested rides will appear here.'
+              }
+              variant="outline"
+              rightIcon="calendar-outline"
+              containerClassName="min-h-0"
+            />
+          </View>
         </View>
-        <View className="flex-1 self-stretch">
-          <ThemedCard
-            heading="I need a ride"
-            subHeading="Find a ride"
-            variant="secondary"
-            href="/(main)/find-ride"
-            rightIcon="person"
-            headingSize="xl"
-            subHeadingSize="xl"
-            iconSize={40}
-            rightIconContainerClassName="ml-3 pt-20"
-          />
-        </View>
       </View>
-
-      <View className="h-px bg-gray-200" />
-
-      <View>
-        <ThemedText weight="semiBold" className="text-2xl mt-6 mb-3">
-          Upcoming Rides
-        </ThemedText>
-
-        <ThemedCard
-          heading="No upcoming rides"
-          subHeading="When you have bookings, it will appear here."
-          variant="outline"
-          rightIcon="calendar"
-          headingClassName="text-xl"
-          subHeadingClassName=" text-md"
-          iconSize={80}
-          rightIconContainerClassName="justify-center items-center ml-3"
-        />
-      </View>
-
-      <View>
-        <ThemedText weight="semiBold" className="text-2xl mt-6 mb-3">
-          Recent Rides
-        </ThemedText>
-
-        <ThemedCard
-          heading="No recent rides"
-          subHeading="Your completed rides will appear here."
-          variant="outline"
-          rightIcon="time"
-          headingClassName="text-xl"
-          subHeadingClassName=" text-md"
-          iconSize={80}
-          rightIconContainerClassName="justify-center items-center ml-3"
-        />
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});
 
 export default HomeScreen;

@@ -70,7 +70,7 @@ export const currentLocationService = {
     }
 
     const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
+      accuracy: Location.Accuracy.High,
     });
 
     return currentLocationService.getLocationFromCoordinates(position.coords);

@@ -21,6 +21,7 @@ import type {
 } from '@/types/types';
 import type { ActiveLocationInput, MapCoordinate, MapRegion } from '../types';
 import {
+  DEFAULT_CURRENT_LOCATION_MAP_REGION,
   DEFAULT_MAP_REGION,
   LOCATION_SEARCH_DEBOUNCE_MS,
   LOCATION_SEARCH_MIN_QUERY_LENGTH,
@@ -55,6 +56,7 @@ export const useLocationSelector = () => {
   const [mapPreviewLocation, setMapPreviewLocation] =
     useState<AppLocation | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [isOpeningMapPicker, setIsOpeningMapPicker] = useState(false);
   const [isWaitingForMapPreview, setIsWaitingForMapPreview] = useState(false);
   const [isLoadingMapPreview, setIsLoadingMapPreview] = useState(false);
   const [isConfirmingMapLocation, setIsConfirmingMapLocation] = useState(false);
@@ -82,10 +84,16 @@ export const useLocationSelector = () => {
   const rideDateTime = useRideDateTime();
 
   useEffect(() => {
-    if (activeInput !== 'pickup') {
-      setPickupQuery(currentLocation?.address ?? '');
+    if (!pickup && currentLocation) {
+      setPickup(currentLocation);
     }
-  }, [activeInput, currentLocation?.address]);
+  }, [currentLocation, pickup, setPickup]);
+
+  useEffect(() => {
+    if (activeInput !== 'pickup') {
+      setPickupQuery(pickup?.address ?? currentLocation?.address ?? '');
+    }
+  }, [activeInput, currentLocation?.address, pickup?.address]);
 
   useEffect(() => {
     if (activeInput !== 'destination') {
@@ -108,7 +116,7 @@ export const useLocationSelector = () => {
     activeQuery.trim().length >= LOCATION_SEARCH_MIN_QUERY_LENGTH;
   const selectedActiveAddress =
     activeInput === 'pickup'
-      ? (currentLocation?.address ?? pickup?.address)
+      ? (pickup?.address ?? currentLocation?.address)
       : activeInput === 'destination'
         ? destination?.address
         : null;
@@ -319,34 +327,57 @@ export const useLocationSelector = () => {
   );
 
   const openMapPicker = useCallback(
-    (input: ActiveLocationInput) => {
+    async (input: ActiveLocationInput) => {
       const existingLocation =
         input === 'pickup' ? currentLocation : destination;
-      const initialCoordinate = existingLocation ??
-        currentLocation ?? {
-          latitude: DEFAULT_MAP_REGION.latitude,
-          longitude: DEFAULT_MAP_REGION.longitude,
-        };
+      let initialCoordinate: MapCoordinate | AppLocation | null =
+        existingLocation ?? currentLocation;
+
+      let nextMapError: string | null = null;
+
+      if (!initialCoordinate && input === 'pickup') {
+        setIsOpeningMapPicker(true);
+
+        try {
+          initialCoordinate = await fetchCurrentLocation();
+        } catch (caughtError) {
+          nextMapError = getErrorMessage(
+            caughtError,
+            FEEDBACK_MESSAGES.locationUnavailable,
+          );
+        } finally {
+          setIsOpeningMapPicker(false);
+        }
+      }
+
+      const initialRegion = initialCoordinate
+        ? DEFAULT_CURRENT_LOCATION_MAP_REGION
+        : DEFAULT_MAP_REGION;
+      const nextCoordinate = initialCoordinate ?? {
+        latitude: initialRegion.latitude,
+        longitude: initialRegion.longitude,
+      };
 
       Keyboard.dismiss();
       setActiveInput(null);
       clearResults();
-      setMapError(null);
-      setMapCoordinate(initialCoordinate);
-      setMapRegion(currentRegion => ({
-        ...currentRegion,
-        latitude: initialCoordinate.latitude,
-        longitude: initialCoordinate.longitude,
-      }));
+      setMapError(nextMapError);
+      setMapCoordinate(nextCoordinate);
+      setMapRegion({
+        ...initialRegion,
+        latitude: nextCoordinate.latitude,
+        longitude: nextCoordinate.longitude,
+      });
       setMapCameraRequestKey(currentKey => currentKey + 1);
       setMapPickerInput(input);
       lastQueuedMapPreviewCoordinateRef.current = null;
-      queueMapPreviewLocationResolve(initialCoordinate);
+      queueMapPreviewLocationResolve(nextCoordinate);
     },
     [
       clearResults,
       currentLocation,
       destination,
+      fetchCurrentLocation,
       queueMapPreviewLocationResolve,
     ],
   );
@@ -366,11 +397,11 @@ export const useLocationSelector = () => {
 
       if (location) {
         setMapCoordinate(location);
-        setMapRegion(currentRegion => ({
-          ...currentRegion,
+        setMapRegion({
+          ...DEFAULT_CURRENT_LOCATION_MAP_REGION,
           latitude: location.latitude,
           longitude: location.longitude,
-        }));
+        });
         setMapCameraRequestKey(currentKey => currentKey + 1);
         setMapPreviewLocation(location);
         lastQueuedMapPreviewCoordinateRef.current = location;
@@ -475,6 +506,7 @@ export const useLocationSelector = () => {
     currentLocation,
     canCloseLocationSheet,
     destination,
+    pickup,
     locationError: locationSearchError,
     hasGooglePlacesApiKey,
     isLoadingCurrentLocation: isLoading,
@@ -487,6 +519,7 @@ export const useLocationSelector = () => {
     isWaitingForMapPreview,
     isLoadingMapPreview,
     isConfirmingMapLocation,
+    isOpeningMapPicker,
     rideDateTime,
     setPickupQuery,
     setDestinationQuery,

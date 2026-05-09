@@ -36,8 +36,8 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: 'Home' }} />
         <Stack.Screen
-          name="(auth)/register"
-          options={{ title: 'Sign Up', gestureEnabled: true }}
+          name="(auth)"
+          options={{ headerShown: false, gestureEnabled: true }}
         />
         <Stack.Screen
           name="auth/callback"

@@ -4,7 +4,17 @@ import { logger } from '@/services/logger';
 import type { AuthStore } from '@/types/types';
 import { createAppError, getErrorMessage } from '@/utils/errors';
 
-export const useAuthStore = create<AuthStore>(set => ({
+const getEmailOtpErrorMessage = (error: unknown) => {
+  const message = getErrorMessage(error);
+
+  if (message.toLowerCase().includes('email logins are disabled')) {
+    return 'Email login is disabled in Supabase. Enable the Email provider in Authentication settings, then try again.';
+  }
+
+  return "Couldn't send OTP. Please check your email and try again.";
+};
+
+export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   isLoading: true,
   error: null,
@@ -23,6 +33,91 @@ export const useAuthStore = create<AuthStore>(set => ({
       );
 
       logger.error('Google sign-in failed', error);
+      set({ error: appError, isLoading: false });
+      throw appError;
+    }
+  },
+
+  sendEmailOtp: async email => {
+    set({ error: null, isLoading: true });
+
+    try {
+      await authService.sendEmailOtp(email);
+      set({ isLoading: false });
+    } catch (error) {
+      const appError = createAppError(
+        'AUTH_FAILED',
+        getEmailOtpErrorMessage(error),
+        error,
+      );
+
+      logger.error('Email OTP send failed', error);
+      set({ error: appError, isLoading: false });
+      throw appError;
+    }
+  },
+
+  verifyEmailOtp: async (email, otp) => {
+    set({ error: null, isLoading: true });
+
+    try {
+      const session = await authService.verifyEmailOtp(email, otp);
+      set({ user: session?.user ?? null, isLoading: false });
+      return session?.user ?? null;
+    } catch (error) {
+      const appError = createAppError(
+        'AUTH_FAILED',
+        getErrorMessage(
+          error,
+          'Incorrect OTP. Please enter the latest code sent to your email.',
+        ),
+        error,
+      );
+
+      logger.error('Email OTP verification failed', error);
+      set({ error: appError, isLoading: false });
+      throw appError;
+    }
+  },
+
+  completeProfile: async profile => {
+    set({ error: null, isLoading: true });
+
+    try {
+      const session = await authService.completeProfile(profile);
+      set({ user: session?.user ?? null, isLoading: false });
+    } catch (error) {
+      const appError = createAppError(
+        'AUTH_FAILED',
+        getErrorMessage(error, 'Unable to save your profile.'),
+        error,
+      );
+
+      logger.error('Profile completion failed', error);
+      set({ error: appError, isLoading: false });
+      throw appError;
+    }
+  },
+
+  updateUserRole: async role => {
+    set({ error: null, isLoading: true });
+
+    try {
+      const currentUser = get().user;
+      const currentSession = await authService.getSession();
+      const session = await authService.completeProfile({
+        fullName: currentUser?.fullName ?? currentSession?.user.fullName ?? '',
+        role,
+      });
+      set({ user: session?.user ?? null, isLoading: false });
+    } catch (error) {
+      const appError = createAppError(
+        'AUTH_FAILED',
+        getErrorMessage(error, 'Unable to switch role.'),
+        error,
+      );
+
+      logger.error('Role switch failed', error);
       set({ error: appError, isLoading: false });
       throw appError;
     }

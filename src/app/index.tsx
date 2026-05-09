@@ -8,6 +8,7 @@ import {
 import BrandedLoader from '@/components/feedback/BrandedLoader';
 import { AUTH_LOADER_MIN_MS } from '@/config/constants';
 import { useMinimumDelay } from '@/hooks/useMinimumDelay';
+import { APP_ROUTES } from '@/constants/appRoutes';
 
 export default function Index() {
   const user = useAuthStore(selectAuthUser);
@@ -23,8 +24,12 @@ export default function Index() {
     return <BrandedLoader />;
   }
   if (!user) {
-    return <Redirect href="/register" />;
+    return <Redirect href={APP_ROUTES.auth.welcome} />;
   }
 
-  return <Redirect href="/(main)/(tabs)/home" />;
+  if (!user.isProfileComplete) {
+    return <Redirect href={APP_ROUTES.auth.basicProfile} />;
+  }
+
+  return <Redirect href={APP_ROUTES.main.home} />;
 }

@@ -45,6 +45,14 @@ export type MapLocationPickerProps = {
 };
 
 export type LocationSelectorViewProps = {
+  flowMode: 'offer' | 'find';
+  roleLabel: string;
+  heading: string;
+  description: string;
+  submitLabel: string;
+  submittingLabel: string;
+  onSubmit: () => void;
+  isSubmitting: boolean;
   bottomSheetRef: RefObject<BottomSheetModal | null>;
   snapPoints: string[];
   topInset: number;
@@ -69,6 +77,7 @@ export type LocationSelectorViewProps = {
   isWaitingForMapPreview: boolean;
   isLoadingMapPreview: boolean;
   isConfirmingMapLocation: boolean;
+  isOpeningMapPicker: boolean;
   dateTime: Date | null;
   isDateTimePickerOpen: boolean;
   minDateTime: Date;

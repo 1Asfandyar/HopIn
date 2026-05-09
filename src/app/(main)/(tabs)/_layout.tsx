@@ -68,13 +68,13 @@ const MainTabsLayout = () => {
         <Tabs.Screen
           name="rides"
           options={{
-            tabBarLabel: 'Rides',
+            tabBarLabel: 'My Rides',
             tabBarIcon: ({ color }) => (
               <Ionicons name="car" size={24} color={color} />
             ),
             header: () => (
               <AppHeader
-                title="Ride History"
+                title="My Rides"
                 leftIcon="arrow-back"
                 onLeftPress={() => router.replace('/(main)/(tabs)/home')}
               />
