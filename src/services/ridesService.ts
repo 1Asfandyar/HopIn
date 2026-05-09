@@ -335,6 +335,23 @@ export const ridesService = {
     return hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
   },
 
+  searchRequests: async (draft: RideDraft): Promise<RideRequestPost[]> => {
+    assertCompleteDraft(draft);
+
+    const { data, error } = await supabase
+      .from('ride_requests')
+      .select(selectRideColumns)
+      .eq('status', 'open')
+      .gte('departure_time', new Date().toISOString())
+      .order('departure_time', { ascending: true });
+
+    if (error) {
+      throw error;
+    }
+
+    return hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+  },
+
   getRideById: async (
     rideType: RideRecordType,
     rideId: string,

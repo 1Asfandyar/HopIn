@@ -26,6 +26,7 @@ type RideResultsSheetProps = {
   colorScheme?: 'primary' | 'secondary';
   isPostingRequest?: boolean;
   postRequestLabel?: string;
+  postRequestLoadingLabel?: string;
   onPostRequest?: () => void;
   onRidePress?: (ride: RideRecord) => void;
 };
@@ -42,6 +43,7 @@ const RideResultsSheet = forwardRef<BottomSheetModal, RideResultsSheetProps>(
       colorScheme = 'primary',
       isPostingRequest = false,
       postRequestLabel = 'Post a request',
+      postRequestLoadingLabel = 'Posting request...',
       onPostRequest,
       onRidePress,
     },
@@ -115,7 +117,9 @@ const RideResultsSheet = forwardRef<BottomSheetModal, RideResultsSheetProps>(
 
           {onPostRequest && (
             <ThemedButton
-              title={isPostingRequest ? 'Posting request...' : postRequestLabel}
+              title={
+                isPostingRequest ? postRequestLoadingLabel : postRequestLabel
+              }
               loading={isPostingRequest}
               disabled={isPostingRequest}
               leftIcon="add-circle-outline"

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { Image, Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import MapView, {
   Marker,
   PROVIDER_GOOGLE,
@@ -12,7 +12,6 @@ import { USER_ROLES } from '@/constants/roles';
 import { useAuthStore } from '@/store/auth.store';
 import { useLocationStore } from '@/store/location.store';
 import ThemedButton from '@/theme/components/ThemedButton';
-import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
 import { getRoleTheme } from '@/theme/helpers/roleTheme.helpers';
 import { themeColors } from '@/theme/tokens';
@@ -36,6 +35,9 @@ const HomeScreen = () => {
   const role = user?.role ?? USER_ROLES.rider;
   const isDriver = role === USER_ROLES.driver;
   const roleTheme = getRoleTheme(role);
+  const tagline = isDriver
+    ? 'Share your route and fill empty seats.'
+    : 'Find trusted rides heading your way.';
   const mapRegion = currentLocation
     ? {
         latitude: currentLocation.latitude,
@@ -52,7 +54,7 @@ const HomeScreen = () => {
   }, [currentLocation, fetchCurrentLocation]);
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-gray-100" edges={[]}>
       <View className="flex-1">
         <MapView
           provider={mapProvider}
@@ -90,13 +92,8 @@ const HomeScreen = () => {
           )}
         </MapView>
 
-        <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-5 pb-6 pt-5">
+        <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white px-5 pb-6 pt-6">
           <View className="mb-5 flex-row items-center">
-            <Image
-              source={require('../../../../assets/icons/hopin_icon.png')}
-              className="h-11 w-11 rounded-full"
-              resizeMode="contain"
-            />
             <View className="ml-3 flex-1">
               <ThemedText size="sm" className="text-gray-500">
                 {isDriver ? 'Driver mode' : 'Rider mode'}
@@ -104,14 +101,14 @@ const HomeScreen = () => {
               <ThemedText weight="semiBold" size="xl" className="text-gray-900">
                 {isDriver ? 'Offer seats in your car' : 'Where are you going?'}
               </ThemedText>
+              <ThemedText size="sm" className="mt-1 text-gray-500 pb-2">
+                {tagline}
+              </ThemedText>
             </View>
           </View>
 
           {isDriver ? (
             <View>
-              <ThemedText className="text-gray-500 mb-5">
-                Earn by sharing your daily route with people going the same way.
-              </ThemedText>
               <ThemedButton
                 title="Offer Seats"
                 leftIcon="add"
@@ -128,21 +125,6 @@ const HomeScreen = () => {
               />
             </View>
           )}
-
-          <View className="mt-5">
-            <ThemedCard
-              heading="No upcoming rides"
-              subHeading={
-                isDriver
-                  ? 'Your published rides will appear here.'
-                  : 'Your requested rides will appear here.'
-              }
-              variant="outline"
-              colorScheme={roleTheme.colorScheme}
-              rightIcon="calendar-outline"
-              containerClassName="min-h-0"
-            />
-          </View>
         </View>
       </View>
     </SafeAreaView>

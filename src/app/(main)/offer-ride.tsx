@@ -19,8 +19,8 @@ const OfferRide = () => {
   const { draft, resetDraft } = useRideDraft();
   const rideRequestsSheetRef = useRef<BottomSheetModal>(null);
   const [requests, setRequests] = useState<RideRequestPost[]>([]);
+  const [isSearchingRequests, setSearchingRequests] = useState(false);
   const [isPosting, setPosting] = useState(false);
-  const [postedOfferId, setPostedOfferId] = useState<string | null>(null);
 
   const openRequestsSheet = () => {
     requestAnimationFrame(() => {
@@ -28,16 +28,37 @@ const OfferRide = () => {
     });
   };
 
+  const handleSearchRequests = async () => {
+    setSearchingRequests(true);
+
+    try {
+      const openRequests = await ridesService.searchRequests(draft);
+      setRequests(openRequests);
+      openRequestsSheet();
+    } catch (error) {
+      Alert.alert(
+        "Couldn't search requests",
+        getErrorMessage(
+          error,
+          'Please choose pickup, destination, and departure time.',
+        ),
+      );
+    } finally {
+      setSearchingRequests(false);
+    }
+  };
+
   const handlePostRide = async () => {
     setPosting(true);
 
     try {
-      const offer = await ridesService.createOffer(draft);
-      const openRequests = await ridesService.listOpenRequests();
-      setPostedOfferId(offer.id);
-      setRequests(openRequests);
+      await ridesService.createOffer(draft);
+      rideRequestsSheetRef.current?.dismiss();
       resetDraft();
-      openRequestsSheet();
+      Alert.alert(
+        'Ride posted',
+        'Your ride is live. Riders can now find and book a seat.',
+      );
     } catch (error) {
       Alert.alert(
         "Couldn't post ride",
@@ -58,7 +79,6 @@ const OfferRide = () => {
       params: {
         rideType: 'request',
         rideId: request.id,
-        offerId: postedOfferId ?? '',
       },
     });
   };
@@ -69,10 +89,10 @@ const OfferRide = () => {
     heading: 'Post your ride',
     description:
       'Choose your route and departure time so riders going the same way can request a seat.',
-    submitLabel: 'Post Ride',
-    submittingLabel: 'Posting ride...',
-    onSubmit: handlePostRide,
-    isSubmitting: isPosting,
+    submitLabel: 'Search Riders',
+    submittingLabel: 'Searching riders...',
+    onSubmit: handleSearchRequests,
+    isSubmitting: isSearchingRequests,
   });
 
   if (user?.role === USER_ROLES.rider) {
@@ -85,12 +105,16 @@ const OfferRide = () => {
       <RideResultsSheet
         ref={rideRequestsSheetRef}
         title="Rider requests"
-        emptyTitle="Ride posted"
-        emptyDescription="Your ride is live. Rider requests will appear here when people need a seat."
+        emptyTitle="No rider requests"
+        emptyDescription="Post your ride so riders going your way can find it."
         itemLabel="request"
         rides={requests}
         rideType="request"
         colorScheme="primary"
+        isPostingRequest={isPosting}
+        postRequestLabel="Post ride"
+        postRequestLoadingLabel="Posting ride..."
+        onPostRequest={handlePostRide}
         onRidePress={ride => openRequestDetails(ride as RideRequestPost)}
       />
     </>

@@ -88,8 +88,8 @@ const FindRide = () => {
     heading: 'Find rides going your way',
     description:
       'Choose where you are starting, where you are going, and when you want to leave.',
-    submitLabel: 'Find Rides',
-    submittingLabel: 'Finding rides...',
+    submitLabel: 'Search Drivers',
+    submittingLabel: 'Searching drivers...',
     onSubmit: handleFindRides,
     isSubmitting: isSearching,
   });
@@ -103,15 +103,15 @@ const FindRide = () => {
       <FindRideScreen {...locationSelectorProps} />
       <RideResultsSheet
         ref={rideResultsSheetRef}
-        title="Available rides"
-        emptyTitle="No rides available"
+        title="Available drivers"
+        emptyTitle="No drivers available"
         emptyDescription="Post a request so drivers can see your route."
-        itemLabel="ride"
+        itemLabel="driver"
         rides={matches}
         rideType="offer"
         colorScheme="secondary"
         isPostingRequest={isPostingRequest}
-        postRequestLabel="Post a request"
+        postRequestLabel="Post request"
         onPostRequest={handlePostRequest}
         onRidePress={ride => openRideDetails(ride as RideOffer)}
       />

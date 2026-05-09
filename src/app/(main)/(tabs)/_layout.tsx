@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Tabs, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { themeColors } from '@/theme/tokens';
 import AppHeader from '@/theme/components/AppHeader';
 import MainMenu from '@/features/menu/components/MainMenu';
 import { useAuthStore } from '@/store/auth.store';
 import { USER_ROLES } from '@/constants/roles';
 import { getRoleTheme } from '@/theme/helpers/roleTheme.helpers';
+import AnimatedMainTabBar from '@/features/main/tabs/components/AnimatedMainTabBar';
 
 const MainTabsLayout = () => {
   const router = useRouter();
@@ -39,13 +39,14 @@ const MainTabsLayout = () => {
   return (
     <>
       <Tabs
+        tabBar={props => (
+          <AnimatedMainTabBar
+            {...props}
+            activeColor={roleTheme.color}
+            activeLightColor={roleTheme.lightColor}
+          />
+        )}
         screenOptions={{
-          tabBarActiveTintColor: roleTheme.color,
-          tabBarInactiveTintColor: themeColors.gray300,
-          tabBarStyle: {
-            backgroundColor: themeColors.white,
-            borderTopWidth: 0,
-          },
           headerShadowVisible: false,
           sceneStyle: {
             backgroundColor: themeColors.white,
@@ -55,10 +56,6 @@ const MainTabsLayout = () => {
         <Tabs.Screen
           name="home"
           options={{
-            tabBarLabel: 'Home',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="home" size={24} color={color} />
-            ),
             header: () => (
               <AppHeader
                 title=""
@@ -72,10 +69,6 @@ const MainTabsLayout = () => {
         <Tabs.Screen
           name="rides"
           options={{
-            tabBarLabel: 'My Rides',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="car" size={24} color={color} />
-            ),
             header: () => (
               <AppHeader
                 title="My Rides"
@@ -88,10 +81,6 @@ const MainTabsLayout = () => {
         <Tabs.Screen
           name="profile"
           options={{
-            tabBarLabel: 'Profile',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="person" size={24} color={color} />
-            ),
             header: () => (
               <AppHeader
                 title="Profile"
