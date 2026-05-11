@@ -2,13 +2,9 @@ import type {
   AppError,
   AppLocation,
   GooglePlaceData,
-  LocationInputProps,
   SavedLocation,
-  SavedLocationKind,
   RideFlowMode,
 } from '@/types/types';
-
-export type { LocationInputProps };
 
 export type ActiveLocationInput = 'pickup' | 'destination';
 
@@ -52,7 +48,6 @@ export type MapLocationPickerProps = {
   previewLocation: AppLocation | null;
   isWaitingForPreview: boolean;
   isLoadingPreview: boolean;
-  isConfirming: boolean;
   error: string | null;
   onPickupChange: (text: string) => void;
   onDestinationChange: (text: string) => void;
@@ -68,63 +63,4 @@ export type MapLocationPickerProps = {
   routeActionDisabled?: boolean;
   routeActionLoading?: boolean;
   onRouteAction?: () => void;
-};
-
-export type LocationSelectorViewProps = {
-  flowMode: 'offer' | 'find';
-  roleLabel: string;
-  heading: string;
-  description: string;
-  submitLabel: string;
-  submittingLabel: string;
-  onSubmit: () => void;
-  isSubmitting: boolean;
-  activeInput: ActiveLocationInput | null;
-  pickupQuery: string;
-  destinationQuery: string;
-  searchResults: GooglePlaceData[];
-  isSearchingPlaces: boolean;
-  placesError: AppError | null;
-  pickup: AppLocation | null;
-  destination: AppLocation | null;
-  savedLocations: SavedLocation[];
-  isLoadingSavedLocations: boolean;
-  isSavingLocation: boolean;
-  locationError: AppError | null;
-  hasGooglePlacesApiKey: boolean;
-  isLoadingCurrentLocation: boolean;
-  shouldShowResults: boolean;
-  mapPickerInput: ActiveLocationInput | null;
-  mapRegion: MapRegion;
-  mapCameraRequestKey: number;
-  mapPreviewLocation: AppLocation | null;
-  mapError: string | null;
-  isWaitingForMapPreview: boolean;
-  isLoadingMapPreview: boolean;
-  isConfirmingMapLocation: boolean;
-  dateTime: Date | null;
-  isDateTimePickerOpen: boolean;
-  minDateTime: Date;
-  formatDateAndTime: (date: Date | null) => string;
-  onPickupChange: (text: string) => void;
-  onDestinationChange: (text: string) => void;
-  onLocationInputClear: (input: ActiveLocationInput) => void;
-  onActiveInputChange: (input: ActiveLocationInput) => void;
-  onOpenRouteMap: () => void;
-  onOpenLocationMap: (input: ActiveLocationInput) => void;
-  onOpenDateTimePicker: () => void;
-  onCloseDateTimePicker: () => void;
-  onDateTimeConfirm: (selectedDateTime: Date) => void;
-  onCloseMapPicker: () => void;
-  onMapRegionChange: (region: MapRegion) => void;
-  onUseDeviceLocationOnMap: () => void;
-  onConfirmMapLocation: () => void;
-  onConfirmRouteMapLocation: () => void;
-  onPlaceSelected: (place: GooglePlaceData) => void;
-  onSavedLocationSelected: (savedLocation: SavedLocation) => void;
-  onSaveLocation: (
-    input: ActiveLocationInput,
-    label: string,
-    kind: SavedLocationKind,
-  ) => Promise<void>;
 };

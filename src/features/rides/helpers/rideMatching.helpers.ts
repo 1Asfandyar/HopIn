@@ -3,31 +3,7 @@ import {
   RIDE_MATCH_TIME_WINDOW_MINUTES,
 } from '@/features/rides/constants/rideMatching.constants';
 import type { AppLocation, RideDraft, RideRecord } from '@/types/types';
-
-const degreesToRadians = (degrees: number) => degrees * (Math.PI / 180);
-
-export const getDistanceInMeters = (
-  from: Pick<AppLocation, 'latitude' | 'longitude'>,
-  to: Pick<AppLocation, 'latitude' | 'longitude'>,
-) => {
-  const earthRadiusMeters = 6371000;
-  const fromLatitude = degreesToRadians(from.latitude);
-  const toLatitude = degreesToRadians(to.latitude);
-  const latitudeDelta = degreesToRadians(to.latitude - from.latitude);
-  const longitudeDelta = degreesToRadians(to.longitude - from.longitude);
-  const haversine =
-    Math.sin(latitudeDelta / 2) * Math.sin(latitudeDelta / 2) +
-    Math.cos(fromLatitude) *
-      Math.cos(toLatitude) *
-      Math.sin(longitudeDelta / 2) *
-      Math.sin(longitudeDelta / 2);
-
-  return (
-    earthRadiusMeters *
-    2 *
-    Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
-  );
-};
+import { getDistanceInMeters } from '@/utils/geo';
 
 const areLocationsNear = (first: AppLocation, second: AppLocation) =>
   getDistanceInMeters(first, second) <= RIDE_MATCH_ROUTE_RADIUS_METERS;

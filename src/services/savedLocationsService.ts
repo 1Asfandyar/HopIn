@@ -24,7 +24,7 @@ const getCurrentUserId = async () => {
   }
 
   if (!data.user?.id) {
-    throw new Error('Please sign in before saving locations.');
+    throw new Error('Please sign in to use saved locations.');
   }
 
   return data.user.id;
@@ -55,36 +55,5 @@ export const savedLocationsService = {
     return (data ?? []).map(row =>
       mapSavedLocationRow(row as SavedLocationRow),
     );
-  },
-
-  save: async ({
-    label,
-    kind,
-    location,
-  }: {
-    label: string;
-    kind: SavedLocationKind;
-    location: AppLocation;
-  }): Promise<SavedLocation> => {
-    const userId = await getCurrentUserId();
-    const { data, error } = await supabase
-      .from('saved_locations')
-      .upsert(
-        {
-          user_id: userId,
-          label,
-          kind,
-          location,
-        },
-        { onConflict: 'user_id,label' },
-      )
-      .select(selectSavedLocationColumns)
-      .single<SavedLocationRow>();
-
-    if (error) {
-      throw error;
-    }
-
-    return mapSavedLocationRow(data);
   },
 };

@@ -157,16 +157,6 @@ export type AppError = {
   cause?: unknown;
 };
 
-export type ApiResult<T> =
-  | {
-      data: T;
-      error: null;
-    }
-  | {
-      data: null;
-      error: AppError;
-    };
-
 export type GooglePlaceData = {
   description: string;
   place_id?: string;
@@ -193,19 +183,6 @@ export type GooglePlaceDetails = {
     short_name: string;
     types: string[];
   }>;
-};
-
-export type LocationInputProps = {
-  label?: string;
-  placeholder?: string;
-  value: string;
-  onChangeText: (text: string) => void;
-  onFocus?: () => void;
-  leftIcon?: keyof typeof Ionicons.glyphMap;
-  containerClassName?: string;
-  isSearching?: boolean;
-  rightButtonLabel?: string;
-  onRightButtonPress?: () => void;
 };
 
 export type LocationGeocodedAddress = ExpoLocation.LocationGeocodedAddress;
@@ -256,22 +233,11 @@ export type RidesStore = {
   resetDraft: () => void;
 };
 
-export type ProfileStore = {
-  profile: User | null;
-  setProfile: (profile: User | null) => void;
-};
-
 export type ExpoExtra = {
-  apiUrl?: string;
-  googleMapsApiKey?: string;
   googlePlacesApiKey?: string;
 };
 
 export type LogMetadata = Record<string, unknown>;
-
-export type RequestOptions = RequestInit & {
-  skipJsonParse?: boolean;
-};
 
 export type FontWeight = 'regular' | 'medium' | 'semiBold' | 'bold';
 

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
-import { useRideDateTime } from '@/features/rides/hooks/useRideDateTime';
 import { useRideDraft } from '@/features/rides/hooks/useRideDraft';
 import { useLocationStore } from '@/store/location.store';
 import {
@@ -10,14 +9,13 @@ import {
   usePlacesStore,
 } from '@/store/places.store';
 import { currentLocationService } from '@/services/currentLocationService';
-import { createAppError, getErrorMessage } from '@/utils/errors';
+import { getErrorMessage } from '@/utils/errors';
 import { FEEDBACK_MESSAGES } from '@/config/constants';
 import type {
   AppLocation,
   GooglePlaceData,
   GooglePlaceDetails,
   SavedLocation,
-  SavedLocationKind,
 } from '@/types/types';
 import type { ActiveLocationInput, MapCoordinate, MapRegion } from '../types';
 import {
@@ -31,9 +29,9 @@ import {
   createRegionForCoordinate,
   getCoordinateFromRegion,
   getDefaultRegionForCoordinate,
-  getDistanceInMeters,
   mapGooglePlaceToLocation,
 } from '../helpers/location.helpers';
+import { getDistanceInMeters } from '@/utils/geo';
 import { useLocationSearch } from './useLocationSearch';
 import { useSavedLocations } from './useSavedLocations';
 
@@ -58,10 +56,6 @@ export const useLocationSelector = ({
   const [destinationQuery, setDestinationQuery] = useState('');
   const [mapPickerInput, setMapPickerInput] =
     useState<ActiveLocationInput | null>(null);
-  const [, setMapCoordinate] = useState<MapCoordinate>({
-    latitude: DEFAULT_MAP_REGION.latitude,
-    longitude: DEFAULT_MAP_REGION.longitude,
-  });
   const [mapRegion, setMapRegion] = useState<MapRegion>(DEFAULT_MAP_REGION);
   const [mapCameraRequestKey, setMapCameraRequestKey] = useState(0);
   const [mapPreviewLocation, setMapPreviewLocation] =
@@ -69,7 +63,6 @@ export const useLocationSelector = ({
   const [mapError, setMapError] = useState<string | null>(null);
   const [isWaitingForMapPreview, setIsWaitingForMapPreview] = useState(false);
   const [isLoadingMapPreview, setIsLoadingMapPreview] = useState(false);
-  const [isConfirmingMapLocation, setIsConfirmingMapLocation] = useState(false);
   const setCurrentLocation = useLocationStore(
     state => state.setCurrentLocation,
   );
@@ -90,13 +83,8 @@ export const useLocationSelector = ({
     hasGooglePlacesApiKey,
     isLoading,
   } = useLocationSearch();
-  const {
-    savedLocations,
-    isLoadingSavedLocations,
-    isSavingLocation,
-    loadSavedLocations,
-    saveLocation: saveLocationToShortcuts,
-  } = useSavedLocations();
+  const { savedLocations, isLoadingSavedLocations, loadSavedLocations } =
+    useSavedLocations();
   const {
     pickup,
     destination,
@@ -105,8 +93,6 @@ export const useLocationSelector = ({
     clearDestination,
     clearPickup,
   } = useRideDraft();
-  const rideDateTime = useRideDateTime();
-
   useEffect(() => {
     if (useCurrentLocationAsPickup && !pickup && currentLocation) {
       setPickup(currentLocation);
@@ -371,23 +357,6 @@ export const useLocationSelector = ({
     [activeInput, applyLocation, clearResults, deferMapSelectionUntilConfirm],
   );
 
-  const saveLocation = useCallback(
-    async (
-      input: ActiveLocationInput,
-      label: string,
-      kind: SavedLocationKind,
-    ) => {
-      const location = input === 'pickup' ? pickup : destination;
-
-      if (!location) {
-        throw new Error('Choose a location before saving it.');
-      }
-
-      await saveLocationToShortcuts(label, kind, location);
-    },
-    [destination, pickup, saveLocationToShortcuts],
-  );
-
   const closeMapPicker = useCallback(() => {
     if (mapPreviewTimeoutRef.current) {
       clearTimeout(mapPreviewTimeoutRef.current);
@@ -400,7 +369,6 @@ export const useLocationSelector = ({
     setMapError(null);
     setIsWaitingForMapPreview(false);
     setIsLoadingMapPreview(false);
-    setIsConfirmingMapLocation(false);
   }, []);
 
   const resolveMapPreviewLocation = useCallback(
@@ -474,7 +442,6 @@ export const useLocationSelector = ({
       setActiveInput(input);
       clearResults();
       setMapError(null);
-      setMapCoordinate(nextCoordinate);
       setMapRegion(createRegionForCoordinate(nextCoordinate, initialRegion));
       setMapCameraRequestKey(currentKey => currentKey + 1);
       setMapPickerInput(input);
@@ -509,7 +476,6 @@ export const useLocationSelector = ({
       const location = await fetchCurrentLocation();
 
       if (location) {
-        setMapCoordinate(location);
         setMapRegion(createRegionForCoordinate(location));
         setMapCameraRequestKey(currentKey => currentKey + 1);
         setMapPreviewLocation(location);
@@ -535,7 +501,6 @@ export const useLocationSelector = ({
           MAP_PREVIEW_MIN_DISTANCE_METERS;
 
       setMapRegion(region);
-      setMapCoordinate(coordinate);
 
       if (hasMovedEnoughForPreview) {
         queueMapPreviewLocationResolve(coordinate);
@@ -544,31 +509,7 @@ export const useLocationSelector = ({
     [queueMapPreviewLocationResolve],
   );
 
-  const confirmMapLocation = useCallback(async () => {
-    if (!mapPickerInput || !mapPreviewLocation) {
-      return;
-    }
-
-    setMapError(null);
-    setIsConfirmingMapLocation(true);
-
-    try {
-      applyLocation(mapPickerInput, mapPreviewLocation);
-      closeMapPicker();
-    } catch (caughtError) {
-      const appError = createAppError(
-        'LOCATION_GEOCODE_FAILED',
-        getErrorMessage(caughtError, FEEDBACK_MESSAGES.locationUnavailable),
-        caughtError,
-      );
-
-      setMapError(appError.message);
-    } finally {
-      setIsConfirmingMapLocation(false);
-    }
-  }, [applyLocation, closeMapPicker, mapPickerInput, mapPreviewLocation]);
-
-  const confirmRouteMapLocation = useCallback(async () => {
+  const confirmRouteMapLocation = useCallback(() => {
     if (!mapPickerInput || !mapPreviewLocation) {
       return;
     }
@@ -585,39 +526,18 @@ export const useLocationSelector = ({
         : null;
 
     setMapError(null);
-    setIsConfirmingMapLocation(true);
+    applyLocation(confirmedInput, mapPreviewLocation);
 
-    try {
-      applyLocation(confirmedInput, mapPreviewLocation);
+    setMapPreviewLocation(null);
 
-      setMapPreviewLocation(null);
-
-      if (nextInput) {
-        setActiveInput(nextInput);
-        setMapPickerInput(nextInput);
-        lastQueuedMapPreviewCoordinateRef.current = null;
-      } else {
-        setActiveInput(null);
-      }
-    } catch (caughtError) {
-      const appError = createAppError(
-        'LOCATION_GEOCODE_FAILED',
-        getErrorMessage(caughtError, FEEDBACK_MESSAGES.locationUnavailable),
-        caughtError,
-      );
-
-      setMapError(appError.message);
-    } finally {
-      setIsConfirmingMapLocation(false);
+    if (nextInput) {
+      setActiveInput(nextInput);
+      setMapPickerInput(nextInput);
+      lastQueuedMapPreviewCoordinateRef.current = null;
+    } else {
+      setActiveInput(null);
     }
   }, [applyLocation, destination, mapPickerInput, mapPreviewLocation, pickup]);
-
-  const handleDateTimeConfirm = useCallback(
-    (selectedDateTime: Date) => {
-      rideDateTime.handleDateTimeConfirm(selectedDateTime);
-    },
-    [rideDateTime],
-  );
 
   return {
     activeInput,
@@ -631,7 +551,6 @@ export const useLocationSelector = ({
     pickup,
     savedLocations,
     isLoadingSavedLocations,
-    isSavingLocation,
     locationError: locationSearchError,
     hasGooglePlacesApiKey,
     isLoadingCurrentLocation: isLoading,
@@ -643,9 +562,6 @@ export const useLocationSelector = ({
     mapError,
     isWaitingForMapPreview,
     isLoadingMapPreview,
-    isConfirmingMapLocation,
-    isOpeningMapPicker: false,
-    rideDateTime,
     setPickupQuery,
     setDestinationQuery,
     clearLocationInput,
@@ -653,13 +569,10 @@ export const useLocationSelector = ({
     openRouteMapPicker,
     openMapPicker,
     closeMapPicker,
-    handleDateTimeConfirm,
     onMapRegionChange: handleMapRegionChange,
     useDeviceLocationOnMap,
-    confirmMapLocation,
     confirmRouteMapLocation,
     handlePlaceSelected,
     onSavedLocationSelected: handleSavedLocationSelected,
-    saveLocation,
   };
 };

@@ -30,7 +30,6 @@ export const useRideDateTime = () => {
   return {
     dateTime,
     formatDateAndTime,
-    formateDateAndTime: formatDateAndTime,
     openDateTimePicker,
     closeDateTimePicker,
     handleDateTimeConfirm,

@@ -9,8 +9,6 @@ export const PLACE_DETAILS_CACHE_TTL_MS = 30 * 60 * 1000;
 export const PLACE_DETAILS_CACHE_MAX_ENTRIES = 80;
 export const MAP_PREVIEW_DELAY_MS = 1200;
 export const MAP_PREVIEW_MIN_DISTANCE_METERS = 35;
-export const LOCATION_SHEET_SNAP_POINTS = ['80%'] as const;
-export const LOCATION_SELECTOR_CONTENT_Z_INDEX = 9999;
 
 export const DEFAULT_MAP_REGION: MapRegion = {
   latitude: 30.3753,
@@ -29,19 +27,12 @@ export const DEFAULT_CURRENT_LOCATION_MAP_REGION: MapRegion = {
 export const LOCATION_SELECTOR_COPY = {
   destinationPlaceholder: 'Where to?',
   pickupPlaceholder: 'Current Location',
-  mapButtonLabel: 'Map',
-  routeSummaryTitle: 'Ride details',
   fromLabel: 'From',
   toLabel: 'To',
-  dateTimeLabel: 'Date & time',
-  routePlaceholder: 'Choose your destination',
-  dateTimePlaceholder: 'Choose your departure time',
 } as const;
 
 export const MAP_LOCATION_PICKER_COPY = {
   routeTitle: 'Set ride details',
-  pickupTitle: 'Select current location',
-  destinationTitle: 'Select destination',
   pickupHeading: 'Pickup location',
   destinationHeading: 'Destination address',
   idleDescription: 'Select a location on the map',

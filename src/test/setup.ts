@@ -7,7 +7,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 jest.mock('expo-constants', () => ({
   expoConfig: {
     extra: {
-      apiUrl: '',
       googlePlacesApiKey: 'test-google-key',
     },
   },

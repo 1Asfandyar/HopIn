@@ -52,7 +52,6 @@ const MapLocationPicker = ({
   previewLocation,
   isWaitingForPreview,
   isLoadingPreview,
-  isConfirming,
   error,
   onPickupChange,
   onDestinationChange,
@@ -334,7 +333,6 @@ const MapLocationPicker = ({
               )}
               <ThemedButton
                 title={MAP_LOCATION_PICKER_COPY.confirmButtonLabel}
-                loading={isConfirming}
                 disabled={
                   !previewLocation || isWaitingForPreview || isLoadingPreview
                 }

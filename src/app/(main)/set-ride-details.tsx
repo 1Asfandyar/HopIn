@@ -5,7 +5,7 @@ import BrandedLoader from '@/components/feedback/BrandedLoader';
 import { APP_ROUTES } from '@/constants/appRoutes';
 import { USER_ROLES } from '@/constants/roles';
 import MapLocationPicker from '@/features/location/components/MapLocationPicker';
-import { useLocationSelectorScreenProps } from '@/features/location/hooks/useLocationSelectorScreenProps';
+import { useRouteMapPickerProps } from '@/features/location/hooks/useRouteMapPickerProps';
 import { RIDE_MATCHING_COPY } from '@/features/rides/constants/rideMatching.constants';
 import { useRideDraft } from '@/features/rides/hooks/useRideDraft';
 import { useAuthStore } from '@/store/auth.store';
@@ -19,24 +19,18 @@ const SetRideDetails = () => {
   const flowMode: RideFlowMode =
     user?.role === USER_ROLES.driver ? 'offer' : 'find';
   const copy = RIDE_MATCHING_COPY[flowMode];
-  const locationSelector = useLocationSelectorScreenProps({
+  const routeMapPicker = useRouteMapPickerProps({
     flowMode,
-    roleLabel: '',
-    heading: '',
-    description: '',
-    submitLabel: copy.mapDoneLabel,
-    submittingLabel: copy.mapDoneLabel,
-    onSubmit: () => router.push(APP_ROUTES.main.rideResults),
-    isSubmitting: false,
     resetDraftOnBlur: false,
     useCurrentLocationAsPickup: false,
     deferMapSelectionUntilConfirm: true,
   });
   const canContinue = Boolean(
-    locationSelector.pickup && locationSelector.destination,
+    routeMapPicker.pickup && routeMapPicker.destination,
   );
+  const openRouteMap = routeMapPicker.onOpenRouteMap;
   const handleRouteDone = () => {
-    locationSelector.onCloseMapPicker();
+    routeMapPicker.onCloseMapPicker();
     requestAnimationFrame(() => {
       router.push(APP_ROUTES.main.rideResults);
     });
@@ -48,46 +42,45 @@ const SetRideDetails = () => {
     }
 
     didOpenMapRef.current = true;
-    locationSelector.onOpenRouteMap();
-  }, [locationSelector]);
+    openRouteMap();
+  }, [openRouteMap]);
 
   return (
     <View className="flex-1 bg-white">
       <BrandedLoader variant="inline" label="Opening map..." />
       <MapLocationPicker
-        visible={locationSelector.mapPickerInput !== null}
-        flowMode={locationSelector.flowMode}
-        inputType={locationSelector.mapPickerInput}
-        activeInput={locationSelector.activeInput}
-        pickupQuery={locationSelector.pickupQuery}
-        destinationQuery={locationSelector.destinationQuery}
-        pickup={locationSelector.pickup}
-        destination={locationSelector.destination}
-        searchResults={locationSelector.searchResults}
-        isSearchingPlaces={locationSelector.isSearchingPlaces}
-        placesError={locationSelector.placesError}
-        shouldShowResults={locationSelector.shouldShowResults}
-        savedLocations={locationSelector.savedLocations}
-        isLoadingSavedLocations={locationSelector.isLoadingSavedLocations}
-        locationError={locationSelector.locationError}
-        hasGooglePlacesApiKey={locationSelector.hasGooglePlacesApiKey}
-        isLoadingCurrentLocation={locationSelector.isLoadingCurrentLocation}
-        region={locationSelector.mapRegion}
-        cameraRequestKey={locationSelector.mapCameraRequestKey}
-        previewLocation={locationSelector.mapPreviewLocation}
-        isWaitingForPreview={locationSelector.isWaitingForMapPreview}
-        isLoadingPreview={locationSelector.isLoadingMapPreview}
-        isConfirming={locationSelector.isConfirmingMapLocation}
-        error={locationSelector.mapError}
-        onPickupChange={locationSelector.onPickupChange}
-        onDestinationChange={locationSelector.onDestinationChange}
-        onLocationInputClear={locationSelector.onLocationInputClear}
-        onActiveInputChange={locationSelector.onActiveInputChange}
-        onPlaceSelected={locationSelector.onPlaceSelected}
-        onSavedLocationSelected={locationSelector.onSavedLocationSelected}
-        onRegionChange={locationSelector.onMapRegionChange}
-        onUseCurrentLocation={locationSelector.onUseDeviceLocationOnMap}
-        onConfirm={locationSelector.onConfirmRouteMapLocation}
+        visible={routeMapPicker.mapPickerInput !== null}
+        flowMode={routeMapPicker.flowMode}
+        inputType={routeMapPicker.mapPickerInput}
+        activeInput={routeMapPicker.activeInput}
+        pickupQuery={routeMapPicker.pickupQuery}
+        destinationQuery={routeMapPicker.destinationQuery}
+        pickup={routeMapPicker.pickup}
+        destination={routeMapPicker.destination}
+        searchResults={routeMapPicker.searchResults}
+        isSearchingPlaces={routeMapPicker.isSearchingPlaces}
+        placesError={routeMapPicker.placesError}
+        shouldShowResults={routeMapPicker.shouldShowResults}
+        savedLocations={routeMapPicker.savedLocations}
+        isLoadingSavedLocations={routeMapPicker.isLoadingSavedLocations}
+        locationError={routeMapPicker.locationError}
+        hasGooglePlacesApiKey={routeMapPicker.hasGooglePlacesApiKey}
+        isLoadingCurrentLocation={routeMapPicker.isLoadingCurrentLocation}
+        region={routeMapPicker.mapRegion}
+        cameraRequestKey={routeMapPicker.mapCameraRequestKey}
+        previewLocation={routeMapPicker.mapPreviewLocation}
+        isWaitingForPreview={routeMapPicker.isWaitingForMapPreview}
+        isLoadingPreview={routeMapPicker.isLoadingMapPreview}
+        error={routeMapPicker.mapError}
+        onPickupChange={routeMapPicker.onPickupChange}
+        onDestinationChange={routeMapPicker.onDestinationChange}
+        onLocationInputClear={routeMapPicker.onLocationInputClear}
+        onActiveInputChange={routeMapPicker.onActiveInputChange}
+        onPlaceSelected={routeMapPicker.onPlaceSelected}
+        onSavedLocationSelected={routeMapPicker.onSavedLocationSelected}
+        onRegionChange={routeMapPicker.onMapRegionChange}
+        onUseCurrentLocation={routeMapPicker.onUseDeviceLocationOnMap}
+        onConfirm={routeMapPicker.onConfirmRouteMapLocation}
         onClose={() => {
           resetDraft();
           router.back();

@@ -162,4 +162,3 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
 export const selectAuthUser = (state: AuthStore) => state.user;
 export const selectAuthLoading = (state: AuthStore) => state.isLoading;
-export const selectAuthError = (state: AuthStore) => state.error;
