@@ -289,9 +289,6 @@ const MapLocationPicker = ({
                   {routeActionLoading ? 'Preparing route...' : 'Route ready'}
                 </ThemedText>
               </View>
-              <ThemedText weight="semiBold" className="text-base text-gray-900">
-                Route selected
-              </ThemedText>
               <View className="h-px bg-gray-200 my-3" />
               <View className="mb-4 gap-3">
                 {routeSummaryRows.map(row => (

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Image, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View } from 'react-native';
 import { USER_ROLE_LABELS, USER_ROLES, type UserRole } from '@/constants/roles';
+import RideParticipantAvatar from '@/features/rides/components/RideParticipantAvatar';
 import { useAuthStore } from '@/store/auth.store';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
@@ -40,20 +40,7 @@ const Profile = () => {
   return (
     <View className="flex-1 bg-white px-5 pt-4">
       <View className="items-center py-6">
-        <View
-          className="h-24 w-24 items-center justify-center overflow-hidden rounded-full"
-          style={{ backgroundColor: roleTheme.lightColor }}
-        >
-          {user?.photoUrl ? (
-            <Image
-              source={{ uri: user.photoUrl }}
-              className="h-full w-full"
-              resizeMode="cover"
-            />
-          ) : (
-            <Ionicons name="person" size={48} color={roleTheme.color} />
-          )}
-        </View>
+        <RideParticipantAvatar profile={user} size={96} />
         <ThemedText weight="semiBold" size="2xl" className="text-gray-900 mt-4">
           {user?.fullName ?? 'Hopin User'}
         </ThemedText>

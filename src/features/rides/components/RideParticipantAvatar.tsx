@@ -1,10 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { themeColors } from '@/theme/tokens';
-import type { UserProfile } from '@/types/types';
 
 type RideParticipantAvatarProps = {
-  profile?: UserProfile | null;
+  profile?: { photoUrl?: string | null } | null;
   size?: number;
 };
 
@@ -12,18 +12,26 @@ const RideParticipantAvatar = ({
   profile,
   size = 48,
 }: RideParticipantAvatarProps) => {
+  const [hasImageError, setHasImageError] = useState(false);
+  const photoUrl = profile?.photoUrl?.trim();
+  const shouldShowPhoto = Boolean(photoUrl) && !hasImageError;
   const avatarStyle = {
     height: size,
     width: size,
     borderRadius: size / 2,
   };
 
-  if (profile?.photoUrl) {
+  useEffect(() => {
+    setHasImageError(false);
+  }, [photoUrl]);
+
+  if (shouldShowPhoto) {
     return (
       <Image
-        source={{ uri: profile.photoUrl }}
+        source={{ uri: photoUrl }}
         resizeMode="cover"
         style={avatarStyle}
+        onError={() => setHasImageError(true)}
       />
     );
   }
