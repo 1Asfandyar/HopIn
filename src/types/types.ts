@@ -61,6 +61,8 @@ export type RideDraft = {
   departureTime: string | null;
 };
 
+export type RideRouteDraft = Pick<RideDraft, 'pickup' | 'destination'>;
+
 export type RideRequest = {
   pickup: AppLocation;
   destination: AppLocation;
@@ -247,6 +249,7 @@ export type PlacesStore = {
 export type RidesStore = {
   draft: RideDraft;
   setPickup: (pickup: AppLocation) => void;
+  clearPickup: () => void;
   setDestination: (destination: AppLocation) => void;
   clearDestination: () => void;
   setDepartureTime: (departureTime: Date | null) => void;
@@ -306,7 +309,7 @@ export type ThemedButtonProps = TouchableOpacityProps & {
 };
 
 export type ThemedCardProps = TouchableOpacityProps & {
-  heading: string;
+  heading: ReactNode;
   subHeading?: string;
   middleElement?: ReactNode;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';

@@ -16,8 +16,8 @@ export const APP_ROUTES = {
     home: route('/(main)/(tabs)/home'),
     rides: route('/(main)/(tabs)/rides'),
     profile: route('/(main)/(tabs)/profile'),
-    findRide: route('/(main)/find-ride'),
-    offerRide: route('/(main)/offer-ride'),
+    setRideDetails: route('/(main)/set-ride-details'),
+    rideResults: route('/(main)/ride-results'),
     rideDetails: route('/(main)/ride-details'),
   },
 } as const;

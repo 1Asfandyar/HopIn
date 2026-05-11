@@ -56,6 +56,7 @@ export type MapLocationPickerProps = {
   error: string | null;
   onPickupChange: (text: string) => void;
   onDestinationChange: (text: string) => void;
+  onLocationInputClear: (input: ActiveLocationInput) => void;
   onActiveInputChange: (input: ActiveLocationInput) => void;
   onPlaceSelected: (place: GooglePlaceData) => void;
   onSavedLocationSelected: (savedLocation: SavedLocation) => void;
@@ -63,6 +64,10 @@ export type MapLocationPickerProps = {
   onUseCurrentLocation: () => void;
   onConfirm: () => void;
   onClose: () => void;
+  routeActionLabel?: string;
+  routeActionDisabled?: boolean;
+  routeActionLoading?: boolean;
+  onRouteAction?: () => void;
 };
 
 export type LocationSelectorViewProps = {
@@ -103,6 +108,7 @@ export type LocationSelectorViewProps = {
   formatDateAndTime: (date: Date | null) => string;
   onPickupChange: (text: string) => void;
   onDestinationChange: (text: string) => void;
+  onLocationInputClear: (input: ActiveLocationInput) => void;
   onActiveInputChange: (input: ActiveLocationInput) => void;
   onOpenRouteMap: () => void;
   onOpenLocationMap: (input: ActiveLocationInput) => void;
@@ -113,6 +119,7 @@ export type LocationSelectorViewProps = {
   onMapRegionChange: (region: MapRegion) => void;
   onUseDeviceLocationOnMap: () => void;
   onConfirmMapLocation: () => void;
+  onConfirmRouteMapLocation: () => void;
   onPlaceSelected: (place: GooglePlaceData) => void;
   onSavedLocationSelected: (savedLocation: SavedLocation) => void;
   onSaveLocation: (

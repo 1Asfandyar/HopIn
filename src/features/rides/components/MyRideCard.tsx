@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, View } from 'react-native';
 import { RIDE_SOURCE_LABELS } from '@/features/rides/constants/rides.constants';
 import RideStatusPill from '@/features/rides/components/RideStatusPill';
+import { getShortRideAddress } from '@/features/rides/helpers/rideDisplay.helpers';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
 import { themeColors } from '@/theme/tokens';
@@ -23,10 +24,12 @@ const MyRideCard = ({
     ? RIDE_SOURCE_LABELS[ride.source]
     : 'Posted request';
   const roleLabel = ride.role === 'driver' ? 'Driving' : 'Riding';
+  const pickup = getShortRideAddress(ride.pickup.address);
+  const destination = getShortRideAddress(ride.destination.address);
 
   return (
     <ThemedCard
-      heading={ride.destination.address}
+      heading={destination}
       subHeading={formatDateAndTime(new Date(ride.departureTime))}
       variant="outline"
       leftIcon={ride.role === 'driver' ? 'car-sport-outline' : 'person-outline'}
@@ -68,7 +71,7 @@ const MyRideCard = ({
 
           <View className="gap-1">
             <ThemedText size="sm" className="text-gray-600">
-              From: {ride.pickup.address}
+              From: {pickup}
             </ThemedText>
             <ThemedText size="sm" className="text-gray-600">
               {sourceLabel}

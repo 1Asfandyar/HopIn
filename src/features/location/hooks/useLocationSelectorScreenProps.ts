@@ -14,6 +14,9 @@ type UseLocationSelectorScreenPropsParams = {
   submittingLabel: string;
   onSubmit: () => void;
   isSubmitting: boolean;
+  resetDraftOnBlur?: boolean;
+  useCurrentLocationAsPickup?: boolean;
+  deferMapSelectionUntilConfirm?: boolean;
 };
 
 export const useLocationSelectorScreenProps = ({
@@ -25,16 +28,24 @@ export const useLocationSelectorScreenProps = ({
   submittingLabel,
   onSubmit,
   isSubmitting,
+  resetDraftOnBlur = true,
+  useCurrentLocationAsPickup = true,
+  deferMapSelectionUntilConfirm = false,
 }: UseLocationSelectorScreenPropsParams): LocationSelectorViewProps => {
   const { resetDraft } = useRideDraft();
-  const locationSelector = useLocationSelector();
+  const locationSelector = useLocationSelector({
+    useCurrentLocationAsPickup,
+    deferMapSelectionUntilConfirm,
+  });
 
   useFocusEffect(
     useCallback(() => {
       return () => {
-        resetDraft();
+        if (resetDraftOnBlur) {
+          resetDraft();
+        }
       };
-    }, [resetDraft]),
+    }, [resetDraft, resetDraftOnBlur]),
   );
 
   return {
@@ -75,6 +86,7 @@ export const useLocationSelectorScreenProps = ({
     formatDateAndTime: locationSelector.rideDateTime.formatDateAndTime,
     onPickupChange: locationSelector.setPickupQuery,
     onDestinationChange: locationSelector.setDestinationQuery,
+    onLocationInputClear: locationSelector.clearLocationInput,
     onActiveInputChange: locationSelector.setActiveInput,
     onOpenRouteMap: locationSelector.openRouteMapPicker,
     onOpenLocationMap: locationSelector.openMapPicker,
@@ -85,6 +97,7 @@ export const useLocationSelectorScreenProps = ({
     onMapRegionChange: locationSelector.onMapRegionChange,
     onUseDeviceLocationOnMap: locationSelector.useDeviceLocationOnMap,
     onConfirmMapLocation: locationSelector.confirmMapLocation,
+    onConfirmRouteMapLocation: locationSelector.confirmRouteMapLocation,
     onPlaceSelected: locationSelector.handlePlaceSelected,
     onSavedLocationSelected: locationSelector.onSavedLocationSelected,
     onSaveLocation: locationSelector.saveLocation,

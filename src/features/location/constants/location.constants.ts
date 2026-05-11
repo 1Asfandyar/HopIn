@@ -46,5 +46,5 @@ export const MAP_LOCATION_PICKER_COPY = {
   destinationHeading: 'Destination address',
   idleDescription: 'Select a location on the map',
   currentLocationButtonLabel: 'Use current location',
-  confirmButtonLabel: 'Done',
+  confirmButtonLabel: 'Use this location',
 } as const;

@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  Alert,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ThemedInput from '@/theme/components/ThemedInput';
@@ -18,6 +11,9 @@ import type { ActiveLocationInput } from '../types';
 import type { SavedLocationKind } from '@/types/types';
 import { LOCATION_SELECTOR_COPY } from '../constants/location.constants';
 import MapLocationPicker from './MapLocationPicker';
+import RouteLocationCard from './RouteLocationCard';
+import SaveLocationModal from './SaveLocationModal';
+import { locationSelectorStyles as styles } from './LocationSelector.styles';
 
 const LocationSelector = ({
   flowMode,
@@ -57,6 +53,7 @@ const LocationSelector = ({
   formatDateAndTime,
   onPickupChange,
   onDestinationChange,
+  onLocationInputClear,
   onActiveInputChange,
   onOpenRouteMap,
   onOpenLocationMap,
@@ -141,70 +138,6 @@ const LocationSelector = ({
     }
   };
 
-  const renderSaveLocationAction = (
-    input: ActiveLocationInput,
-    isDisabled: boolean,
-  ) => (
-    <TouchableOpacity
-      activeOpacity={0.75}
-      disabled={isDisabled}
-      className={`ml-3 flex-row items-center rounded-full border px-3 py-2 ${
-        isDisabled ? 'border-gray-200 bg-gray-50' : 'border-gray-200 bg-white'
-      }`}
-      style={styles.saveLocationAction}
-      onPress={event => {
-        event.stopPropagation();
-        openSaveLocationModal(input);
-      }}
-    >
-      <Ionicons
-        name="bookmark-outline"
-        size={14}
-        color={isDisabled ? themeColors.gray300 : themeColors.gray600}
-      />
-      <ThemedText
-        weight="semiBold"
-        size="xs"
-        className={`ml-1 ${isDisabled ? 'text-gray-300' : 'text-gray-700'}`}
-      >
-        Save
-      </ThemedText>
-    </TouchableOpacity>
-  );
-
-  const renderRouteLocationCard = (
-    input: ActiveLocationInput,
-    label: string,
-    address: string | undefined,
-    placeholder: string,
-    hasLocation: boolean,
-  ) => (
-    <View className={`rounded-2xl px-3 py-3 ${modeClasses.routeCard}`}>
-      <View className="flex-row items-start justify-between">
-        <TouchableOpacity
-          activeOpacity={0.75}
-          className="min-w-0 flex-1 pr-2"
-          onPress={() => onOpenLocationMap(input)}
-        >
-          <ThemedText
-            weight="semiBold"
-            className={`mb-1 text-[12px] uppercase tracking-wide ${modeClasses.routeLabel}`}
-          >
-            {label}
-          </ThemedText>
-          <ThemedText
-            className={`text-sm ${address ? 'text-gray-900' : modeClasses.routePlaceholder}`}
-            numberOfLines={2}
-          >
-            {address ?? placeholder}
-          </ThemedText>
-        </TouchableOpacity>
-
-        {renderSaveLocationAction(input, !hasLocation)}
-      </View>
-    </View>
-  );
-
   return (
     <View className="bg-white flex-1">
       <View className={`mb-4 rounded-3xl p-4 ${modeClasses.container}`}>
@@ -238,20 +171,30 @@ const LocationSelector = ({
         </View>
 
         <View className="gap-3">
-          {renderRouteLocationCard(
-            'pickup',
-            LOCATION_SELECTOR_COPY.fromLabel,
-            pickup?.address,
-            LOCATION_SELECTOR_COPY.pickupPlaceholder,
-            Boolean(pickup),
-          )}
-          {renderRouteLocationCard(
-            'destination',
-            LOCATION_SELECTOR_COPY.toLabel,
-            destination?.address,
-            LOCATION_SELECTOR_COPY.routePlaceholder,
-            Boolean(destination),
-          )}
+          <RouteLocationCard
+            input="pickup"
+            label={LOCATION_SELECTOR_COPY.fromLabel}
+            address={pickup?.address}
+            placeholder={LOCATION_SELECTOR_COPY.pickupPlaceholder}
+            hasLocation={Boolean(pickup)}
+            routeCardClassName={modeClasses.routeCard}
+            routeLabelClassName={modeClasses.routeLabel}
+            routePlaceholderClassName={modeClasses.routePlaceholder}
+            onOpenLocationMap={onOpenLocationMap}
+            onSaveLocationPress={openSaveLocationModal}
+          />
+          <RouteLocationCard
+            input="destination"
+            label={LOCATION_SELECTOR_COPY.toLabel}
+            address={destination?.address}
+            placeholder={LOCATION_SELECTOR_COPY.routePlaceholder}
+            hasLocation={Boolean(destination)}
+            routeCardClassName={modeClasses.routeCard}
+            routeLabelClassName={modeClasses.routeLabel}
+            routePlaceholderClassName={modeClasses.routePlaceholder}
+            onOpenLocationMap={onOpenLocationMap}
+            onSaveLocationPress={openSaveLocationModal}
+          />
         </View>
       </View>
 
@@ -306,6 +249,7 @@ const LocationSelector = ({
         error={mapError}
         onPickupChange={onPickupChange}
         onDestinationChange={onDestinationChange}
+        onLocationInputClear={onLocationInputClear}
         onActiveInputChange={onActiveInputChange}
         onPlaceSelected={onPlaceSelected}
         onSavedLocationSelected={onSavedLocationSelected}
@@ -324,107 +268,23 @@ const LocationSelector = ({
         is24Hour={false}
       />
 
-      <Modal
+      <SaveLocationModal
         visible={saveTargetInput !== null}
-        animationType="fade"
-        transparent
-        onRequestClose={closeSaveLocationModal}
-      >
-        <Pressable
-          style={styles.modalBackdrop}
-          onPress={closeSaveLocationModal}
-        >
-          <Pressable style={styles.saveLocationModal}>
-            <ThemedText weight="semiBold" size="lg" className="text-gray-900">
-              Save location
-            </ThemedText>
-            <View className="my-4 flex-row flex-wrap gap-2">
-              {saveKindOptions.map(option => {
-                const isSelected = option.kind === selectedSavedKind;
-
-                return (
-                  <TouchableOpacity
-                    key={option.kind}
-                    activeOpacity={0.8}
-                    onPress={() => setSelectedSavedKind(option.kind)}
-                    className={`rounded-xl border px-3 py-2 ${
-                      isSelected
-                        ? modeClasses.selectedSaveKind
-                        : 'border-gray-200 bg-white'
-                    }`}
-                  >
-                    <ThemedText
-                      weight="semiBold"
-                      size="sm"
-                      className={
-                        isSelected
-                          ? modeClasses.selectedSaveKindText
-                          : 'text-gray-700'
-                      }
-                    >
-                      {option.label}
-                    </ThemedText>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            {selectedSavedKind === 'other' && (
-              <ThemedInput
-                value={customLocationLabel}
-                onChangeText={setCustomLocationLabel}
-                placeholder="Label"
-                leftIcon="bookmark-outline"
-              />
-            )}
-            <View className="mt-2 flex-row gap-2">
-              <ThemedButton
-                title="Cancel"
-                variant="outline"
-                colorScheme={colorScheme}
-                onPress={closeSaveLocationModal}
-                containerClassName="flex-1"
-              />
-              <ThemedButton
-                title={isSavingLocation ? 'Saving...' : 'Save'}
-                loading={isSavingLocation}
-                disabled={!canSaveLocation || isSavingLocation}
-                onPress={handleSaveLocation}
-                colorScheme={colorScheme}
-                containerClassName="flex-1"
-              />
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        colorScheme={colorScheme}
+        saveKindOptions={saveKindOptions}
+        selectedKind={selectedSavedKind}
+        customLabel={customLocationLabel}
+        canSave={canSaveLocation}
+        isSaving={isSavingLocation}
+        selectedKindClassName={modeClasses.selectedSaveKind}
+        selectedKindTextClassName={modeClasses.selectedSaveKindText}
+        onKindChange={setSelectedSavedKind}
+        onCustomLabelChange={setCustomLocationLabel}
+        onClose={closeSaveLocationModal}
+        onSave={handleSaveLocation}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  routeSummaryCard: {
-    shadowColor: themeColors.black,
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
-  saveLocationAction: {
-    zIndex: 2,
-    elevation: 3,
-  },
-  modalBackdrop: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    padding: 20,
-  },
-  saveLocationModal: {
-    width: '100%',
-    borderRadius: 18,
-    backgroundColor: themeColors.white,
-    padding: 18,
-  },
-});
 
 export default LocationSelector;

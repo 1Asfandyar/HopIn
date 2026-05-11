@@ -5,7 +5,7 @@ import RideStatusPill from '@/features/rides/components/RideStatusPill';
 import {
   getRideDetailActionLabel,
   getRideParticipantName,
-  getRideSummaryText,
+  getShortRideAddress,
 } from '@/features/rides/helpers/rideDisplay.helpers';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
@@ -36,6 +36,43 @@ const RouteStop = ({ label, address }: { label: string; address: string }) => {
   );
 };
 
+const RideSummaryText = ({
+  ride,
+  rideType,
+  color,
+}: {
+  ride: RideRecord;
+  rideType: RideRecordType;
+  color: string;
+}) => {
+  const participantName = getRideParticipantName(
+    ride,
+    rideType === 'offer' ? 'A driver' : 'A rider',
+  );
+  const verb = rideType === 'offer' ? 'is driving to' : 'is going to';
+  const destination = getShortRideAddress(ride.destination.address);
+  const pickup = getShortRideAddress(ride.pickup.address);
+  const departureTime = formatDateAndTime(new Date(ride.departureTime));
+
+  return (
+    <>
+      {participantName} {verb}{' '}
+      <ThemedText weight="semiBold" style={{ color }}>
+        {destination}
+      </ThemedText>{' '}
+      from{' '}
+      <ThemedText weight="semiBold" style={{ color }}>
+        {pickup}
+      </ThemedText>{' '}
+      at{' '}
+      <ThemedText weight="semiBold" style={{ color }}>
+        {departureTime}
+      </ThemedText>
+      .
+    </>
+  );
+};
+
 const RideDetailsScreen = ({
   ride,
   rideType,
@@ -50,6 +87,8 @@ const RideDetailsScreen = ({
   const participantName = ride
     ? getRideParticipantName(ride, participantFallback)
     : participantFallback;
+  const highlightColor =
+    rideType === 'offer' ? themeColors.secondary : themeColors.primary;
 
   return (
     <ScrollView
@@ -99,7 +138,13 @@ const RideDetailsScreen = ({
           </View>
 
           <ThemedCard
-            heading={getRideSummaryText(ride, rideType)}
+            heading={
+              <RideSummaryText
+                ride={ride}
+                rideType={rideType}
+                color={highlightColor}
+              />
+            }
             subHeading={formatDateAndTime(new Date(ride.departureTime))}
             variant="outline"
             leftIcon={

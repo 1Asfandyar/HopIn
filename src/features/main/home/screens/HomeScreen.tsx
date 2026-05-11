@@ -113,7 +113,7 @@ const HomeScreen = () => {
                 title="Offer Seats"
                 leftIcon="add"
                 colorScheme={roleTheme.colorScheme}
-                onPress={() => router.push(APP_ROUTES.main.offerRide)}
+                onPress={() => router.push(APP_ROUTES.main.setRideDetails)}
               />
             </View>
           ) : (
@@ -121,7 +121,7 @@ const HomeScreen = () => {
               <ThemedButton
                 title="Find Rides"
                 colorScheme={roleTheme.colorScheme}
-                onPress={() => router.push(APP_ROUTES.main.findRide)}
+                onPress={() => router.push(APP_ROUTES.main.setRideDetails)}
               />
             </View>
           )}

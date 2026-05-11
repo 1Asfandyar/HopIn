@@ -56,23 +56,15 @@ const MainLayout = () => {
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
-            name="offer-ride"
-            options={{
-              header: () => (
-                <AppHeader
-                  title="Offer a Ride"
-                  leftIcon="arrow-back"
-                  onLeftPress={() => router.back()}
-                />
-              ),
-            }}
+            name="set-ride-details"
+            options={{ headerShown: false }}
           />
           <Stack.Screen
-            name="find-ride"
+            name="ride-results"
             options={{
               header: () => (
                 <AppHeader
-                  title="Find a Ride"
+                  title="Search Results"
                   leftIcon="arrow-back"
                   onLeftPress={() => router.back()}
                 />

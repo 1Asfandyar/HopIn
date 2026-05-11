@@ -7,6 +7,19 @@ export const getRideParticipantName = (
   fallback = 'Someone',
 ) => ride.userProfile?.fullName?.trim() || fallback;
 
+export const getShortRideAddress = (address: string) => {
+  const addressParts = address
+    .split(',')
+    .map(part => part.trim())
+    .filter(Boolean);
+
+  if (addressParts.length <= 2) {
+    return address.trim();
+  }
+
+  return addressParts.slice(-2).join(', ');
+};
+
 export const getRideSummaryText = (
   ride: RideRecord,
   rideType: RideRecordType,
@@ -16,8 +29,10 @@ export const getRideSummaryText = (
     rideType === 'offer' ? 'A driver' : 'A rider',
   );
   const verb = rideType === 'offer' ? 'is driving to' : 'is going to';
+  const pickup = getShortRideAddress(ride.pickup.address);
+  const destination = getShortRideAddress(ride.destination.address);
 
-  return `${name} ${verb} ${ride.destination.address} from ${ride.pickup.address} at ${formatDateAndTime(
+  return `${name} ${verb} ${destination} from ${pickup} at ${formatDateAndTime(
     new Date(ride.departureTime),
   )}.`;
 };

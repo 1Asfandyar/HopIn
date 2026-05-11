@@ -9,6 +9,10 @@ export const useRidesStore = create<RidesStore>(set => ({
     set(state => ({ draft: { ...state.draft, pickup } }));
   },
 
+  clearPickup: () => {
+    set(state => ({ draft: { ...state.draft, pickup: null } }));
+  },
+
   setDestination: destination => {
     set(state => ({ draft: { ...state.draft, destination } }));
   },

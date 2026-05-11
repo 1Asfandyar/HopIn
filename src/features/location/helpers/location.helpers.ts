@@ -6,6 +6,11 @@ import type {
 } from '@/types/types';
 import { CURRENT_LOCATION_FALLBACK_LABEL } from '@/config/constants';
 import { Linking } from 'react-native';
+import {
+  DEFAULT_CURRENT_LOCATION_MAP_REGION,
+  DEFAULT_MAP_REGION,
+} from '../constants/location.constants';
+import type { MapCoordinate, MapRegion } from '../types';
 
 export const formatGeocodedAddress = (address?: LocationGeocodedAddress) => {
   if (!address) {
@@ -50,6 +55,48 @@ export const mapGooglePlaceToLocation = (
     country: null,
     countryCode: null,
   };
+};
+
+export const getCoordinateFromRegion = (region: MapRegion): MapCoordinate => ({
+  latitude: region.latitude,
+  longitude: region.longitude,
+});
+
+export const createRegionForCoordinate = (
+  coordinate: MapCoordinate,
+  fallbackRegion: MapRegion = DEFAULT_CURRENT_LOCATION_MAP_REGION,
+): MapRegion => ({
+  ...fallbackRegion,
+  latitude: coordinate.latitude,
+  longitude: coordinate.longitude,
+});
+
+export const getDefaultRegionForCoordinate = (
+  coordinate: MapCoordinate | null,
+) => (coordinate ? DEFAULT_CURRENT_LOCATION_MAP_REGION : DEFAULT_MAP_REGION);
+
+export const getDistanceInMeters = (
+  from: MapCoordinate,
+  to: MapCoordinate,
+): number => {
+  const earthRadiusMeters = 6371000;
+  const degreesToRadians = Math.PI / 180;
+  const fromLatitude = from.latitude * degreesToRadians;
+  const toLatitude = to.latitude * degreesToRadians;
+  const latitudeDelta = (to.latitude - from.latitude) * degreesToRadians;
+  const longitudeDelta = (to.longitude - from.longitude) * degreesToRadians;
+  const haversine =
+    Math.sin(latitudeDelta / 2) * Math.sin(latitudeDelta / 2) +
+    Math.cos(fromLatitude) *
+      Math.cos(toLatitude) *
+      Math.sin(longitudeDelta / 2) *
+      Math.sin(longitudeDelta / 2);
+
+  return (
+    earthRadiusMeters *
+    2 *
+    Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+  );
 };
 
 const getLocationQuery = (location: AppLocation) => {

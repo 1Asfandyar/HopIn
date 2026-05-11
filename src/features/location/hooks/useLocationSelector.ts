@@ -10,7 +10,6 @@ import {
   usePlacesStore,
 } from '@/store/places.store';
 import { currentLocationService } from '@/services/currentLocationService';
-import { savedLocationsService } from '@/services/savedLocationsService';
 import { createAppError, getErrorMessage } from '@/utils/errors';
 import { FEEDBACK_MESSAGES } from '@/config/constants';
 import type {
@@ -22,17 +21,31 @@ import type {
 } from '@/types/types';
 import type { ActiveLocationInput, MapCoordinate, MapRegion } from '../types';
 import {
-  DEFAULT_CURRENT_LOCATION_MAP_REGION,
   DEFAULT_MAP_REGION,
   LOCATION_SEARCH_DEBOUNCE_MS,
   LOCATION_SEARCH_MIN_QUERY_LENGTH,
   MAP_PREVIEW_DELAY_MS,
   MAP_PREVIEW_MIN_DISTANCE_METERS,
 } from '../constants/location.constants';
-import { mapGooglePlaceToLocation } from '../helpers/location.helpers';
+import {
+  createRegionForCoordinate,
+  getCoordinateFromRegion,
+  getDefaultRegionForCoordinate,
+  getDistanceInMeters,
+  mapGooglePlaceToLocation,
+} from '../helpers/location.helpers';
 import { useLocationSearch } from './useLocationSearch';
+import { useSavedLocations } from './useSavedLocations';
 
-export const useLocationSelector = () => {
+type UseLocationSelectorOptions = {
+  useCurrentLocationAsPickup?: boolean;
+  deferMapSelectionUntilConfirm?: boolean;
+};
+
+export const useLocationSelector = ({
+  useCurrentLocationAsPickup = true,
+  deferMapSelectionUntilConfirm = false,
+}: UseLocationSelectorOptions = {}) => {
   const mapPreviewRequestRef = useRef(0);
   const lastQueuedMapPreviewCoordinateRef = useRef<MapCoordinate | null>(null);
   const mapPreviewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -54,13 +67,9 @@ export const useLocationSelector = () => {
   const [mapPreviewLocation, setMapPreviewLocation] =
     useState<AppLocation | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [isOpeningMapPicker, setIsOpeningMapPicker] = useState(false);
   const [isWaitingForMapPreview, setIsWaitingForMapPreview] = useState(false);
   const [isLoadingMapPreview, setIsLoadingMapPreview] = useState(false);
   const [isConfirmingMapLocation, setIsConfirmingMapLocation] = useState(false);
-  const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([]);
-  const [isLoadingSavedLocations, setIsLoadingSavedLocations] = useState(false);
-  const [isSavingLocation, setIsSavingLocation] = useState(false);
   const setCurrentLocation = useLocationStore(
     state => state.setCurrentLocation,
   );
@@ -81,27 +90,28 @@ export const useLocationSelector = () => {
     hasGooglePlacesApiKey,
     isLoading,
   } = useLocationSearch();
-  const { pickup, destination, setDestination, setPickup } = useRideDraft();
+  const {
+    savedLocations,
+    isLoadingSavedLocations,
+    isSavingLocation,
+    loadSavedLocations,
+    saveLocation: saveLocationToShortcuts,
+  } = useSavedLocations();
+  const {
+    pickup,
+    destination,
+    setDestination,
+    setPickup,
+    clearDestination,
+    clearPickup,
+  } = useRideDraft();
   const rideDateTime = useRideDateTime();
 
-  const loadSavedLocations = useCallback(async () => {
-    setIsLoadingSavedLocations(true);
-
-    try {
-      const locations = await savedLocationsService.list();
-      setSavedLocations(locations);
-    } catch {
-      setSavedLocations([]);
-    } finally {
-      setIsLoadingSavedLocations(false);
-    }
-  }, []);
-
   useEffect(() => {
-    if (!pickup && currentLocation) {
+    if (useCurrentLocationAsPickup && !pickup && currentLocation) {
       setPickup(currentLocation);
     }
-  }, [currentLocation, pickup, setPickup]);
+  }, [currentLocation, pickup, setPickup, useCurrentLocationAsPickup]);
 
   useEffect(() => {
     loadSavedLocations();
@@ -109,15 +119,48 @@ export const useLocationSelector = () => {
 
   useEffect(() => {
     if (activeInput !== 'pickup') {
-      setPickupQuery(pickup?.address ?? currentLocation?.address ?? '');
+      const pendingPickupAddress =
+        deferMapSelectionUntilConfirm &&
+        mapPickerInput === 'pickup' &&
+        mapPreviewLocation
+          ? mapPreviewLocation.address
+          : '';
+      const currentPickupAddress = useCurrentLocationAsPickup
+        ? (currentLocation?.address ?? '')
+        : '';
+
+      setPickupQuery(
+        pickup?.address || pendingPickupAddress || currentPickupAddress,
+      );
     }
-  }, [activeInput, currentLocation?.address, pickup?.address]);
+  }, [
+    activeInput,
+    currentLocation?.address,
+    deferMapSelectionUntilConfirm,
+    mapPickerInput,
+    mapPreviewLocation,
+    pickup?.address,
+    useCurrentLocationAsPickup,
+  ]);
 
   useEffect(() => {
     if (activeInput !== 'destination') {
-      setDestinationQuery(destination?.address ?? '');
+      const pendingDestinationAddress =
+        deferMapSelectionUntilConfirm &&
+        mapPickerInput === 'destination' &&
+        mapPreviewLocation
+          ? mapPreviewLocation.address
+          : '';
+
+      setDestinationQuery(destination?.address ?? pendingDestinationAddress);
     }
-  }, [activeInput, destination?.address]);
+  }, [
+    activeInput,
+    deferMapSelectionUntilConfirm,
+    destination?.address,
+    mapPickerInput,
+    mapPreviewLocation,
+  ]);
 
   const activeQuery =
     activeInput === 'pickup'
@@ -130,7 +173,8 @@ export const useLocationSelector = () => {
     activeQuery.trim().length >= LOCATION_SEARCH_MIN_QUERY_LENGTH;
   const selectedActiveAddress =
     activeInput === 'pickup'
-      ? (pickup?.address ?? currentLocation?.address)
+      ? (pickup?.address ??
+        (useCurrentLocationAsPickup ? currentLocation?.address : null))
       : activeInput === 'destination'
         ? destination?.address
         : null;
@@ -159,11 +203,6 @@ export const useLocationSelector = () => {
     searchPlaces,
     selectedActiveAddress,
   ]);
-
-  const handleActiveInputChange = useCallback((input: ActiveLocationInput) => {
-    setActiveInput(input);
-    setMapPickerInput(input);
-  }, []);
 
   const applyPickupLocation = useCallback(
     (location: AppLocation) => {
@@ -194,6 +233,47 @@ export const useLocationSelector = () => {
     [applyDestinationLocation, applyPickupLocation],
   );
 
+  const focusMapInput = useCallback(
+    (input: ActiveLocationInput) => {
+      const existingLocation = input === 'pickup' ? pickup : destination;
+
+      setActiveInput(input);
+      setMapPickerInput(input);
+      clearResults();
+
+      if (!existingLocation) {
+        setMapPreviewLocation(null);
+        return;
+      }
+
+      setMapPreviewLocation(existingLocation);
+      setMapRegion(createRegionForCoordinate(existingLocation));
+      setMapCameraRequestKey(currentKey => currentKey + 1);
+      lastQueuedMapPreviewCoordinateRef.current = existingLocation;
+    },
+    [clearResults, destination, pickup],
+  );
+
+  const clearLocationInput = useCallback(
+    (input: ActiveLocationInput) => {
+      if (input === 'pickup') {
+        setPickupQuery('');
+        clearPickup();
+      } else {
+        setDestinationQuery('');
+        clearDestination();
+      }
+
+      setActiveInput(input);
+      setMapPickerInput(input);
+      setMapPreviewLocation(null);
+      setMapError(null);
+      clearResults();
+      lastQueuedMapPreviewCoordinateRef.current = null;
+    },
+    [clearDestination, clearPickup, clearResults],
+  );
+
   const mapPlaceSelectionToLocation = useCallback(
     (
       input: ActiveLocationInput,
@@ -206,10 +286,13 @@ export const useLocationSelector = () => {
         return null;
       }
 
-      applyLocation(input, location);
+      if (!deferMapSelectionUntilConfirm) {
+        applyLocation(input, location);
+      }
+
       return location;
     },
-    [applyLocation],
+    [applyLocation, deferMapSelectionUntilConfirm],
   );
 
   const handlePlaceSelected = useCallback(
@@ -239,14 +322,17 @@ export const useLocationSelector = () => {
       );
 
       if (selectedLocation) {
+        if (selectedInput === 'pickup') {
+          setPickupQuery(selectedLocation.address);
+        } else {
+          setDestinationQuery(selectedLocation.address);
+        }
+
         Keyboard.dismiss();
+        setActiveInput(null);
         setMapPickerInput(selectedInput);
         setMapPreviewLocation(selectedLocation);
-        setMapRegion({
-          ...DEFAULT_CURRENT_LOCATION_MAP_REGION,
-          latitude: selectedLocation.latitude,
-          longitude: selectedLocation.longitude,
-        });
+        setMapRegion(createRegionForCoordinate(selectedLocation));
         setMapCameraRequestKey(currentKey => currentKey + 1);
         lastQueuedMapPreviewCoordinateRef.current = selectedLocation;
       }
@@ -263,20 +349,26 @@ export const useLocationSelector = () => {
     (savedLocation: SavedLocation) => {
       const input = activeInput ?? 'destination';
 
-      applyLocation(input, savedLocation.location);
+      if (input === 'pickup') {
+        setPickupQuery(savedLocation.location.address);
+      } else {
+        setDestinationQuery(savedLocation.location.address);
+      }
+
+      if (!deferMapSelectionUntilConfirm) {
+        applyLocation(input, savedLocation.location);
+      }
+
       setMapPickerInput(input);
       clearResults();
       Keyboard.dismiss();
+      setActiveInput(null);
       setMapPreviewLocation(savedLocation.location);
-      setMapRegion({
-        ...DEFAULT_CURRENT_LOCATION_MAP_REGION,
-        latitude: savedLocation.location.latitude,
-        longitude: savedLocation.location.longitude,
-      });
+      setMapRegion(createRegionForCoordinate(savedLocation.location));
       setMapCameraRequestKey(currentKey => currentKey + 1);
       lastQueuedMapPreviewCoordinateRef.current = savedLocation.location;
     },
-    [activeInput, applyLocation, clearResults],
+    [activeInput, applyLocation, clearResults, deferMapSelectionUntilConfirm],
   );
 
   const saveLocation = useCallback(
@@ -291,33 +383,9 @@ export const useLocationSelector = () => {
         throw new Error('Choose a location before saving it.');
       }
 
-      setIsSavingLocation(true);
-
-      try {
-        const savedLocation = await savedLocationsService.save({
-          label,
-          kind,
-          location,
-        });
-
-        setSavedLocations(currentLocations => {
-          const existingIndex = currentLocations.findIndex(
-            item => item.id === savedLocation.id || item.label === label,
-          );
-
-          if (existingIndex === -1) {
-            return [...currentLocations, savedLocation];
-          }
-
-          return currentLocations.map((item, index) =>
-            index === existingIndex ? savedLocation : item,
-          );
-        });
-      } finally {
-        setIsSavingLocation(false);
-      }
+      await saveLocationToShortcuts(label, kind, location);
     },
-    [destination, pickup],
+    [destination, pickup, saveLocationToShortcuts],
   );
 
   const closeMapPicker = useCallback(() => {
@@ -392,31 +460,11 @@ export const useLocationSelector = () => {
   );
 
   const openMapPicker = useCallback(
-    async (input: ActiveLocationInput) => {
+    (input: ActiveLocationInput) => {
       const existingLocation = input === 'pickup' ? pickup : destination;
-      let initialCoordinate: MapCoordinate | AppLocation | null =
+      const initialCoordinate: MapCoordinate | AppLocation | null =
         existingLocation ?? currentLocation;
-
-      let nextMapError: string | null = null;
-
-      if (!initialCoordinate && input === 'pickup') {
-        setIsOpeningMapPicker(true);
-
-        try {
-          initialCoordinate = await fetchCurrentLocation();
-        } catch (caughtError) {
-          nextMapError = getErrorMessage(
-            caughtError,
-            FEEDBACK_MESSAGES.locationUnavailable,
-          );
-        } finally {
-          setIsOpeningMapPicker(false);
-        }
-      }
-
-      const initialRegion = initialCoordinate
-        ? DEFAULT_CURRENT_LOCATION_MAP_REGION
-        : DEFAULT_MAP_REGION;
+      const initialRegion = getDefaultRegionForCoordinate(initialCoordinate);
       const nextCoordinate = initialCoordinate ?? {
         latitude: initialRegion.latitude,
         longitude: initialRegion.longitude,
@@ -425,13 +473,9 @@ export const useLocationSelector = () => {
       Keyboard.dismiss();
       setActiveInput(input);
       clearResults();
-      setMapError(nextMapError);
+      setMapError(null);
       setMapCoordinate(nextCoordinate);
-      setMapRegion({
-        ...initialRegion,
-        latitude: nextCoordinate.latitude,
-        longitude: nextCoordinate.longitude,
-      });
+      setMapRegion(createRegionForCoordinate(nextCoordinate, initialRegion));
       setMapCameraRequestKey(currentKey => currentKey + 1);
       setMapPickerInput(input);
       lastQueuedMapPreviewCoordinateRef.current = null;
@@ -441,7 +485,6 @@ export const useLocationSelector = () => {
       clearResults,
       currentLocation,
       destination,
-      fetchCurrentLocation,
       pickup,
       queueMapPreviewLocationResolve,
     ],
@@ -449,8 +492,8 @@ export const useLocationSelector = () => {
 
   const openRouteMapPicker = useCallback(() => {
     loadSavedLocations();
-    openMapPicker(destination ? 'destination' : 'pickup');
-  }, [destination, loadSavedLocations, openMapPicker]);
+    openMapPicker(pickup ? 'destination' : 'pickup');
+  }, [loadSavedLocations, openMapPicker, pickup]);
 
   const useDeviceLocationOnMap = useCallback(async () => {
     if (mapPreviewTimeoutRef.current) {
@@ -467,11 +510,7 @@ export const useLocationSelector = () => {
 
       if (location) {
         setMapCoordinate(location);
-        setMapRegion({
-          ...DEFAULT_CURRENT_LOCATION_MAP_REGION,
-          latitude: location.latitude,
-          longitude: location.longitude,
-        });
+        setMapRegion(createRegionForCoordinate(location));
         setMapCameraRequestKey(currentKey => currentKey + 1);
         setMapPreviewLocation(location);
         lastQueuedMapPreviewCoordinateRef.current = location;
@@ -488,10 +527,7 @@ export const useLocationSelector = () => {
 
   const handleMapRegionChange = useCallback(
     (region: MapRegion) => {
-      const coordinate = {
-        latitude: region.latitude,
-        longitude: region.longitude,
-      };
+      const coordinate = getCoordinateFromRegion(region);
       const lastQueuedCoordinate = lastQueuedMapPreviewCoordinateRef.current;
       const hasMovedEnoughForPreview =
         !lastQueuedCoordinate ||
@@ -532,6 +568,50 @@ export const useLocationSelector = () => {
     }
   }, [applyLocation, closeMapPicker, mapPickerInput, mapPreviewLocation]);
 
+  const confirmRouteMapLocation = useCallback(async () => {
+    if (!mapPickerInput || !mapPreviewLocation) {
+      return;
+    }
+
+    const confirmedInput = mapPickerInput;
+    const nextPickup =
+      confirmedInput === 'pickup' ? mapPreviewLocation : pickup;
+    const nextDestination =
+      confirmedInput === 'destination' ? mapPreviewLocation : destination;
+    const nextInput = !nextPickup
+      ? 'pickup'
+      : !nextDestination
+        ? 'destination'
+        : null;
+
+    setMapError(null);
+    setIsConfirmingMapLocation(true);
+
+    try {
+      applyLocation(confirmedInput, mapPreviewLocation);
+
+      setMapPreviewLocation(null);
+
+      if (nextInput) {
+        setActiveInput(nextInput);
+        setMapPickerInput(nextInput);
+        lastQueuedMapPreviewCoordinateRef.current = null;
+      } else {
+        setActiveInput(null);
+      }
+    } catch (caughtError) {
+      const appError = createAppError(
+        'LOCATION_GEOCODE_FAILED',
+        getErrorMessage(caughtError, FEEDBACK_MESSAGES.locationUnavailable),
+        caughtError,
+      );
+
+      setMapError(appError.message);
+    } finally {
+      setIsConfirmingMapLocation(false);
+    }
+  }, [applyLocation, destination, mapPickerInput, mapPreviewLocation, pickup]);
+
   const handleDateTimeConfirm = useCallback(
     (selectedDateTime: Date) => {
       rideDateTime.handleDateTimeConfirm(selectedDateTime);
@@ -564,11 +644,12 @@ export const useLocationSelector = () => {
     isWaitingForMapPreview,
     isLoadingMapPreview,
     isConfirmingMapLocation,
-    isOpeningMapPicker,
+    isOpeningMapPicker: false,
     rideDateTime,
     setPickupQuery,
     setDestinationQuery,
-    setActiveInput: handleActiveInputChange,
+    clearLocationInput,
+    setActiveInput: focusMapInput,
     openRouteMapPicker,
     openMapPicker,
     closeMapPicker,
@@ -576,32 +657,9 @@ export const useLocationSelector = () => {
     onMapRegionChange: handleMapRegionChange,
     useDeviceLocationOnMap,
     confirmMapLocation,
+    confirmRouteMapLocation,
     handlePlaceSelected,
     onSavedLocationSelected: handleSavedLocationSelected,
     saveLocation,
   };
-};
-
-const getDistanceInMeters = (
-  from: MapCoordinate,
-  to: MapCoordinate,
-): number => {
-  const earthRadiusMeters = 6371000;
-  const degreesToRadians = Math.PI / 180;
-  const fromLatitude = from.latitude * degreesToRadians;
-  const toLatitude = to.latitude * degreesToRadians;
-  const latitudeDelta = (to.latitude - from.latitude) * degreesToRadians;
-  const longitudeDelta = (to.longitude - from.longitude) * degreesToRadians;
-  const haversine =
-    Math.sin(latitudeDelta / 2) * Math.sin(latitudeDelta / 2) +
-    Math.cos(fromLatitude) *
-      Math.cos(toLatitude) *
-      Math.sin(longitudeDelta / 2) *
-      Math.sin(longitudeDelta / 2);
-
-  return (
-    earthRadiusMeters *
-    2 *
-    Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
-  );
 };

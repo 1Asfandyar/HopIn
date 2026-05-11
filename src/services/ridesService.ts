@@ -10,6 +10,7 @@ import type {
   RideRecordType,
   RideRequest,
   RideRequestPost,
+  RideRouteDraft,
   UserProfile,
 } from '@/types/types';
 import type { UserRole } from '@/constants/roles';
@@ -24,6 +25,10 @@ import {
   mapRequestToMyRide,
   sortMyRidesByDeparture,
 } from '@/features/rides/helpers/rides.helpers';
+import {
+  filterMatchingRides,
+  getRideMatchTimeRange,
+} from '@/features/rides/helpers/rideMatching.helpers';
 import { profileService } from './profileService';
 import { supabase } from './supabaseClient';
 
@@ -62,6 +67,29 @@ const assertCompleteDraft = (draft: RideDraft): RideRequest => {
     destination: draft.destination,
     departureTime: draft.departureTime,
   };
+};
+
+const assertRouteDraft = (draft: RideDraft): RideRouteDraft => {
+  if (!draft.pickup || !draft.destination) {
+    throw new Error('Pickup and destination are required.');
+  }
+
+  return {
+    pickup: draft.pickup,
+    destination: draft.destination,
+  };
+};
+
+const getDepartureStart = (draft: RideDraft) => {
+  if (!draft.departureTime) {
+    return new Date().toISOString();
+  }
+
+  const range = getRideMatchTimeRange(draft.departureTime);
+
+  return new Date(
+    Math.max(new Date(range.start).getTime(), Date.now()),
+  ).toISOString();
 };
 
 const getCurrentUserId = async () => {
@@ -304,20 +332,31 @@ export const ridesService = {
   },
 
   search: async (draft: RideDraft): Promise<RideOffer[]> => {
-    assertCompleteDraft(draft);
-
-    const { data, error } = await supabase
+    assertRouteDraft(draft);
+    const range = draft.departureTime
+      ? getRideMatchTimeRange(draft.departureTime)
+      : null;
+    let query = supabase
       .from('ride_offers')
       .select(selectRideColumns)
       .eq('status', 'open')
-      .gte('departure_time', new Date().toISOString())
-      .order('departure_time', { ascending: true });
+      .gte('departure_time', getDepartureStart(draft));
+
+    if (range) {
+      query = query.lte('departure_time', range.end);
+    }
+
+    const { data, error } = await query.order('departure_time', {
+      ascending: true,
+    });
 
     if (error) {
       throw error;
     }
 
-    return hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+    const rides = await hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+
+    return filterMatchingRides(rides, draft);
   },
 
   listOpenRequests: async (): Promise<RideRequestPost[]> => {
@@ -336,20 +375,31 @@ export const ridesService = {
   },
 
   searchRequests: async (draft: RideDraft): Promise<RideRequestPost[]> => {
-    assertCompleteDraft(draft);
-
-    const { data, error } = await supabase
+    assertRouteDraft(draft);
+    const range = draft.departureTime
+      ? getRideMatchTimeRange(draft.departureTime)
+      : null;
+    let query = supabase
       .from('ride_requests')
       .select(selectRideColumns)
       .eq('status', 'open')
-      .gte('departure_time', new Date().toISOString())
-      .order('departure_time', { ascending: true });
+      .gte('departure_time', getDepartureStart(draft));
+
+    if (range) {
+      query = query.lte('departure_time', range.end);
+    }
+
+    const { data, error } = await query.order('departure_time', {
+      ascending: true,
+    });
 
     if (error) {
       throw error;
     }
 
-    return hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+    const rides = await hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+
+    return filterMatchingRides(rides, draft);
   },
 
   getRideById: async (
