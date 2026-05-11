@@ -56,6 +56,11 @@ const RideResults = () => {
     }
   };
 
+  const handleCancel = () => {
+    resetDraft();
+    router.replace(APP_ROUTES.main.home);
+  };
+
   if (!hasRoute) {
     return <Redirect href={APP_ROUTES.main.setRideDetails} />;
   }
@@ -86,6 +91,7 @@ const RideResults = () => {
       onCloseDateTimePicker={rideDateTime.closeDateTimePicker}
       onDateTimeConfirm={rideDateTime.handleDateTimeConfirm}
       onPost={handlePost}
+      onCancel={handleCancel}
       onRidePress={openRideDetails}
     />
   );

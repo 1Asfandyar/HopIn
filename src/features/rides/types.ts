@@ -25,5 +25,6 @@ export type RideSearchResultsScreenProps = {
   onCloseDateTimePicker: () => void;
   onDateTimeConfirm: (selectedDateTime: Date) => void;
   onPost: () => void;
+  onCancel: () => void;
   onRidePress: (ride: RideRecord) => void;
 };

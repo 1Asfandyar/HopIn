@@ -1,7 +1,6 @@
 import { RefreshControl, ScrollView, View } from 'react-native';
 import BrandedLoader from '@/components/feedback/BrandedLoader';
 import RideParticipantAvatar from '@/features/rides/components/RideParticipantAvatar';
-import RideStatusPill from '@/features/rides/components/RideStatusPill';
 import {
   getRideDetailActionLabel,
   getRideParticipantName,
@@ -12,18 +11,11 @@ import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
 import { themeColors } from '@/theme/tokens';
 import { formatDateAndTime } from '@/utils/date';
-import type { RideRecord, RideRecordType } from '@/types/types';
-
-type RideDetailsScreenProps = {
-  ride: RideRecord | null;
-  rideType: RideRecordType;
-  isLoading: boolean;
-  isSubmitting: boolean;
-  errorMessage: string | null;
-  onPrimaryAction: () => void;
-  onOpenRoute: () => void;
-  onRefresh: () => void;
-};
+import type {
+  RideDetailsScreenProps,
+  RideRecord,
+  RideRecordType,
+} from '@/types/types';
 
 const RouteStop = ({ label, address }: { label: string; address: string }) => {
   return (
@@ -132,9 +124,6 @@ const RideDetailsScreen = ({
             >
               {participantName}
             </ThemedText>
-            <View className="mt-2">
-              <RideStatusPill status={ride.status} />
-            </View>
           </View>
 
           <ThemedCard
@@ -145,7 +134,6 @@ const RideDetailsScreen = ({
                 color={highlightColor}
               />
             }
-            subHeading={formatDateAndTime(new Date(ride.departureTime))}
             variant="outline"
             leftIcon={
               rideType === 'offer' ? 'car-sport-outline' : 'person-outline'
@@ -160,7 +148,6 @@ const RideDetailsScreen = ({
             </ThemedText>
             <ThemedCard
               heading="Open route in maps"
-              subHeading="Pickup to destination"
               variant="outline"
               rightIcon="arrow-forward-circle-outline"
               touchable

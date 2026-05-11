@@ -2,11 +2,7 @@ import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import BrandedLoader from '@/components/feedback/BrandedLoader';
-import RideParticipantAvatar from '@/features/rides/components/RideParticipantAvatar';
-import {
-  getRideStatusLabel,
-  getRideSummaryText,
-} from '@/features/rides/helpers/rideDisplay.helpers';
+import { getRideSummaryText } from '@/features/rides/helpers/rideDisplay.helpers';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedInput from '@/theme/components/ThemedInput';
@@ -40,6 +36,7 @@ const RideSearchResultsScreen = ({
   onCloseDateTimePicker,
   onDateTimeConfirm,
   onPost,
+  onCancel,
   onRidePress,
 }: RideSearchResultsScreenProps) => {
   const colorScheme = flowMode === 'find' ? 'secondary' : 'primary';
@@ -53,7 +50,6 @@ const RideSearchResultsScreen = ({
   const renderRide = ({ item }: { item: RideRecord }) => (
     <ThemedCard
       heading={getRideSummaryText(item, rideType)}
-      subHeading={`Status: ${getRideStatusLabel(item)}`}
       variant="outline"
       rightIcon="chevron-forward"
       touchable
@@ -61,18 +57,9 @@ const RideSearchResultsScreen = ({
       containerClassName="min-h-0"
       headingSize="sm"
       middleElement={
-        <View className="mb-2 mt-3 flex-row items-center">
-          <RideParticipantAvatar profile={item.userProfile} />
-          <View className="ml-3 flex-1">
-            <ThemedText weight="semiBold" className="text-gray-900">
-              {item.userProfile?.fullName ??
-                (rideType === 'offer' ? 'Driver' : 'Rider')}
-            </ThemedText>
-            <ThemedText size="sm" className="text-gray-500">
-              Tap for complete route details
-            </ThemedText>
-          </View>
-        </View>
+        <ThemedText size="sm" className="mt-3 text-gray-500">
+          Tap for complete route details
+        </ThemedText>
       }
     />
   );
@@ -171,6 +158,14 @@ const RideSearchResultsScreen = ({
           leftIcon="add-circle-outline"
           onPress={onPost}
           colorScheme={colorScheme}
+        />
+        <ThemedButton
+          title="Cancel"
+          variant="ghost"
+          disabled={isPosting}
+          onPress={onCancel}
+          colorScheme={colorScheme}
+          containerClassName="mt-2"
         />
       </View>
 

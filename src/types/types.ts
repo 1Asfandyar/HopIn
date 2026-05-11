@@ -141,6 +141,17 @@ export type RideFlowMode = 'offer' | 'find';
 
 export type RideRecordType = 'offer' | 'request';
 
+export type RideDetailsScreenProps = {
+  ride: RideRecord | null;
+  rideType: RideRecordType;
+  isLoading: boolean;
+  isSubmitting: boolean;
+  errorMessage: string | null;
+  onPrimaryAction: () => void;
+  onOpenRoute: () => void;
+  onRefresh: () => void;
+};
+
 export type AppErrorCode =
   | 'AUTH_FAILED'
   | 'LOCATION_PERMISSION_DENIED'

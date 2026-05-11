@@ -62,13 +62,7 @@ const MainLayout = () => {
           <Stack.Screen
             name="ride-results"
             options={{
-              header: () => (
-                <AppHeader
-                  title="Search Results"
-                  leftIcon="arrow-back"
-                  onLeftPress={() => router.back()}
-                />
-              ),
+              header: () => <AppHeader title="Search Results" />,
             }}
           />
           <Stack.Screen
