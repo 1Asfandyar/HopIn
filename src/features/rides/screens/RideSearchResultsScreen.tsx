@@ -2,14 +2,33 @@ import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import BrandedLoader from '@/components/feedback/BrandedLoader';
-import { getRideSummaryText } from '@/features/rides/helpers/rideDisplay.helpers';
+import { getShortRideAddress } from '@/features/rides/helpers/rideDisplay.helpers';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedInput from '@/theme/components/ThemedInput';
 import ThemedText from '@/theme/components/ThemedText';
 import { themeColors } from '@/theme/tokens';
+import { formatDateAndTime as formatRideDateAndTime } from '@/utils/date';
 import type { RideSearchResultsScreenProps } from '../types';
 import type { RideRecord } from '@/types/types';
+
+const RideRouteHeading = ({ ride }: { ride: RideRecord }) => {
+  const pickup = getShortRideAddress(ride.pickup.address);
+  const destination = getShortRideAddress(ride.destination.address);
+  const departureTime = formatRideDateAndTime(new Date(ride.departureTime));
+
+  return (
+    <>
+      <ThemedText weight="semiBold">{pickup}</ThemedText>
+      {'\n'}
+      <Ionicons name="arrow-down" size={18} color={themeColors.gray500} />
+      {'\n'}
+      <ThemedText weight="semiBold">{destination}</ThemedText>
+      {'\n'}
+      <ThemedText weight="bold">{departureTime}</ThemedText>
+    </>
+  );
+};
 
 const RideSearchResultsScreen = ({
   flowMode,
@@ -20,7 +39,6 @@ const RideSearchResultsScreen = ({
   loadingLabel,
   itemLabel,
   rides,
-  rideType,
   isLoading,
   errorMessage,
   hasDepartureTime,
@@ -49,13 +67,14 @@ const RideSearchResultsScreen = ({
 
   const renderRide = ({ item }: { item: RideRecord }) => (
     <ThemedCard
-      heading={getRideSummaryText(item, rideType)}
+      heading={<RideRouteHeading ride={item} />}
       variant="outline"
       rightIcon="chevron-forward"
       touchable
       onPress={() => onRidePress(item)}
       containerClassName="min-h-0"
       headingSize="sm"
+      headingWeight="regular"
       middleElement={
         <ThemedText size="sm" className="mt-3 text-gray-500">
           Tap for complete route details

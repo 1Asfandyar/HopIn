@@ -305,6 +305,7 @@ export type ThemedCardProps = TouchableOpacityProps & {
   leftIconContainerStyle?: StyleProp<ViewStyle>;
   rightIconContainerStyle?: StyleProp<ViewStyle>;
   headingSize?: FontSize;
+  headingWeight?: FontWeight;
   subHeadingSize?: FontSize;
   headingClassName?: string;
   subHeadingClassName?: string;

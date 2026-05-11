@@ -1,4 +1,4 @@
-import type { RideFlowMode, RideRecord, RideRecordType } from '@/types/types';
+import type { RideFlowMode, RideRecord } from '@/types/types';
 
 export type RideSearchResultsScreenProps = {
   flowMode: RideFlowMode;
@@ -9,7 +9,6 @@ export type RideSearchResultsScreenProps = {
   loadingLabel: string;
   itemLabel: string;
   rides: RideRecord[];
-  rideType: RideRecordType;
   isLoading: boolean;
   errorMessage: string | null;
   hasDepartureTime: boolean;

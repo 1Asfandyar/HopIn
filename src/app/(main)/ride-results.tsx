@@ -75,7 +75,6 @@ const RideResults = () => {
       loadingLabel={copy.loadingLabel}
       itemLabel={copy.itemLabel}
       rides={rides}
-      rideType={rideType}
       isLoading={isLoading}
       errorMessage={errorMessage}
       hasDepartureTime={hasDepartureTime}
