@@ -5,6 +5,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -15,6 +16,7 @@ import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedText from '@/theme/components/ThemedText';
 import { themeColors } from '@/theme/tokens';
 import { FEEDBACK_MESSAGES } from '@/config/constants';
+import RideSeatsControl from '@/features/rides/components/RideSeatsControl';
 import type { ActiveLocationInput, MapLocationPickerProps } from '../types';
 import {
   LOCATION_SELECTOR_COPY,
@@ -66,6 +68,11 @@ const MapLocationPicker = ({
   routeActionLabel,
   routeActionDisabled = false,
   routeActionLoading = false,
+  routeSeatCount,
+  routeSeatControlEditable = false,
+  routeSeatControlLabel,
+  routeSeatControlHelperText,
+  onRouteSeatCountChange,
   onRouteAction,
 }: MapLocationPickerProps) => {
   const mapRef = useRef<MapView | null>(null);
@@ -91,6 +98,8 @@ const MapLocationPicker = ({
     isRouteFlow && pickup && destination && !activeInput && !previewLocation,
   );
   const shouldShowMapControls = !shouldShowRouteSummary;
+  const shouldShowSeatControl =
+    routeSeatControlEditable || routeSeatCount !== undefined;
   const routeSummaryRows = [
     {
       label: LOCATION_SELECTOR_COPY.fromLabel,
@@ -268,51 +277,76 @@ const MapLocationPicker = ({
           )}
         </View>
 
-        <View style={styles.detailPanel}>
+        <View
+          style={[
+            styles.detailPanel,
+            shouldShowRouteSummary && styles.routeSummaryPanel,
+          ]}
+        >
           {shouldShowRouteSummary ? (
             <>
-              <View style={styles.routeSummaryStatus}>
-                {routeActionLoading ? (
-                  <ActivityIndicator size="small" color={modeColor} />
-                ) : (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={18}
-                    color={modeColor}
-                  />
-                )}
-                <ThemedText
-                  weight="semiBold"
-                  className="ml-2 text-sm"
-                  style={modeTextStyle}
-                >
-                  {routeActionLoading ? 'Preparing route...' : 'Route ready'}
-                </ThemedText>
+              <ScrollView
+                style={styles.routeSummaryContent}
+                contentContainerStyle={styles.routeSummaryContentContainer}
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={styles.routeSummaryStatus}>
+                  {routeActionLoading ? (
+                    <ActivityIndicator size="small" color={modeColor} />
+                  ) : (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={18}
+                      color={modeColor}
+                    />
+                  )}
+                  <ThemedText
+                    weight="semiBold"
+                    className="ml-2 text-sm"
+                    style={modeTextStyle}
+                  >
+                    {routeActionLoading ? 'Preparing route...' : 'Route ready'}
+                  </ThemedText>
+                </View>
+                <View className="h-px bg-gray-200 my-3" />
+                <View style={styles.routeSummaryRows}>
+                  {routeSummaryRows.map(row => (
+                    <View key={row.label} style={styles.routeSummaryRow}>
+                      <ThemedText
+                        weight="semiBold"
+                        className="text-[11px] uppercase text-gray-500"
+                      >
+                        {row.label}
+                      </ThemedText>
+                      <ThemedText className="mt-1 text-sm text-gray-800">
+                        {row.address}
+                      </ThemedText>
+                    </View>
+                  ))}
+
+                  {shouldShowSeatControl && (
+                    <RideSeatsControl
+                      value={routeSeatCount}
+                      editable={routeSeatControlEditable}
+                      label={routeSeatControlLabel}
+                      helperText={routeSeatControlHelperText}
+                      color={modeColor}
+                      onChange={onRouteSeatCountChange}
+                    />
+                  )}
+                </View>
+              </ScrollView>
+
+              <View style={styles.routeActionFooter}>
+                <ThemedButton
+                  title={routeActionLabel ?? 'Done'}
+                  loading={routeActionLoading}
+                  disabled={routeActionDisabled || routeActionLoading}
+                  rightIcon="arrow-forward-circle"
+                  onPress={onRouteAction}
+                  colorScheme={flowMode === 'find' ? 'secondary' : 'primary'}
+                />
               </View>
-              <View className="h-px bg-gray-200 my-3" />
-              <View className="mb-4 gap-3">
-                {routeSummaryRows.map(row => (
-                  <View key={row.label} style={styles.routeSummaryRow}>
-                    <ThemedText
-                      weight="semiBold"
-                      className="text-[11px] uppercase text-gray-500"
-                    >
-                      {row.label}
-                    </ThemedText>
-                    <ThemedText className="mt-1 text-sm text-gray-800">
-                      {row.address}
-                    </ThemedText>
-                  </View>
-                ))}
-              </View>
-              <ThemedButton
-                title={routeActionLabel ?? 'Done'}
-                loading={routeActionLoading}
-                disabled={routeActionDisabled || routeActionLoading}
-                rightIcon="arrow-forward-circle"
-                onPress={onRouteAction}
-                colorScheme={flowMode === 'find' ? 'secondary' : 'primary'}
-              />
             </>
           ) : (
             <>

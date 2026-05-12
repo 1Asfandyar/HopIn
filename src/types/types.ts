@@ -59,6 +59,7 @@ export type RideDraft = {
   pickup: AppLocation | null;
   destination: AppLocation | null;
   departureTime: string | null;
+  seats: number | null;
 };
 
 export type RideRouteDraft = Pick<RideDraft, 'pickup' | 'destination'>;
@@ -86,7 +87,7 @@ export type RideRecord = RideRequest & {
 };
 
 export type RideOffer = RideRecord & {
-  seats?: number;
+  seats: number;
   price?: number;
 };
 
@@ -130,6 +131,7 @@ export type MyRide = RideRequest & {
   source?: RideBookingSource;
   offerId?: string | null;
   requestId?: string | null;
+  seats?: number;
 };
 
 export type MyRidesSummary = {
@@ -142,7 +144,7 @@ export type RideFlowMode = 'offer' | 'find';
 export type RideRecordType = 'offer' | 'request';
 
 export type RideDetailsScreenProps = {
-  ride: RideRecord | null;
+  ride: RideOffer | RideRequestPost | null;
   rideType: RideRecordType;
   isLoading: boolean;
   isSubmitting: boolean;
@@ -241,6 +243,7 @@ export type RidesStore = {
   setDestination: (destination: AppLocation) => void;
   clearDestination: () => void;
   setDepartureTime: (departureTime: Date | null) => void;
+  setSeats: (seats: number | null) => void;
   resetDraft: () => void;
 };
 

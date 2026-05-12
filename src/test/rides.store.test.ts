@@ -37,6 +37,20 @@ describe('rides store', () => {
     );
   });
 
+  it('stores seats within the ride seat limits', () => {
+    useRidesStore.getState().setSeats(3);
+
+    expect(useRidesStore.getState().draft.seats).toBe(3);
+
+    useRidesStore.getState().setSeats(10);
+
+    expect(useRidesStore.getState().draft.seats).toBe(4);
+
+    useRidesStore.getState().setSeats(null);
+
+    expect(useRidesStore.getState().draft.seats).toBeNull();
+  });
+
   it('clears only the destination', () => {
     useRidesStore.getState().setPickup(location);
     useRidesStore.getState().setDestination({

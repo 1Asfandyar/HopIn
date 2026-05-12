@@ -6,6 +6,7 @@ import type {
   RideBookingSource,
   RideDraft,
   RideOffer,
+  RideRecord,
   RideRecordStatus,
   RideRecordType,
   RideRequest,
@@ -18,6 +19,7 @@ import { USER_ROLES } from '@/constants/roles';
 import {
   RIDE_BOOKING_SOURCES,
   RIDE_RECORD_STATUSES,
+  RIDE_SEAT_LIMITS,
 } from '@/features/rides/constants/rides.constants';
 import {
   mapBookingToMyRide,
@@ -57,6 +59,10 @@ type RideBookingRow = {
   ride_requests?: RideRow | RideRow[] | null;
 };
 
+type RideOfferPayload = RideRequest & {
+  seats: number;
+};
+
 const assertCompleteDraft = (draft: RideDraft): RideRequest => {
   if (!draft.pickup || !draft.destination || !draft.departureTime) {
     throw new Error('Pickup, destination, and departure time are required.');
@@ -66,6 +72,27 @@ const assertCompleteDraft = (draft: RideDraft): RideRequest => {
     pickup: draft.pickup,
     destination: draft.destination,
     departureTime: draft.departureTime,
+  };
+};
+
+const assertCompleteOfferDraft = (draft: RideDraft): RideOfferPayload => {
+  const offer = assertCompleteDraft(draft);
+  const seats = draft.seats;
+
+  if (
+    typeof seats !== 'number' ||
+    !Number.isInteger(seats) ||
+    seats < RIDE_SEAT_LIMITS.min ||
+    seats > RIDE_SEAT_LIMITS.max
+  ) {
+    throw new Error(
+      `Please choose between ${RIDE_SEAT_LIMITS.min} and ${RIDE_SEAT_LIMITS.max} seats.`,
+    );
+  }
+
+  return {
+    ...offer,
+    seats,
   };
 };
 
@@ -106,7 +133,10 @@ const getCurrentUserId = async () => {
   return data.user.id;
 };
 
-const mapRideRow = (row: RideRow, profile?: UserProfile | null): RideOffer => ({
+const mapBaseRideRow = (
+  row: RideRow,
+  profile?: UserProfile | null,
+): RideRecord => ({
   id: row.id,
   userId: row.user_id,
   pickup: row.pickup,
@@ -115,19 +145,44 @@ const mapRideRow = (row: RideRow, profile?: UserProfile | null): RideOffer => ({
   status: (row.status ?? RIDE_RECORD_STATUSES.open) as RideRecordStatus,
   createdAt: row.created_at,
   userProfile: profile ?? null,
-  seats: row.seats ?? undefined,
+});
+
+const mapOfferRow = (
+  row: RideRow,
+  profile?: UserProfile | null,
+): RideOffer => ({
+  ...mapBaseRideRow(row, profile),
+  seats: row.seats ?? RIDE_SEAT_LIMITS.min,
   price: row.price ?? undefined,
 });
 
-const hydrateRideRowsWithProfiles = async (rows: RideRow[]) => {
+const mapRequestRow = (
+  row: RideRow,
+  profile?: UserProfile | null,
+): RideRequestPost => mapBaseRideRow(row, profile);
+
+const getProfilesByUserId = async (rows: RideRow[]) => {
   const userIds = rows
     .map(row => row.user_id)
     .filter((userId): userId is string => Boolean(userId));
   const profiles = await profileService.listProfilesByIds(userIds);
-  const profilesById = new Map(profiles.map(profile => [profile.id, profile]));
+
+  return new Map(profiles.map(profile => [profile.id, profile]));
+};
+
+const hydrateOfferRowsWithProfiles = async (rows: RideRow[]) => {
+  const profilesById = await getProfilesByUserId(rows);
 
   return rows.map(row =>
-    mapRideRow(row, row.user_id ? profilesById.get(row.user_id) : null),
+    mapOfferRow(row, row.user_id ? profilesById.get(row.user_id) : null),
+  );
+};
+
+const hydrateRequestRowsWithProfiles = async (rows: RideRow[]) => {
+  const profilesById = await getProfilesByUserId(rows);
+
+  return rows.map(row =>
+    mapRequestRow(row, row.user_id ? profilesById.get(row.user_id) : null),
   );
 };
 
@@ -139,26 +194,30 @@ const pickJoinedRow = (row?: RideRow | RideRow[] | null) => {
   return row ?? null;
 };
 
-const mapRideBookingRow = (row: RideBookingRow): RideBooking => ({
-  id: row.id,
-  offerId: row.offer_id,
-  requestId: row.request_id,
-  riderId: row.rider_id,
-  driverId: row.driver_id,
-  status: (row.status ??
-    RIDE_RECORD_STATUSES.accepted) as RideBooking['status'],
-  source: (row.source ?? RIDE_BOOKING_SOURCES.directOffer) as RideBookingSource,
-  createdAt: row.created_at,
-  offer: pickJoinedRow(row.ride_offers)
-    ? mapRideRow(pickJoinedRow(row.ride_offers) as RideRow)
-    : null,
-  request: pickJoinedRow(row.ride_requests)
-    ? mapRideRow(pickJoinedRow(row.ride_requests) as RideRow)
-    : null,
-});
+const mapRideBookingRow = (row: RideBookingRow): RideBooking => {
+  const offerRow = pickJoinedRow(row.ride_offers);
+  const requestRow = pickJoinedRow(row.ride_requests);
 
-const selectRideColumns =
+  return {
+    id: row.id,
+    offerId: row.offer_id,
+    requestId: row.request_id,
+    riderId: row.rider_id,
+    driverId: row.driver_id,
+    status: (row.status ??
+      RIDE_RECORD_STATUSES.accepted) as RideBooking['status'],
+    source: (row.source ??
+      RIDE_BOOKING_SOURCES.directOffer) as RideBookingSource,
+    createdAt: row.created_at,
+    offer: offerRow ? mapOfferRow(offerRow) : null,
+    request: requestRow ? mapRequestRow(requestRow) : null,
+  };
+};
+
+const selectBaseRideColumns =
   'id,user_id,pickup,destination,departure_time,status,created_at';
+const selectOfferColumns = `${selectBaseRideColumns},seats`;
+const selectRequestColumns = selectBaseRideColumns;
 const selectRideBookingColumns = `
   id,
   offer_id,
@@ -168,13 +227,13 @@ const selectRideBookingColumns = `
   status,
   source,
   created_at,
-  ride_offers (${selectRideColumns}),
-  ride_requests (${selectRideColumns})
+  ride_offers (${selectOfferColumns}),
+  ride_requests (${selectRequestColumns})
 `;
 
 export const ridesService = {
   createOffer: async (draft: RideDraft): Promise<RideOffer> => {
-    const offer = assertCompleteDraft(draft);
+    const offer = assertCompleteOfferDraft(draft);
     const userId = await getCurrentUserId();
     const { data, error } = await supabase
       .from('ride_offers')
@@ -183,16 +242,17 @@ export const ridesService = {
         pickup: offer.pickup,
         destination: offer.destination,
         departure_time: offer.departureTime,
+        seats: offer.seats,
         status: 'open',
       })
-      .select(selectRideColumns)
+      .select(selectOfferColumns)
       .single<RideRow>();
 
     if (error) {
       throw error;
     }
 
-    const [ride] = await hydrateRideRowsWithProfiles([data]);
+    const [ride] = await hydrateOfferRowsWithProfiles([data]);
 
     return ride;
   },
@@ -209,14 +269,14 @@ export const ridesService = {
         departure_time: request.departureTime,
         status: 'open',
       })
-      .select(selectRideColumns)
+      .select(selectRequestColumns)
       .single<RideRow>();
 
     if (error) {
       throw error;
     }
 
-    const [ride] = await hydrateRideRowsWithProfiles([data]);
+    const [ride] = await hydrateRequestRowsWithProfiles([data]);
 
     return ride;
   },
@@ -225,7 +285,7 @@ export const ridesService = {
     const userId = await getCurrentUserId();
     const { data: offerData, error: offerError } = await supabase
       .from('ride_offers')
-      .select(selectRideColumns)
+      .select(selectOfferColumns)
       .eq('id', offerId)
       .single<RideRow>();
 
@@ -245,6 +305,40 @@ export const ridesService = {
       throw new Error('This ride offer is no longer available.');
     }
 
+    const { data: existingBooking, error: existingBookingError } =
+      await supabase
+        .from('ride_bookings')
+        .select('id')
+        .eq('offer_id', offerId)
+        .eq('rider_id', userId)
+        .maybeSingle<{ id: string }>();
+
+    if (existingBookingError) {
+      throw existingBookingError;
+    }
+
+    if (existingBooking) {
+      throw new Error("You've already booked a seat on this ride.");
+    }
+
+    const { count: acceptedBookingCount, error: bookingCountError } =
+      await supabase
+        .from('ride_bookings')
+        .select('id', { count: 'exact', head: true })
+        .eq('offer_id', offerId)
+        .eq('status', RIDE_RECORD_STATUSES.accepted);
+
+    if (bookingCountError) {
+      throw bookingCountError;
+    }
+
+    const bookedSeats = acceptedBookingCount ?? 0;
+    const offeredSeats = offerData.seats ?? RIDE_SEAT_LIMITS.min;
+
+    if (bookedSeats >= offeredSeats) {
+      throw new Error('This ride is fully booked.');
+    }
+
     const { data, error } = await supabase
       .from('ride_bookings')
       .insert({
@@ -261,11 +355,13 @@ export const ridesService = {
       throw error;
     }
 
-    await supabase
-      .from('ride_offers')
-      .update({ status: RIDE_RECORD_STATUSES.accepted })
-      .eq('id', offerId)
-      .eq('status', RIDE_RECORD_STATUSES.open);
+    if (bookedSeats + 1 >= offeredSeats) {
+      await supabase
+        .from('ride_offers')
+        .update({ status: RIDE_RECORD_STATUSES.accepted })
+        .eq('id', offerId)
+        .eq('status', RIDE_RECORD_STATUSES.open);
+    }
 
     return mapRideBookingRow(data);
   },
@@ -277,7 +373,7 @@ export const ridesService = {
     const userId = await getCurrentUserId();
     const { data: requestData, error: requestError } = await supabase
       .from('ride_requests')
-      .select(selectRideColumns)
+      .select(selectRequestColumns)
       .eq('id', requestId)
       .single<RideRow>();
 
@@ -338,7 +434,7 @@ export const ridesService = {
       : null;
     let query = supabase
       .from('ride_offers')
-      .select(selectRideColumns)
+      .select(selectOfferColumns)
       .eq('status', 'open')
       .gte('departure_time', getDepartureStart(draft));
 
@@ -354,7 +450,7 @@ export const ridesService = {
       throw error;
     }
 
-    const rides = await hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+    const rides = await hydrateOfferRowsWithProfiles((data ?? []) as RideRow[]);
 
     return filterMatchingRides(rides, draft);
   },
@@ -362,7 +458,7 @@ export const ridesService = {
   listOpenRequests: async (): Promise<RideRequestPost[]> => {
     const { data, error } = await supabase
       .from('ride_requests')
-      .select(selectRideColumns)
+      .select(selectRequestColumns)
       .eq('status', 'open')
       .gte('departure_time', new Date().toISOString())
       .order('departure_time', { ascending: true });
@@ -371,7 +467,7 @@ export const ridesService = {
       throw error;
     }
 
-    return hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+    return hydrateRequestRowsWithProfiles((data ?? []) as RideRow[]);
   },
 
   searchRequests: async (draft: RideDraft): Promise<RideRequestPost[]> => {
@@ -381,7 +477,7 @@ export const ridesService = {
       : null;
     let query = supabase
       .from('ride_requests')
-      .select(selectRideColumns)
+      .select(selectRequestColumns)
       .eq('status', 'open')
       .gte('departure_time', getDepartureStart(draft));
 
@@ -397,7 +493,9 @@ export const ridesService = {
       throw error;
     }
 
-    const rides = await hydrateRideRowsWithProfiles((data ?? []) as RideRow[]);
+    const rides = await hydrateRequestRowsWithProfiles(
+      (data ?? []) as RideRow[],
+    );
 
     return filterMatchingRides(rides, draft);
   },
@@ -406,9 +504,12 @@ export const ridesService = {
     rideType: RideRecordType,
     rideId: string,
   ): Promise<RideOffer | RideRequestPost> => {
+    const tableName = rideType === 'offer' ? 'ride_offers' : 'ride_requests';
+    const columns =
+      rideType === 'offer' ? selectOfferColumns : selectRequestColumns;
     const { data, error } = await supabase
-      .from(rideType === 'offer' ? 'ride_offers' : 'ride_requests')
-      .select(selectRideColumns)
+      .from(tableName)
+      .select(columns)
       .eq('id', rideId)
       .single<RideRow>();
 
@@ -416,7 +517,10 @@ export const ridesService = {
       throw error;
     }
 
-    const [ride] = await hydrateRideRowsWithProfiles([data]);
+    const [ride] =
+      rideType === 'offer'
+        ? await hydrateOfferRowsWithProfiles([data])
+        : await hydrateRequestRowsWithProfiles([data]);
 
     return ride;
   },
@@ -428,12 +532,12 @@ export const ridesService = {
       isDriver
         ? supabase
             .from('ride_offers')
-            .select(selectRideColumns)
+            .select(selectOfferColumns)
             .eq('user_id', userId)
             .order('departure_time', { ascending: true })
         : supabase
             .from('ride_requests')
-            .select(selectRideColumns)
+            .select(selectRequestColumns)
             .eq('user_id', userId)
             .order('departure_time', { ascending: true }),
       supabase
@@ -463,12 +567,19 @@ export const ridesService = {
       }
     });
     const postedRides = (postedRidesResult.data ?? []).map(row => {
-      const ride = mapRideRow(row as RideRow);
-      const booking = bookingsByPostedRideId.get(ride.id);
+      const rideRow = row as RideRow;
 
-      return isDriver
-        ? mapOfferToMyRide(ride, booking)
-        : mapRequestToMyRide(ride, booking);
+      if (isDriver) {
+        const offer = mapOfferRow(rideRow);
+        const booking = bookingsByPostedRideId.get(offer.id);
+
+        return mapOfferToMyRide(offer, booking);
+      }
+
+      const request = mapRequestRow(rideRow);
+      const booking = bookingsByPostedRideId.get(request.id);
+
+      return mapRequestToMyRide(request, booking);
     });
     const postedRideIds = new Set(
       postedRides

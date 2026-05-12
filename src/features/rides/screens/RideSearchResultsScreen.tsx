@@ -2,7 +2,11 @@ import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import BrandedLoader from '@/components/feedback/BrandedLoader';
-import { getShortRideAddress } from '@/features/rides/helpers/rideDisplay.helpers';
+import {
+  formatRideSeatCount,
+  getRideSeatCount,
+  getShortRideAddress,
+} from '@/features/rides/helpers/rideDisplay.helpers';
 import ThemedButton from '@/theme/components/ThemedButton';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedInput from '@/theme/components/ThemedInput';
@@ -27,6 +31,23 @@ const RideRouteHeading = ({ ride }: { ride: RideRecord }) => {
       {'\n'}
       <ThemedText weight="bold">{departureTime}</ThemedText>
     </>
+  );
+};
+
+const RideSeatSummary = ({ ride }: { ride: RideRecord }) => {
+  const seats = getRideSeatCount(ride);
+
+  if (!seats) {
+    return null;
+  }
+
+  return (
+    <View className="flex-row items-center">
+      <Ionicons name="people-outline" size={15} color={themeColors.gray500} />
+      <ThemedText size="sm" className="ml-1 text-gray-500">
+        {formatRideSeatCount(seats)}
+      </ThemedText>
+    </View>
   );
 };
 
@@ -76,9 +97,12 @@ const RideSearchResultsScreen = ({
       headingSize="sm"
       headingWeight="regular"
       middleElement={
-        <ThemedText size="sm" className="mt-3 text-gray-500">
-          Tap for complete route details
-        </ThemedText>
+        <View className="mt-3 gap-2">
+          {flowMode === 'find' && <RideSeatSummary ride={item} />}
+          <ThemedText size="sm" className="text-gray-500">
+            Tap for complete route details
+          </ThemedText>
+        </View>
       }
     />
   );

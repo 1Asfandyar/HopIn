@@ -2,7 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, View } from 'react-native';
 import { RIDE_SOURCE_LABELS } from '@/features/rides/constants/rides.constants';
 import RideStatusPill from '@/features/rides/components/RideStatusPill';
-import { getShortRideAddress } from '@/features/rides/helpers/rideDisplay.helpers';
+import {
+  formatRideSeatCount,
+  getRideSeatCount,
+  getShortRideAddress,
+} from '@/features/rides/helpers/rideDisplay.helpers';
 import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
 import { themeColors } from '@/theme/tokens';
@@ -26,6 +30,7 @@ const MyRideCard = ({
   const roleLabel = ride.role === 'driver' ? 'Driving' : 'Riding';
   const pickup = getShortRideAddress(ride.pickup.address);
   const destination = getShortRideAddress(ride.destination.address);
+  const seatCount = getRideSeatCount(ride);
 
   return (
     <ThemedCard
@@ -53,6 +58,22 @@ const MyRideCard = ({
                 {roleLabel}
               </ThemedText>
             </View>
+            {seatCount && (
+              <View className="flex-row items-center rounded-full bg-gray-100 px-3 py-1">
+                <Ionicons
+                  name="people-outline"
+                  size={13}
+                  color={themeColors.gray600}
+                />
+                <ThemedText
+                  size="xs"
+                  weight="semiBold"
+                  className="ml-1 text-gray-600"
+                >
+                  {formatRideSeatCount(seatCount)}
+                </ThemedText>
+              </View>
+            )}
             {onDelete && (
               <TouchableOpacity
                 activeOpacity={0.75}

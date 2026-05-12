@@ -1,9 +1,11 @@
 import { RefreshControl, ScrollView, View } from 'react-native';
 import BrandedLoader from '@/components/feedback/BrandedLoader';
 import RideParticipantAvatar from '@/features/rides/components/RideParticipantAvatar';
+import RideSeatsControl from '@/features/rides/components/RideSeatsControl';
 import {
   getRideDetailActionLabel,
   getRideParticipantName,
+  getRideSeatCount,
   getShortRideAddress,
 } from '@/features/rides/helpers/rideDisplay.helpers';
 import ThemedButton from '@/theme/components/ThemedButton';
@@ -81,6 +83,8 @@ const RideDetailsScreen = ({
     : participantFallback;
   const highlightColor =
     rideType === 'offer' ? themeColors.secondary : themeColors.primary;
+  const seatCount =
+    ride && rideType === 'offer' ? getRideSeatCount(ride) : null;
 
   return (
     <ScrollView
@@ -162,15 +166,16 @@ const RideDetailsScreen = ({
                 </View>
               }
             />
-          </View>
-
-          <View className="mt-5 rounded-2xl bg-gray-50 p-4">
-            <ThemedText weight="semiBold" size="sm" className="text-gray-900">
-              Scheduled time
-            </ThemedText>
-            <ThemedText className="mt-1 text-gray-600">
-              {formatDateAndTime(new Date(ride.departureTime))}
-            </ThemedText>
+            {seatCount && (
+              <View className="mt-4">
+                <RideSeatsControl
+                  value={seatCount}
+                  editable={false}
+                  label="Seats"
+                  color={highlightColor}
+                />
+              </View>
+            )}
           </View>
 
           <ThemedButton

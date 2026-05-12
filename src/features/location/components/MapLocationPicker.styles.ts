@@ -133,10 +133,23 @@ export const mapLocationPickerStyles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
   },
+  routeSummaryPanel: {
+    maxHeight: '52%',
+    paddingBottom: 0,
+  },
+  routeSummaryContent: {
+    flexGrow: 0,
+  },
+  routeSummaryContentContainer: {
+    paddingBottom: 12,
+  },
   routeSummaryStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  routeSummaryRows: {
+    gap: 12,
   },
   routeSummaryRow: {
     borderRadius: 14,
@@ -145,5 +158,11 @@ export const mapLocationPickerStyles = StyleSheet.create({
     backgroundColor: themeColors.gray100,
     paddingHorizontal: 12,
     paddingVertical: 10,
+  },
+  routeActionFooter: {
+    paddingTop: 12,
+    paddingBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: themeColors.gray200,
   },
 });

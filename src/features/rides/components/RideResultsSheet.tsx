@@ -11,6 +11,8 @@ import ThemedCard from '@/theme/components/ThemedCard';
 import ThemedText from '@/theme/components/ThemedText';
 import RideParticipantAvatar from '@/features/rides/components/RideParticipantAvatar';
 import {
+  formatRideSeatCount,
+  getRideSeatCount,
   getRideStatusLabel,
   getRideSummaryText,
 } from '@/features/rides/helpers/rideDisplay.helpers';
@@ -29,6 +31,19 @@ type RideResultsSheetProps = {
   postRequestLoadingLabel?: string;
   onPostRequest?: () => void;
   onRidePress?: (ride: RideRecord) => void;
+};
+
+const getRideResultDetailText = (
+  ride: RideRecord,
+  rideType: RideRecordType,
+) => {
+  const seats = getRideSeatCount(ride);
+
+  if (rideType === 'offer' && seats) {
+    return `${formatRideSeatCount(seats)} - Tap for complete route details`;
+  }
+
+  return 'Tap for complete route details';
 };
 
 const RideResultsSheet = forwardRef<BottomSheetModal, RideResultsSheetProps>(
@@ -106,7 +121,7 @@ const RideResultsSheet = forwardRef<BottomSheetModal, RideResultsSheetProps>(
                           (rideType === 'offer' ? 'Driver' : 'Rider')}
                       </ThemedText>
                       <ThemedText size="sm" className="text-gray-500">
-                        Tap for complete route details
+                        {getRideResultDetailText(ride, rideType)}
                       </ThemedText>
                     </View>
                   </View>

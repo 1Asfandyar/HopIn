@@ -15,9 +15,10 @@ const SetRideDetails = () => {
   const router = useRouter();
   const didOpenMapRef = useRef(false);
   const user = useAuthStore(state => state.user);
-  const { resetDraft } = useRideDraft();
+  const { resetDraft, seats, setSeats } = useRideDraft();
   const flowMode: RideFlowMode =
     user?.role === USER_ROLES.driver ? 'offer' : 'find';
+  const isDriverFlow = flowMode === 'offer';
   const copy = RIDE_MATCHING_COPY[flowMode];
   const routeMapPicker = useRouteMapPickerProps({
     flowMode,
@@ -26,7 +27,9 @@ const SetRideDetails = () => {
     deferMapSelectionUntilConfirm: true,
   });
   const canContinue = Boolean(
-    routeMapPicker.pickup && routeMapPicker.destination,
+    routeMapPicker.pickup &&
+    routeMapPicker.destination &&
+    (!isDriverFlow || seats),
   );
   const openRouteMap = routeMapPicker.onOpenRouteMap;
   const handleRouteDone = () => {
@@ -87,6 +90,10 @@ const SetRideDetails = () => {
         }}
         routeActionLabel={copy.mapDoneLabel}
         routeActionDisabled={!canContinue}
+        routeSeatCount={isDriverFlow ? seats : undefined}
+        routeSeatControlEditable={isDriverFlow}
+        routeSeatControlLabel="Available seats"
+        onRouteSeatCountChange={setSeats}
         onRouteAction={handleRouteDone}
       />
     </View>

@@ -23,6 +23,11 @@ export const MY_RIDES_TABS = {
   completed: 'completed',
 } as const satisfies Record<string, MyRideLifecycle>;
 
+export const RIDE_SEAT_LIMITS = {
+  min: 1,
+  max: 4,
+} as const;
+
 export const RIDE_STATUS_LABELS: Record<RideRecordStatus, string> = {
   open: 'Pending',
   pending: 'Pending',

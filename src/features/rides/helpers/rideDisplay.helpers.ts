@@ -41,6 +41,16 @@ export const getRideDetailActionLabel = (rideType: RideRecordType) => {
   return rideType === 'offer' ? 'Book a seat' : 'Accept rider request';
 };
 
+export const getRideSeatCount = <TRide extends object>(ride: TRide) => {
+  const seats = (ride as { seats?: unknown }).seats;
+
+  return typeof seats === 'number' ? seats : null;
+};
+
+export const formatRideSeatCount = (seats: number) => {
+  return `${seats} ${seats === 1 ? 'seat' : 'seats'}`;
+};
+
 export const getRideDetailTitle = (rideType: RideRecordType) => {
   return rideType === 'offer' ? 'Ride details' : 'Request details';
 };

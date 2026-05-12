@@ -84,6 +84,7 @@ export const mapOfferToMyRide = (
     source: booking?.source,
     offerId: offer.id,
     requestId: booking?.requestId,
+    seats: offer.seats,
   };
 };
 
@@ -111,6 +112,7 @@ export const mapBookingToMyRide = (
     source: booking.source ?? RIDE_BOOKING_SOURCES.directOffer,
     offerId: booking.offerId,
     requestId: booking.requestId,
+    seats: booking.offer?.seats,
   };
 };
 

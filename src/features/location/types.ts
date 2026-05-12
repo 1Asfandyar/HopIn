@@ -62,5 +62,10 @@ export type MapLocationPickerProps = {
   routeActionLabel?: string;
   routeActionDisabled?: boolean;
   routeActionLoading?: boolean;
+  routeSeatCount?: number | null;
+  routeSeatControlEditable?: boolean;
+  routeSeatControlLabel?: string;
+  routeSeatControlHelperText?: string;
+  onRouteSeatCountChange?: (seats: number) => void;
   onRouteAction?: () => void;
 };

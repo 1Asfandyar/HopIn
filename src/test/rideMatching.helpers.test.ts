@@ -40,6 +40,7 @@ describe('ride matching helpers', () => {
       pickup,
       destination,
       departureTime: '2026-05-10T10:00:00.000Z',
+      seats: null,
     };
     const matchingRide = makeRide({ id: 'match' });
     const lateRide = makeRide({
@@ -68,6 +69,7 @@ describe('ride matching helpers', () => {
       pickup,
       destination,
       departureTime: null,
+      seats: null,
     };
 
     expect(
